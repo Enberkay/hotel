@@ -1,0 +1,493 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+//prisma เป็นการมอง relationship แล้วเอามาใส่ที่ตัวเอง ไม่ใช่เอาตัวที่อยู่ใกล้
+
+model User {
+    userId       Int      @id @default(autoincrement())
+    userEmail    String   @unique // อีเมลเก็บใน User
+    userPassword String?
+    userName     String? // ชื่อเก็บใน User
+    userSurName  String? // นามสกุลเก็บใน User
+    userNumPhone String?  @unique // เบอร์โทรศัพท์เก็บใน User
+    userRole     UserRole @default(customer)
+    prefix       String? //คำนำหน้า
+    licensePlate String?
+    userEnable   Boolean  @default(true)
+    createdAt    DateTime @default(now())
+
+    // Relationships
+    Customer     Customer?
+    Housekeeping Housekeeping?
+    Maintenance  Maintenance?
+    Front        Front?
+}
+
+enum UserRole {
+    admin
+    customer
+    front
+    housekeeping
+    maintenance
+}
+
+model Customer {
+    customerId Int     @id @default(autoincrement())
+    stdId      String? @unique
+    idCard     String?
+    userId     Int     @unique // Foreign key to User model
+    user       User    @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship with User
+
+    customerTypeId Int          @default(1) // FK to CustomerType
+    customerType   CustomerType @relation(fields: [customerTypeId], references: [customerTypeId])
+
+    Receipt Receipt[]
+    Booking Booking[]
+
+    images Image[]
+}
+
+model CustomerType {
+    customerTypeId   Int    @id @default(autoincrement())
+    customerTypeName String
+    discount         Int
+
+    Customer Customer[]
+}
+
+model Front {
+    frontId Int @id @default(autoincrement())
+
+    userId Int  @unique // Foreign key to User model
+    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship with User
+
+    CleaningRequest CleaningRequest[]
+    CleaningReport  CleaningReport[]
+    RepairRequest   RepairRequest[]
+    RepairReport    RepairReport[]
+
+    Booking Booking[]
+
+    Receipt Receipt[]
+}
+
+model Housekeeping {
+    housekeepingId Int @id @default(autoincrement())
+
+    assignedFloor String @default("3")
+
+    userId Int  @unique // Foreign key to User model
+    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship with User
+
+    CleaningRequest CleaningRequest[]
+    CleaningReport  CleaningReport[]
+}
+
+model CleaningRequest {
+    requestId Int @id @default(autoincrement())
+
+    //วันที่ออกใบทำความสะอาด
+    requestAt DateTime @default(now())
+
+    //เวลาแม่บ้านรับเรื่อง
+    receiveAt DateTime?
+
+    //เพื่อติดตามว่าอัปเดตล่าสุดเมื่อไหร่
+    updatedAt DateTime @default(now()) @updatedAt // **เพิ่มค่า default**
+
+    housekeepingId Int?
+    housekeeping   Housekeeping? @relation(fields: [housekeepingId], references: [housekeepingId])
+
+    frontId Int
+    front   Front @relation(fields: [frontId], references: [frontId])
+
+    cleaningRequestStatusId Int                   @default(1)
+    cleaningRequestStatus   CleaningRequestStatus @relation(fields: [cleaningRequestStatusId], references: [cleaningRequestStatusId])
+
+    CleaningRequestRoom CleaningRequestRoom[]
+
+    // เพิ่มความสัมพันธ์แบบ 1:1 กับ CleaningReport
+    CleaningReport CleaningReport?
+}
+
+model CleaningRequestStatus {
+    cleaningRequestStatusId   Int               @id @default(autoincrement())
+    cleaningRequestStatusName String            @unique //รอดำเนินการ, รับเรื่องแล้ว(กำลังทำความสะอาด), เสร็จแล้ว
+    CleaningRequest           CleaningRequest[]
+}
+
+model CleaningRequestRoom {
+    requestId Int
+    roomId    Int
+
+    description String? @default("") //คำอธิบายหรือหมายเหตุ
+
+    //เพื่อติดตามว่าอัปเดตล่าสุดเมื่อไหร่
+    updatedAt DateTime @default(now()) @updatedAt // **เพิ่มค่า default**
+
+    cleaningRequest CleaningRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
+    room            Room            @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+
+    @@id([requestId, roomId]) // Composite Primary Key
+}
+
+model CleaningReport {
+    reportId Int      @id @default(autoincrement())
+    //วันที่รายงานผลทำความสะอาด
+    reportAt DateTime @default(now())
+
+    housekeepingId Int
+    housekeeping   Housekeeping @relation(fields: [housekeepingId], references: [housekeepingId])
+
+    frontId Int?
+    front   Front? @relation(fields: [frontId], references: [frontId])
+
+    // เชื่อมกับ CleaningRequest แบบ 1:1
+    requestId       Int             @unique
+    cleaningRequest CleaningRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
+
+    CleaningResults CleaningResults[]
+
+    // ความสัมพันธ์ M:N กับ Room ผ่าน CleaningReportRoom
+    CleaningReportRoom CleaningReportRoom[]
+
+    cleaningReportStatusId Int                  @default(1)
+    cleaningReportStatus   CleaningReportStatus @relation(fields: [cleaningReportStatusId], references: [cleaningReportStatusId])
+}
+
+model CleaningReportStatus {
+    cleaningReportStatusId   Int              @id @default(autoincrement())
+    cleaningReportStatusName String           @unique //รอการตรวจสอบ, ตรวจสอบแล้ว, ถูกแจ้งซ่อม
+    CleaningReport           CleaningReport[]
+}
+
+// 🔗 **ตารางกลางสำหรับ M:N**
+model CleaningReportRoom {
+    reportId Int
+    roomId   Int
+
+    cleaningReport  CleaningReport    @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
+    room            Room              @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+    CleaningResults CleaningResults[]
+
+    @@id([reportId, roomId]) // Composite Primary Key
+}
+
+model CleaningResults {
+    reportId Int
+    roomId   Int
+    itemId   Int
+
+    description String? @default("") // คำอธิบายหรือหมายเหตุ
+
+    cleaningStatusId Int
+    cleaningStatus   CleaningStatus @relation(fields: [cleaningStatusId], references: [cleaningStatusId])
+
+    cleaningReport     CleaningReport     @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
+    cleaningList       CleaningList       @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
+    cleaningReportRoom CleaningReportRoom @relation(fields: [reportId, roomId], references: [reportId, roomId], onDelete: Cascade)
+
+    @@id([reportId, roomId, itemId]) // Composite Primary Key ป้องกัน itemId ซ้ำกันในห้องอื่น
+}
+
+//เป็น checkList ของในห้องแต่ละชิ้น
+model CleaningList {
+    itemId          Int               @id @default(autoincrement())
+    itemName        String
+    CleaningResults CleaningResults[]
+}
+
+//สถานะ ของในห้องแต่ละชิ้น เช่น ปกติ, มีปัญหา
+model CleaningStatus {
+    cleaningStatusId   Int               @id @default(autoincrement())
+    cleaningStatusName String
+    CleaningResults    CleaningResults[]
+}
+
+model Maintenance {
+    maintenanceId Int  @id @default(autoincrement())
+    userId        Int  @unique // Foreign key to User model
+    user          User @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship with User
+
+    RepairRequest RepairRequest[]
+    RepairReport  RepairReport[]
+}
+
+//ใบแจ้งซ่อม
+model RepairRequest {
+    requestId Int @id @default(autoincrement())
+
+    //วันที่ออกใบซ่อม
+    requestAt DateTime @default(now())
+
+    maintenanceId Int?
+    maintenance   Maintenance? @relation(fields: [maintenanceId], references: [maintenanceId])
+
+    frontId Int
+    front   Front @relation(fields: [frontId], references: [frontId])
+
+    repairRequestStatusId Int                 @default(1)
+    repairRequestStatus   RepairRequestStatus @relation(fields: [repairRequestStatusId], references: [repairRequestStatusId])
+
+    RepairRequestRoom RepairRequestRoom[]
+    RepairReport      RepairReport?
+}
+
+model RepairRequestStatus {
+    repairRequestStatusId   Int    @id @default(autoincrement())
+    repairRequestStatusName String //รอดำเนินการ, รับเรื่องแล้ว(กำลังซ่อม), เสร็จแล้ว
+
+    RepairRequest RepairRequest[]
+}
+
+//รายละเอียดหรือรายการในใบแจ้งซ่อม
+model RepairRequestRoom {
+    requestId Int
+    roomId    Int
+
+    description String? //คำอธิบายหรือหมายเหตุ
+
+    repairRequest RepairRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
+    room          Room          @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+
+    @@id([requestId, roomId])
+}
+
+//ใบรายงานผลการซ่อม
+model RepairReport {
+    reportId Int @id @default(autoincrement())
+
+    //วันที่รายงานผลซ่อม
+    reportAt DateTime @default(now())
+
+    maintenanceId Int
+    maintenance   Maintenance @relation(fields: [maintenanceId], references: [maintenanceId])
+
+    frontId Int
+    front   Front @relation(fields: [frontId], references: [frontId])
+
+    requestId     Int           @unique //RepairReport 1:1 RepairRequest
+    repairRequest RepairRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
+
+    RepairReportRoom RepairReportRoom[]
+}
+
+//รายละเอียดหรือรายการในใบรายงานผลการซ่อม
+model RepairReportRoom {
+    reportId Int
+    roomId   Int
+
+    description String? //คำอธิบายหรือหมายเหตุ
+
+    repairReport RepairReport @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
+    room         Room         @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+
+    repairStatusId Int          @default(1)
+    repairStatus   RepairStatus @relation(fields: [repairStatusId], references: [repairStatusId])
+
+    @@id([reportId, roomId])
+}
+
+//สถานะของแต่ละรายการ [ซ่อมแล้ว, ยังมีปัญหา(ไม่สามารถซ่อมได้)]
+model RepairStatus {
+    repairStatusId   Int                @id @default(autoincrement())
+    repairStatusName String
+
+    RepairReportRoom RepairReportRoom[]
+}
+
+model Room {
+    roomId     Int    @id @default(autoincrement())
+    roomNumber String @unique
+    floor      String @default("3")
+
+    roomTypeId Int      @default(0)
+    roomType   RoomType @relation(fields: [roomTypeId], references: [roomTypeId])
+
+    roomStatusId Int        @default(0)
+    roomStatus   RoomStatus @relation(fields: [roomStatusId], references: [roomStatusId])
+
+    pairRoomId Int?
+    pairRoom   Room? @relation("RoomPairing", fields: [pairRoomId], references: [roomId])
+
+    // ✅ เพิ่มฟิลด์ตรงข้าม (back-reference) 
+    pairedWith Room[] @relation("RoomPairing")
+
+    createdAt DateTime @default(now())
+
+    Bookings     Booking[] @relation("MainRoom") // ความสัมพันธ์หลัก
+    PairBookings Booking[] @relation("PairRoom") // ความสัมพันธ์ห้องคู่
+
+    CleaningRequestRoom CleaningRequestRoom[]
+    RepairRequestRoom   RepairRequestRoom[]
+
+    Receipt Receipt[]
+
+    // ความสัมพันธ์ M:N กับ CleaningReport ผ่าน CleaningReportRoom
+    CleaningReportRoom CleaningReportRoom[]
+
+    // ความสัมพันธ์ M:N กับ RepairReport ผ่าน RepairReportRoom
+    RepairReportRoom RepairReportRoom[]
+}
+
+model RoomType {
+    roomTypeId   Int    @id @default(autoincrement())
+    roomTypeName String
+    price        Float  @default(0)
+
+    Room    Room[]
+    Booking Booking[]
+}
+
+model RoomStatus {
+    roomStatusId   Int    @id @default(autoincrement())
+    roomStatusName String //Available, Occupied, Reserved, Cleaning, Maintenance
+    Room           Room[]
+}
+
+model Booking {
+    bookingId Int @id @default(autoincrement())
+    count     Int @default(1) //จำนวนคน 
+
+    customerId Int // Foreign key to Customer
+    customer   Customer @relation(fields: [customerId], references: [customerId]) // Relationship with Customer
+
+    roomId Int? // ห้องหลัก
+    room   Room? @relation("MainRoom", fields: [roomId], references: [roomId]) // ตั้งชื่อ relation "MainRoom"
+
+    pairRoomId Int? // ห้องที่ถูกจับคู่ (ถ้ามี)
+    pairRoom   Room? @relation("PairRoom", fields: [pairRoomId], references: [roomId]) // ตั้งชื่อ relation "PairRoom"
+
+    roomTypeId Int?
+    roomType   RoomType? @relation(fields: [roomTypeId], references: [roomTypeId])
+
+    frontId Int?
+    front   Front? @relation(fields: [frontId], references: [frontId])
+
+    total Float @default(0)
+
+    checkInDate  DateTime
+    checkOutDate DateTime
+
+    createdAt   DateTime  @default(now())
+    confirmedAt DateTime?
+    cancelledAt DateTime?
+
+    // paymentAt   DateTime?
+
+    paymentStatusId Int           @default(1)
+    paymentStatus   PaymentStatus @relation(fields: [paymentStatusId], references: [paymentStatusId])
+
+    bookingStatusId Int           @default(1)
+    bookingStatus   BookingStatus @relation(fields: [bookingStatusId], references: [bookingStatusId])
+
+    paymentMethodId Int?
+    paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [paymentMethodId])
+
+    image Image[]
+
+    BookingAddonListRelation BookingAddonListRelation[]
+    Receipt                  Receipt?
+}
+
+model BookingAddonListRelation {
+    bookingId          Int
+    bookingAddonListId Int
+    price              Float
+
+    booking          Booking          @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
+    bookingAddonList BookingAddonList @relation(fields: [bookingAddonListId], references: [bookingAddonListId], onDelete: Cascade)
+
+    @@id([bookingId, bookingAddonListId]) // Composite Primary Key
+}
+
+model BookingAddonList {
+    bookingAddonListId Int      @id @default(autoincrement())
+    createAt           DateTime @default(now())
+
+    BookingAddonListRelation BookingAddonListRelation[]
+    BookingAddon             BookingAddon[]
+}
+
+model BookingAddon {
+    addonId            Int
+    bookingAddonListId Int
+    quantity           Int
+
+    addon            Addon            @relation(fields: [addonId], references: [addonId], onDelete: Cascade)
+    bookingAddonList BookingAddonList @relation(fields: [bookingAddonListId], references: [bookingAddonListId], onDelete: Cascade)
+
+    @@id([addonId, bookingAddonListId]) // Composite Primary Key
+}
+
+model Addon {
+    addonId      Int            @id @default(autoincrement())
+    addonName    String
+    price        Int
+    BookingAddon BookingAddon[]
+}
+
+model BookingStatus {
+    bookingStatusId   Int       @id @default(autoincrement())
+    bookingStatusName String //Pending, Confirmed, Checked-in, Checked-out, Cancelled, No-show
+    Bookings          Booking[]
+}
+
+model PaymentStatus {
+    paymentStatusId   Int    @id @default(autoincrement())
+    paymentStatusName String //Pending, Paid, Refunded, Cancelled
+
+    Bookings Booking[]
+}
+
+model PaymentMethod {
+    paymentMethodId   Int       @id @default(autoincrement())
+    paymentMethodName String
+    Booking           Booking[]
+}
+
+model Receipt {
+    receiptId Int @id @default(autoincrement())
+
+    createdAt DateTime @default(now())
+
+    customerId Int
+    customer   Customer @relation(fields: [customerId], references: [customerId], onDelete: Cascade)
+
+    roomId Int
+    room   Room @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+
+    frontId Int
+    front   Front @relation(fields: [frontId], references: [frontId], onDelete: Cascade)
+
+    bookingId Int     @unique
+    booking   Booking @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
+}
+
+model Image {
+    id         Int      @id @default(autoincrement())
+    asset_id   String
+    public_id  String
+    url        String
+    secure_url String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    bookingId Int?
+    booking   Booking? @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
+
+    customerId Int
+    customer   Customer @relation(fields: [customerId], references: [customerId], onDelete: Cascade)
+}
