@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store"
 import { NavLink } from "react-router-dom"
 import { updateProfile } from "../../api/profile"
 import { toast } from "react-toastify"
 import { Menu, X } from "lucide-react"
 
 const CustomerProfile = () => {
-    const token = useHotelStore((state) => state.token)
-    const profile = useHotelStore((state) => state.profile)
-    const getProfile = useHotelStore((state) => state.getProfile)
-    const getCustomerType = useHotelStore((state) => state.getCustomerType)
-    const customertypes = useHotelStore((state) => state.customertypes)
+    const user = useAuthStore((state) => state.user)
+    const token = useAuthStore((state) => state.token)
+    const profile = useAuthStore((state) => state.profile)
+    const getProfile = useAuthStore((state) => state.getProfile)
+    const getCustomerType = useAuthStore((state) => state.getCustomerType)
+    const customertypes = useAuthStore((state) => state.customertypes)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
 
     const [form, setForm] = useState({}) // ใช้ {} แทน initialState

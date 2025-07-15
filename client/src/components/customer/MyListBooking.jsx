@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useBookingStore from "../../store/booking-store"
+import useAuthStore from "../../store/auth-store"
 import dayjs from "dayjs"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { cancelledBooking } from "../../api/myBooking"
@@ -9,9 +10,9 @@ import { Menu, X } from "lucide-react" // ไอคอนสำหรับเ�
 const MyListBooking = () => {
 
   const navigate = useNavigate()
-  const token = useHotelStore((state) => state.token)
-  const getMyBookings = useHotelStore((state) => state.getMyBookings)
-  const myBookings = useHotelStore((state) => state.myBookings)
+  const token = useAuthStore((state) => state.token)
+  const myBookings = useBookingStore((state) => state.myBookings)
+  const getMyBookings = useBookingStore((state) => state.getMyBookings)
   const getProfile = useHotelStore((state) => state.getProfile)
   const Profile = useHotelStore((state) => state.profile)
   const [isMenuOpen, setIsMenuOpen] = useState(false) //ทำResponsive
