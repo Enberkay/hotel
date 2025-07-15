@@ -5,7 +5,7 @@ import useCleaningStore from "../../store/cleaning-store"
 import { useNavigate } from "react-router-dom"
 import dayjs from "dayjs"
 
-const ListCleaningRequestDetail = () => {
+const CleaningRequestDetailList = () => {
     const { id } = useParams()
     const navigate = useNavigate()
     const token = useCleaningStore((state) => state.token)
@@ -152,4 +152,4 @@ const ListCleaningRequestDetail = () => {
     )
 }
 
-export default ListCleaningRequestDetail
+export default CleaningRequestDetailList

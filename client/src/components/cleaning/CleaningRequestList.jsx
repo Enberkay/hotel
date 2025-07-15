@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import CountdownTimer from "../../routes/CountdownTimer"
 
-const ListCleaningRequest = () => {
+const CleaningRequestList = () => {
     const token = useCleaningStore((state) => state.token)
     const getCleaningRequest = useCleaningStore((state) => state.getCleaningRequest)
     const cleaningRequests = useCleaningStore((state) => state.cleaningRequests)
@@ -232,4 +232,4 @@ const ListCleaningRequest = () => {
     )
 }
 
-export default ListCleaningRequest
+export default CleaningRequestList

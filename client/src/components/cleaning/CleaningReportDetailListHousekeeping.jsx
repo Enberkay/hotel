@@ -6,7 +6,7 @@ import { readCleaningReport } from "../../api/cleaning"
 import { toast } from "react-toastify"
 
 
-const ListCleaningReportDetail = () => {
+const CleaningReportDetailListHousekeeping = () => {
 
   const { id } = useParams()
   const token = useCleaningStore((state) => state.token)
@@ -99,4 +99,4 @@ const ListCleaningReportDetail = () => {
     </div>
   )
 }
-export default ListCleaningReportDetail
+export default CleaningReportDetailListHousekeeping
