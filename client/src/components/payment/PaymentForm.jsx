@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useLocation } from "react-router-dom"
-import UploadFile from "../../components/admin/UploadFile"
+import UploadFile from "../shared/UploadFile"
 
 
 //chat gpt 100%

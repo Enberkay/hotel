@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import SidebarHousekeeping from "../components/housekeeping/SidebarHousekeeping"
+import SidebarHousekeeping from "../components/shared/HousekeepingSidebar"
 
 const LayoutHousekeeping = () => {
   return (
