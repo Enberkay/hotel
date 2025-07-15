@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link, NavLink, useNavigate } from "react-router-dom"
-import useAuthStore from "../store/auth-store"
+import useAuthStore from "../../store/auth-store"
 import { CircleUserRound, Menu } from "lucide-react"
 import logo from "/src/assets/Images/Logo.png"
 

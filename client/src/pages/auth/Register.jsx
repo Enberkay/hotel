@@ -3,8 +3,8 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import useAuthStore from "../../store/auth-store";
-import useCustomerTypeStore from "../../store/customer-type-store"; // ถ้ามีแยก store
 import { useNavigate } from "react-router-dom"
+import { listCustomerType } from "../../api/customerType"
 const API_URL = import.meta.env.VITE_API_URL
 import UploadFile from "../shared/UploadFile"
 import image from "../../assets/Images/test3.png"
@@ -13,8 +13,7 @@ const Register = () => {
 
   const navigate = useNavigate()
   const token = useAuthStore((state) => state.token)
-  const getCustomerType = useCustomerTypeStore ? useCustomerTypeStore((state) => state.getCustomerType) : () => {};
-  const customertypes = useCustomerTypeStore ? useCustomerTypeStore((state) => state.customertypes) : [];
+  const [customerTypes, setCustomerTypes] = useState([])
 
   const [form, setForm] = useState({
     //object
@@ -32,8 +31,16 @@ const Register = () => {
 
 
   useEffect(() => {
-    getCustomerType(token)
-  }, [])
+    async function fetchCustomerTypes() {
+      try {
+        const res = await listCustomerType(token)
+        setCustomerTypes(res.data)
+      } catch (err) {
+        toast.error("ไม่สามารถโหลดประเภทลูกค้าได้")
+      }
+    }
+    if (token) fetchCustomerTypes()
+  }, [token])
 
   const handleOnChange = (e) => {
     console.log(e.target.name, e.target.value)
@@ -196,7 +203,7 @@ const Register = () => {
               value={form.customertypeId}
             >
               <option value="" disabled>กรุณาเลือก</option>
-              {customertypes.map((item, index) => (
+              {customerTypes.map((item, index) => (
                 <option key={index} value={item.customerTypeId}>
                   {item.customerTypeName}
                 </option>

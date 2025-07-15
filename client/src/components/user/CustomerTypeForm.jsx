@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { createCustomerType, readCustomerType, updateCustomerType } from "../../api/customerType"
 import useAuthStore from "../../store/auth-store"
-import useCustomerTypeStore from "../../store/customer-type-store"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
 
@@ -12,17 +11,24 @@ const initialState = {
 
 const FormCustomerType = () => {
   const token = useAuthStore((state) => state.token)
-  const getCustomerType = useCustomerTypeStore((state) => state.getCustomerType)
-  const customerTypes = useCustomerTypeStore((state) => state.customerTypes)
-
+  const [customerTypes, setCustomerTypes] = useState([])
   const [form, setForm] = useState(initialState)
   const [editForm, setEditForm] = useState(initialState)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [editId, setEditId] = useState(null)
 
+  const getCustomerType = async (token) => {
+    try {
+      const res = await readCustomerType(token)
+      setCustomerTypes(res.data)
+    } catch (err) {
+      toast.error("ไม่สามารถโหลดประเภทลูกค้าได้")
+    }
+  }
+
   useEffect(() => {
-    getCustomerType(token)
-  }, [])
+    if (token) getCustomerType(token)
+  }, [token])
 
   const handleOnChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })

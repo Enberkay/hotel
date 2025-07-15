@@ -4,22 +4,28 @@ import { NavLink } from "react-router-dom"
 import { updateProfile } from "../../api/profile"
 import { toast } from "react-toastify"
 import { Menu, X } from "lucide-react"
+import { listCustomerType } from "../../api/customerType"
 
 const CustomerProfile = () => {
     const user = useAuthStore((state) => state.user)
     const token = useAuthStore((state) => state.token)
     const profile = useAuthStore((state) => state.profile)
     const getProfile = useAuthStore((state) => state.getProfile)
-    const getCustomerType = useAuthStore((state) => state.getCustomerType)
-    const customertypes = useAuthStore((state) => state.customertypes)
+    const [customerTypes, setCustomerTypes] = useState([])
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-    const [form, setForm] = useState({}) // ใช้ {} แทน initialState
+    const [form, setForm] = useState({})
 
     useEffect(() => {
         getProfile(token)
-        console.log(profile)
-        getCustomerType(token)
+        async function fetchCustomerTypes() {
+            try {
+                const res = await listCustomerType(token)
+                setCustomerTypes(res.data)
+            } catch (err) {
+                toast.error("ไม่สามารถโหลดประเภทลูกค้าได้")
+            }
+        }
+        if (token) fetchCustomerTypes()
     }, [token, getProfile])
 
     useEffect(() => {
@@ -32,7 +38,7 @@ const CustomerProfile = () => {
         const { name, value } = e.target
 
         if (name === "customerType") {
-            const selectedType = customertypes.find(type => type.customerTypeId.toString() === value)
+            const selectedType = customerTypes.find(type => type.customerTypeId.toString() === value)
 
             setForm(prev => ({
                 ...prev,
@@ -138,7 +144,7 @@ const CustomerProfile = () => {
                                 label: "ประเภทลูกค้า",
                                 name: "customerType",
                                 type: "select",
-                                options: customertypes.map(({ customerTypeId, customerTypeName }) => ({
+                                options: customerTypes.map(({ customerTypeId, customerTypeName }) => ({
                                     value: customerTypeId,
                                     label: customerTypeName,
                                 })),
