@@ -1,10 +1,10 @@
 import React, { useEffect } from "react"
 import { NavLink } from "react-router-dom"
 import { List, CircleUserRound, LogOut, House } from "lucide-react"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store"
 
 const SidebarMaintenance = () => {
-    const { logout, user, profile, getProfile, token } = useHotelStore() // ดึง logout จาก store
+    const { logout, user, token, getProfile, profile } = useAuthStore() // ดึง logout จาก store
 
     useEffect(() => {
         getProfile(token)

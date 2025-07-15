@@ -1,10 +1,10 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
 import { LayoutDashboard, Users, LogOut, Bed, House, BookPlus, CreditCard, ClipboardPen } from "lucide-react"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store"
 
 const SidebarAdmin = () => {
-    const { logout } = useHotelStore() // ดึง logout จาก store
+    const { logout, user, token, getProfile, profile } = useAuthStore() // ดึง logout จาก store
 
     return (
         <div className="bg-white w-64 text-gray-500 flex flex-col">

@@ -9,11 +9,11 @@ import {
   FileText,
   Menu
 } from "lucide-react"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store"
 
 
 const SidebarHousekeeping = () => {
-  const { logout, user, token, getProfile, profile } = useHotelStore() // ดึง logout จาก store
+  const { logout, user, token, getProfile, profile } = useAuthStore() // ดึง logout จาก store
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
