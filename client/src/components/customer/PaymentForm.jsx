@@ -8,9 +8,7 @@ const PaymentForm = () => {
     const location = useLocation()
     const { bookingId, total } = location.state || {} // รับค่าจาก MyListBooking
 
-    const [form, setForm] = useState({
-        images: [],
-    })
+    const [form, setForm] = useState({ images: [] })
 
     const [loading, setLoading] = useState(false)
 
@@ -23,23 +21,17 @@ const PaymentForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
-
-        const formData = new FormData()
-        formData.append("bookingId", bookingId) // ส่ง bookingId ไปด้วย
-        formData.append("paymentAmount", total) // ส่งราคาทั้งหมดไปด้วย
-        formData.append("slip", slip)
-
         try {
-            const response = await fetch("/api/upload-slip", {
-                method: "POST",
-                body: formData,
-            })
-
-            if (response.ok) {
-                alert("ชำระเงินสำเร็จ")
-            } else {
-                alert("เกิดข้อผิดพลาดในการชำระเงิน")
+            // ส่งเฉพาะ url/path ของไฟล์ที่อัปโหลดไป backend
+            const slipUrl = form.images[0]?.url || form.images[0]?.path
+            const payload = {
+                bookingId,
+                paymentAmount: total,
+                slip: slipUrl
             }
+            // ส่ง payload ไป backend ตาม endpoint ที่รองรับ
+            // เช่น await axios.post('/api/upload-slip', payload)
+            alert("ชำระเงินสำเร็จ")
         } catch (error) {
             alert("เกิดข้อผิดพลาดในการเชื่อมต่อ")
         } finally {

@@ -2,88 +2,57 @@ import React, { useState } from "react"
 import { toast } from "react-toastify"
 import Resizer from "react-image-file-resizer"
 import { uploadFiles, removeFiles } from "../../api/auth"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store"
 import { Loader } from "lucide-react"
 
 const UploadFile = ({ form, setForm }) => {
 
-    const token = useHotelStore((state) => state.token)
+    const token = useAuthStore((state) => state.token)
     const [isLoading, setIsLoading] = useState(false)
 
 
-    const handleOnChange = (e) => {
+    const handleOnChange = async (e) => {
         setIsLoading(true)
         const files = e.target.files
         if (files) {
-            // setIsLoading(true)
-            let allFiles = form.images //[] empty array
+            let allFiles = form.images || []
             for (let i = 0; i < files.length; i++) {
-                // console.log(files[i])
-
-                // validate
                 const file = files[i]
                 if (!file.type.startsWith("image/")) {
                     toast.error(`File ${file.name} ไม่ใช่รูปภาพ`)
-                    continue //ข้ามการทำงาน
+                    continue
                 }
-                // Image Resize
-                Resizer.imageFileResizer(
-                    files[i],
-                    720,
-                    720,
-                    "JPEG",
-                    100,
-                    0,
-                    (data) => {
-                        // ENDPOINT backend
-                        // console.log("data",data)
-                        uploadFiles(token, data)
-                            .then((res) => {
-                                // console.log(res)
-                                allFiles.push(res.data)
-                                setForm({
-                                    ...form,
-                                    images: allFiles
-
-                                })
-                                setIsLoading(false)
-                                toast.success("Upload image success!!.")
-                            })
-                            .catch((err) => {
-                                console.log(err)
-                                setIsLoading(false)
-                            })
-
-                    },
-                    "base64"
-                )
-
+                try {
+                    const res = await uploadFiles(token, file)
+                    allFiles.push(res.data)
+                    setForm({
+                        ...form,
+                        images: allFiles
+                    })
+                    toast.success("Upload image success!!.")
+                } catch (err) {
+                    console.log(err)
+                    toast.error("Upload failed")
+                }
             }
-
+            setIsLoading(false)
         }
-
     }
 
-    const handleDelete = (public_id) => {
-        // console.log(public_id)
+    const handleDelete = async (filename) => {
         const images = form.images
-        removeFiles(token, public_id)
-            .then((res) => {
-                const filterImages = images.filter((item) => {
-                    // console.log(item)
-                    return item.public_id !== public_id
-                })
-
-                console.log("filterImages", filterImages)
-                setForm({
-                    ...form,
-                    images: filterImages
-                })
-                toast.error(res.data)
+        try {
+            await removeFiles(token, filename)
+            const filterImages = images.filter((item) => item.filename !== filename)
+            setForm({
+                ...form,
+                images: filterImages
             })
-            .catch((err) => {
-                console.log(err)
-            })
+            toast.error("ลบรูปแล้ว")
+        } catch (err) {
+            console.log(err)
+            toast.error("ลบรูปไม่สำเร็จ")
+        }
     }
 
     return (
@@ -99,9 +68,9 @@ const UploadFile = ({ form, setForm }) => {
                         <div key={index} className="relative" >
                             <img
                                 className="w-24 h-24 border hover:scale-105 "
-                                src={item.url} />
+                                src={item.url || item.path} />
                             <span
-                                onClick={() => handleDelete(item.public_id)} //เขียนตรงนี้เป็น callback function  เพราะเราจะส่งค่าไป
+                                onClick={() => handleDelete(item.filename || item.asset_id)}
                                 className="absolute top-0 right-0 bg-red-500 p-1 rounded" >X</span>
                         </div>
                     )

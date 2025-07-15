@@ -2,7 +2,8 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store";
+import useCustomerTypeStore from "../../store/customer-type-store"; // ถ้ามีแยก store
 import { useNavigate } from "react-router-dom"
 const API_URL = import.meta.env.VITE_API_URL
 import UploadFile from "../../components/admin/UploadFile"
@@ -11,9 +12,9 @@ import image from "../../assets/Images/test3.png"
 const Register = () => {
 
   const navigate = useNavigate()
-  const token = useHotelStore((state) => state.token)
-  const getCustomerType = useHotelStore((state) => state.getCustomerType)
-  const customertypes = useHotelStore((state) => state.customertypes)
+  const token = useAuthStore((state) => state.token)
+  const getCustomerType = useCustomerTypeStore ? useCustomerTypeStore((state) => state.getCustomerType) : () => {};
+  const customertypes = useCustomerTypeStore ? useCustomerTypeStore((state) => state.customertypes) : [];
 
   const [form, setForm] = useState({
     //object

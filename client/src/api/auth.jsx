@@ -63,26 +63,21 @@ export const currentMaintenance = async (token) => {
     )
 }
 
-export const uploadFiles = async (token, form) => {
-
-    // console.log("form api fronend", form)
-    return axios.post(`${API_URL}/images`, {
-        image: form // ตั้งชื่อ key ให้ตรงกับที่รอรับที่ backend
-    }, {
+export const uploadFiles = async (token, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axios.post(`${API_URL}/images`, formData, {
         headers: {
-            Authorization: `Bearer ${token}`
-        }
-    })
-}
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
 
-export const removeFiles = async (token, public_id) => {
-
-    // console.log("form api fronend", form)
-    return axios.post(`${API_URL}/removeimages`, {
-        public_id  //เขียนแบบสั้นๆไม่ต้อง key:value
-    }, {
+export const removeFiles = async (token, filename) => {
+    return axios.post(`${API_URL}/removeimages`, { filename }, {
         headers: {
-            Authorization: `Bearer ${token}`
-        }
-    })
-}
+            Authorization: `Bearer ${token}`,
+        },
+    });
+};
