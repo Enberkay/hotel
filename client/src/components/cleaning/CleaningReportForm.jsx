@@ -5,7 +5,7 @@ import dayjs from "dayjs"
 import useCleaningStore from "../../store/cleaning-store"
 import { cleaningReport, notedCleaningRequest } from "../../api/cleaning"
 
-const FormCleaningReport = () => {
+const CleaningReportForm = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const requestIdFromState = location.state?.requestId
@@ -267,4 +267,4 @@ const FormCleaningReport = () => {
     )
 }
 
-export default FormCleaningReport
+export default CleaningReportForm

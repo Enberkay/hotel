@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from "react"
 import { repairRequest } from "../../api/repair"
 import { toast } from "react-toastify"
 
-const FormRepairRequest = () => {
+const RepairRequestForm = () => {
     const token = useAuthStore((state) => state.token)
     const [cleaningReports, setCleaningReports] = useState([])
     const [selectedReport, setSelectedReport] = useState(null)
@@ -339,4 +339,4 @@ const FormRepairRequest = () => {
     )
 }
 
-export default FormRepairRequest
+export default RepairRequestForm

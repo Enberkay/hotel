@@ -6,7 +6,7 @@ import { toast } from "react-toastify"
 import { cleaningRequest } from "../../api/cleaning"
 import { useLocation } from "react-router-dom"
 
-const FormCleaningRequest = () => {
+const CleaningRequestForm = () => {
   const location = useLocation()
   const state = location.state
   const token = useAuthStore((state) => state.token);
@@ -280,4 +280,4 @@ const FormCleaningRequest = () => {
   )
 }
 
-export default FormCleaningRequest
+export default CleaningRequestForm

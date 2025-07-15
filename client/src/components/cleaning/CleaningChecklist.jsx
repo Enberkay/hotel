@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import useCleaningStore from "../../store/cleaning-store"
 
 
-const ChecklistCleaningReport = () => {
+const CleaningChecklist = () => {
     const location = useLocation()
     const navigate = useNavigate()
     const token = useCleaningStore((state) => state.token)
@@ -112,4 +112,4 @@ const ChecklistCleaningReport = () => {
     )
 }
 
-export default ChecklistCleaningReport
+export default CleaningChecklist

@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import SidebarFront from "../components/front/SidebarFront"
+import SidebarFront from "../components/shared/FrontSidebar"
 
 const LayoutFront = () => {
   return (
