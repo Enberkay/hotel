@@ -7,7 +7,7 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { allListCleaningReport } from "../../api/cleaning"
 
-const ListAllCleaningReport = () => {
+const CleaningReportList = () => {
     const token = useCleaningStore((state) => state.token)
     const [cleaningReports, setCleaningReports] = useState([])
     const [startDate, setStartDate] = useState(dayjs().toDate())
@@ -147,4 +147,4 @@ const ListAllCleaningReport = () => {
     )
 }
 
-export default ListAllCleaningReport
+export default CleaningReportList

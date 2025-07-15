@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css"
 import CountdownTimer from "../../routes/CountdownTimer"
 import { listCleaningReport } from "../../api/cleaning"
 
-const ListCleaningReport = () => {
+const CleaningReportListHousekeeping = () => {
     const token = useCleaningStore((state) => state.token)
     const [cleaningReports, setCleaningReports] = useState([])
     const [startDate, setStartDate] = useState(dayjs().toDate())
@@ -247,4 +247,4 @@ const ListCleaningReport = () => {
     )
 }
 
-export default ListCleaningReport
+export default CleaningReportListHousekeeping

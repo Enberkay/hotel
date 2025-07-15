@@ -5,7 +5,7 @@ import dayjs from "dayjs"
 import { readCleaningReport, notedCleaningReport } from "../../api/cleaning"
 import { toast } from "react-toastify"
 
-const ListAllCleaningReportDetail = () => {
+const CleaningReportDetailList = () => {
     const { id } = useParams()
     const token = useCleaningStore((state) => state.token)
     const [report, setReport] = useState(null)
@@ -129,4 +129,4 @@ const ListAllCleaningReportDetail = () => {
     )
 }
 
-export default ListAllCleaningReportDetail
+export default CleaningReportDetailList

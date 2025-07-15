@@ -6,7 +6,7 @@ import { Pencil } from "lucide-react"
 
 const initialState = { itemName: "" }
 
-const FormCleaningListItem = () => {
+const CleaningListItemForm = () => {
     const token = useCleaningStore((state) => state.token)
     const getCleaningListItem = useCleaningStore((state) => state.getCleaningListItem)
     const cleaningListItems = useCleaningStore((state) => state.cleaningListItems)
@@ -108,4 +108,4 @@ const FormCleaningListItem = () => {
         </div>
     )
 }
-export default FormCleaningListItem
+export default CleaningListItemForm
