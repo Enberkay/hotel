@@ -148,7 +148,7 @@ exports.update = async (req, res) => {
             },
             data: {
                 roomNumber: roomNumber,
-                roomStatusId: Number(roomStatusId),
+                roomStatus: roomStatusId,
                 roomTypeId: Number(roomTypeId),
                 floor: floor
             }

@@ -118,15 +118,9 @@ exports.createBooking = async (req, res) => {
                 checkOutDate: checkOut,
                 total: lastTotal,
                 confirmedAt: null,
-                bookingStatus: {
-                    connect: { bookingStatusId: 1 }
-                },
-                paymentStatus: {
-                    connect: { paymentStatusId: 1 }
-                },
-                // paymentMethod: {
-                //     connect: { paymentMethodId: Number(paymentMethodId) }
-                // } //ปิดเพราะระบบนี้ยังทำไม่เสร็จ
+                bookingStatus: 'PENDING',
+                paymentStatus: 'PENDING',
+                paymentMethod: paymentMethodId ? paymentMethodId : undefined,
             }
         })
 
@@ -330,14 +324,14 @@ exports.confirmBooking = async (req, res) => {
         // ค้นหาข้อมูลห้อง
         const room = await prisma.room.findUnique({
             where: { roomId: Number(roomId) },
-            select: { roomStatusId: true, pairRoomId: true }
+            select: { roomStatus: true, pairRoomId: true }
         });
 
         if (!room) {
             return res.status(404).json({ message: "Room not found" });
         }
 
-        if (room.roomStatusId !== 1) {
+        if (room.roomStatus !== 'AVAILABLE') {
             return res.status(400).json({ message: "Room is not available for booking" });
         }
 
@@ -366,10 +360,10 @@ exports.confirmBooking = async (req, res) => {
             const booking = await prisma.booking.update({
                 where: { bookingId: Number(id) },
                 data: {
-                    room: { connect: { roomId: Number(mainRoomId) } }, // ใช้ห้องหลัก
-                    pairRoom: secondRoomId ? { connect: { roomId: Number(secondRoomId) } } : undefined, // ถ้ามีห้องคู่ให้บันทึก
+                    room: { connect: { roomId: Number(mainRoomId) } },
+                    pairRoom: secondRoomId ? { connect: { roomId: Number(secondRoomId) } } : undefined,
                     front: { connect: { frontId: frontUser.frontId } },
-                    bookingStatus: { connect: { bookingStatusId: 2 } }, // 2 = confirmed
+                    bookingStatus: 'CONFIRMED',
                     confirmedAt: new Date()
                 }
             });
@@ -377,14 +371,14 @@ exports.confirmBooking = async (req, res) => {
             // อัปเดตสถานะห้องหลัก
             await prisma.room.update({
                 where: { roomId: Number(mainRoomId) },
-                data: { roomStatus: { connect: { roomStatusId: 3 } } } // 3 = Reserved
+                data: { roomStatus: 'RESERVED' }
             });
 
             // ถ้าเป็นห้อง Signature ให้อัปเดตสถานะห้องที่สองด้วย
             if (secondRoomId) {
                 await prisma.room.update({
                     where: { roomId: Number(secondRoomId) },
-                    data: { roomStatus: { connect: { roomStatusId: 3 } } }
+                    data: { roomStatus: 'RESERVED' }
                 });
             }
 

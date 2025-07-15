@@ -20,7 +20,7 @@ exports.CancelledBooking = async (req, res) => {
             return res.status(404).json({ message: "ไม่พบข้อมูลการจอง" })
         }
 
-        if (booking.bookingStatusId !== 1) {
+        if (booking.bookingStatus !== 'PENDING') {
             return res.status(400).json({ message: "สถานะนี้ไม่สามารถยกเลิกได้" })
         }
 
@@ -30,7 +30,7 @@ exports.CancelledBooking = async (req, res) => {
                 bookingId: Number(bookingId)
             },
             data: {
-                bookingStatusId: 5,
+                bookingStatus: 'CANCELLED',
                 cancelledAt: new Date()
             }
         })

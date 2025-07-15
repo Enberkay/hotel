@@ -21,7 +21,7 @@ exports.changeStatusRoom = async (req, res) => {
         // อัปเดตสถานะของทุกห้องที่พบ
         const updatedRooms = await prisma.room.updateMany({
             where: { roomId: { in: roomIds.map(Number) } },
-            data: { roomStatusId: Number(roomStatusId) }
+            data: { roomStatus: roomStatusId }
         });
 
         res.json({

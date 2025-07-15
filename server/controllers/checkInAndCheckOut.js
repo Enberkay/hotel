@@ -28,9 +28,8 @@ exports.checkIn = async (req, res) => {
                 bookingId: Number(bookingId)
             },
             data: {
-                bookingStatusId: 3,
+                bookingStatus: 'CHECKED_IN',
             },
-
         })
 
         const checkedInRoom = await prisma.room.update({
@@ -38,7 +37,7 @@ exports.checkIn = async (req, res) => {
                 roomId: Number(roomCheckInId)
             },
             data: {
-                roomStatusId: 2
+                roomStatus: 'OCCUPIED'
             }
         })
 
@@ -77,12 +76,11 @@ exports.checkOut = async (req, res) => {
                 bookingId: Number(bookingId)
             },
             data: {
-                bookingStatusId: 4,
+                bookingStatus: 'CHECKED_OUT',
             },
             include: {
                 room: true
             }
-
         })
 
         res.status(200).json({ message: "Check-out สำเร็จ", checkedOutBooking })

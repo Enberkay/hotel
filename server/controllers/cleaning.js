@@ -32,7 +32,7 @@ exports.cleaningRequest = async (req, res) => {
             const cleaningRequest = await prisma.cleaningRequest.create({
                 data: {
                     frontId,
-                    cleaningRequestStatusId: 1, // Pending
+                    cleaningRequestStatus: 'PENDING',
                     CleaningRequestRoom: {
                         create: rooms.map(({ roomId, description }) => ({
                             roomId,
@@ -43,13 +43,13 @@ exports.cleaningRequest = async (req, res) => {
                 include: { CleaningRequestRoom: true },
             })
 
-            // อัปเดตสถานะของห้องที่ส่งคำขอให้เป็น `4` (แจ้งทำความสะอาด)
+            // อัปเดตสถานะของห้องที่ส่งคำขอให้เป็น 'CLEANING'
             await prisma.room.updateMany({
                 where: {
                     roomId: { in: rooms.map(({ roomId }) => roomId) },
                 },
                 data: {
-                    roomStatusId: 4, // แจ้งทำความสะอาด
+                    roomStatus: 'CLEANING',
                 },
             })
 
@@ -259,7 +259,7 @@ exports.cleaningReport = async (req, res) => {
                     reportId: report.reportId,
                     roomId: room.roomId,
                     itemId: result.itemId,
-                    cleaningStatusId: result.cleaningStatusId ?? 1,  //ตั้งค่า default ถ้าไม่มีค่า
+                    cleaningStatus: result.cleaningStatus || 'NORMAL',
                     description: result.description || ""
                 })
             }
@@ -285,7 +285,7 @@ exports.cleaningReport = async (req, res) => {
         // อัปเดตสถานะ `CleaningRequest` เป็น "เสร็จแล้ว"
         await prisma.cleaningRequest.update({
             where: { requestId },
-            data: { cleaningRequestStatusId: 3 }
+            data: { cleaningRequestStatus: 'COMPLETED' }
         })
 
         //ดึงข้อมูลรายงานที่อัปเดต
@@ -486,9 +486,8 @@ exports.noteReport = async (req, res) => {
                 reportId: Number(reportId)
             },
             data: {
-                cleaningReportStatusId: 2,
+                cleaningReportStatus: 'CHECKED',
                 frontId: front.frontId
-
             }
         })
         res.json(noted)
@@ -533,7 +532,7 @@ exports.noteRequest = async (req, res) => {
             },
             data: {
                 housekeepingId: housekeeping.housekeepingId,
-                cleaningRequestStatusId: 2
+                cleaningRequestStatus: 'IN_PROGRESS'
             }
         })
 

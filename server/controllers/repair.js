@@ -31,6 +31,7 @@ exports.repairRequest = async (req, res) => {
             const newRepairRequest = await prisma.repairRequest.create({
                 data: {
                     frontId,
+                    repairRequestStatus: 'PENDING',
                     RepairRequestRoom: {
                         create: rooms.map((room) => ({
                             roomId: room.roomId,
@@ -41,10 +42,10 @@ exports.repairRequest = async (req, res) => {
                 include: { RepairRequestRoom: true }
             })
 
-            //2. อัปเดต cleaningReportStatusId เป็น 3 (ถ้ามี reportIds)
+            //2. อัปเดต cleaningReportStatus เป็น 'REPORTED' (ถ้ามี reportIds)
             await prisma.cleaningReport.updateMany({
                 where: { reportId: { in: reportIds } },
-                data: { cleaningReportStatusId: 3 }
+                data: { cleaningReportStatus: 'REPORTED' }
             })
 
             return newRepairRequest
@@ -178,7 +179,7 @@ exports.noteRepairRequest = async (req, res) => {
             },
             data: {
                 maintenanceId: maintenance.maintenanceId,
-                repairRequestStatusId: 2
+                repairRequestStatus: 'IN_PROGRESS'
             }
         })
 
@@ -238,8 +239,8 @@ exports.repairReport = async (req, res) => {
             data: rooms.map(room => ({
                 reportId: repairReport.reportId,
                 roomId: room.roomId,
-                description: room.description,   // คำอธิบายการซ่อม
-                repairStatusId: Number(room.repairStatusId),   // สถานะการซ่อม
+                description: room.description,
+                repairStatus: room.repairStatus || 'FIXED',
             }))
         })
 
@@ -248,7 +249,7 @@ exports.repairReport = async (req, res) => {
                 requestId: Number(requestId)
             },
             data: {
-                repairRequestStatusId: 3
+                repairRequestStatus: 'COMPLETED'
             }
         })
 
