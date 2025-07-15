@@ -113,19 +113,17 @@ model CleaningRequest {
     frontId Int
     front   Front @relation(fields: [frontId], references: [frontId])
 
-    cleaningRequestStatusId Int                   @default(1)
-    cleaningRequestStatus   CleaningRequestStatus @relation(fields: [cleaningRequestStatusId], references: [cleaningRequestStatusId])
-
+    cleaningRequestStatus CleaningRequestStatus @default(PENDING)
     CleaningRequestRoom CleaningRequestRoom[]
 
     // เพิ่มความสัมพันธ์แบบ 1:1 กับ CleaningReport
     CleaningReport CleaningReport?
 }
 
-model CleaningRequestStatus {
-    cleaningRequestStatusId   Int               @id @default(autoincrement())
-    cleaningRequestStatusName String            @unique //รอดำเนินการ, รับเรื่องแล้ว(กำลังทำความสะอาด), เสร็จแล้ว
-    CleaningRequest           CleaningRequest[]
+enum CleaningRequestStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
 }
 
 model CleaningRequestRoom {
@@ -163,14 +161,13 @@ model CleaningReport {
     // ความสัมพันธ์ M:N กับ Room ผ่าน CleaningReportRoom
     CleaningReportRoom CleaningReportRoom[]
 
-    cleaningReportStatusId Int                  @default(1)
-    cleaningReportStatus   CleaningReportStatus @relation(fields: [cleaningReportStatusId], references: [cleaningReportStatusId])
+    cleaningReportStatus CleaningReportStatus @default(PENDING)
 }
 
-model CleaningReportStatus {
-    cleaningReportStatusId   Int              @id @default(autoincrement())
-    cleaningReportStatusName String           @unique //รอการตรวจสอบ, ตรวจสอบแล้ว, ถูกแจ้งซ่อม
-    CleaningReport           CleaningReport[]
+enum CleaningReportStatus {
+    PENDING
+    CHECKED
+    REPORTED
 }
 
 // 🔗 **ตารางกลางสำหรับ M:N**
@@ -192,8 +189,7 @@ model CleaningResults {
 
     description String? @default("") // คำอธิบายหรือหมายเหตุ
 
-    cleaningStatusId Int
-    cleaningStatus   CleaningStatus @relation(fields: [cleaningStatusId], references: [cleaningStatusId])
+    cleaningStatus CleaningStatus @default(NORMAL)
 
     cleaningReport     CleaningReport     @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
     cleaningList       CleaningList       @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
@@ -210,10 +206,9 @@ model CleaningList {
 }
 
 //สถานะ ของในห้องแต่ละชิ้น เช่น ปกติ, มีปัญหา
-model CleaningStatus {
-    cleaningStatusId   Int               @id @default(autoincrement())
-    cleaningStatusName String
-    CleaningResults    CleaningResults[]
+enum CleaningStatus {
+    NORMAL
+    PROBLEM
 }
 
 model Maintenance {
@@ -238,18 +233,15 @@ model RepairRequest {
     frontId Int
     front   Front @relation(fields: [frontId], references: [frontId])
 
-    repairRequestStatusId Int                 @default(1)
-    repairRequestStatus   RepairRequestStatus @relation(fields: [repairRequestStatusId], references: [repairRequestStatusId])
-
+    repairRequestStatus RepairRequestStatus @default(PENDING)
     RepairRequestRoom RepairRequestRoom[]
     RepairReport      RepairReport?
 }
 
-model RepairRequestStatus {
-    repairRequestStatusId   Int    @id @default(autoincrement())
-    repairRequestStatusName String //รอดำเนินการ, รับเรื่องแล้ว(กำลังซ่อม), เสร็จแล้ว
-
-    RepairRequest RepairRequest[]
+enum RepairRequestStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
 }
 
 //รายละเอียดหรือรายการในใบแจ้งซ่อม
@@ -294,18 +286,15 @@ model RepairReportRoom {
     repairReport RepairReport @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
     room         Room         @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
 
-    repairStatusId Int          @default(1)
-    repairStatus   RepairStatus @relation(fields: [repairStatusId], references: [repairStatusId])
+    repairStatus RepairStatus @default(FIXED)
 
     @@id([reportId, roomId])
 }
 
 //สถานะของแต่ละรายการ [ซ่อมแล้ว, ยังมีปัญหา(ไม่สามารถซ่อมได้)]
-model RepairStatus {
-    repairStatusId   Int                @id @default(autoincrement())
-    repairStatusName String
-
-    RepairReportRoom RepairReportRoom[]
+enum RepairStatus {
+    FIXED
+    UNFIXABLE
 }
 
 model Room {
@@ -316,13 +305,12 @@ model Room {
     roomTypeId Int      @default(0)
     roomType   RoomType @relation(fields: [roomTypeId], references: [roomTypeId])
 
-    roomStatusId Int        @default(0)
-    roomStatus   RoomStatus @relation(fields: [roomStatusId], references: [roomStatusId])
+    roomStatus RoomStatus @default(AVAILABLE)
 
     pairRoomId Int?
     pairRoom   Room? @relation("RoomPairing", fields: [pairRoomId], references: [roomId])
 
-    // ✅ เพิ่มฟิลด์ตรงข้าม (back-reference) 
+    //เพิ่มฟิลด์ตรงข้าม (back-reference) 
     pairedWith Room[] @relation("RoomPairing")
 
     createdAt DateTime @default(now())
@@ -351,10 +339,36 @@ model RoomType {
     Booking Booking[]
 }
 
-model RoomStatus {
-    roomStatusId   Int    @id @default(autoincrement())
-    roomStatusName String //Available, Occupied, Reserved, Cleaning, Maintenance
-    Room           Room[]
+enum RoomStatus {
+    AVAILABLE
+    OCCUPIED
+    RESERVED
+    CLEANING
+    MAINTENANCE
+}
+
+// เพิ่ม enum BookingStatus, PaymentStatus, PaymentMethod ก่อน model Booking
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  QR
 }
 
 model Booking {
@@ -387,14 +401,9 @@ model Booking {
 
     // paymentAt   DateTime?
 
-    paymentStatusId Int           @default(1)
-    paymentStatus   PaymentStatus @relation(fields: [paymentStatusId], references: [paymentStatusId])
-
-    bookingStatusId Int           @default(1)
-    bookingStatus   BookingStatus @relation(fields: [bookingStatusId], references: [bookingStatusId])
-
-    paymentMethodId Int?
-    paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [paymentMethodId])
+    paymentStatus PaymentStatus @default(PENDING)
+    bookingStatus BookingStatus @default(PENDING)
+    paymentMethod PaymentMethod?
 
     image Image[]
 
@@ -437,25 +446,6 @@ model Addon {
     addonName    String
     price        Int
     BookingAddon BookingAddon[]
-}
-
-model BookingStatus {
-    bookingStatusId   Int       @id @default(autoincrement())
-    bookingStatusName String //Pending, Confirmed, Checked-in, Checked-out, Cancelled, No-show
-    Bookings          Booking[]
-}
-
-model PaymentStatus {
-    paymentStatusId   Int    @id @default(autoincrement())
-    paymentStatusName String //Pending, Paid, Refunded, Cancelled
-
-    Bookings Booking[]
-}
-
-model PaymentMethod {
-    paymentMethodId   Int       @id @default(autoincrement())
-    paymentMethodName String
-    Booking           Booking[]
 }
 
 model Receipt {
