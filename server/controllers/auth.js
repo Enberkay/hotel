@@ -3,14 +3,7 @@ const prisma = require("../config/prisma")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
-const cloudinary = require("cloudinary").v2
-
-// Configuration
-cloudinary.config({
-    cloud_name: process.env.CLOUNDINARY_CLOUND_NAME,
-    api_key: process.env.CLOUNDINARY_API_KEY,
-    api_secret: process.env.CLOUNDINARY_API_SECRET // Click 'View API Keys' above to copy your API secret
-});
+const path = require("path");
 
 exports.register = async (req, res) => {
     try {
@@ -99,40 +92,49 @@ exports.register = async (req, res) => {
 
 exports.createImages = async (req, res) => {
     try {
-
-        // console.log(req.body)
-        // const { image } = req.body
-
-        const result = await cloudinary.uploader.upload(req.body.image,
-            {
-                public_id: `Apiwat-${Date.now()}`,
-                resource_type: "auto",
-                folder: "Hotel2025"
-
-            })
-        res.send(result)
+        // Multer จะเพิ่ม req.file เข้ามา
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+        // ตัวอย่างการบันทึกข้อมูลไฟล์ลง DB (หรือจะส่งกลับ client อย่างเดียวก็ได้)
+        // สมมติว่า images table มี field: asset_id, public_id, url, secure_url
+        // ในที่นี้จะใช้ filename เป็น asset_id/public_id และ path เป็น url
+        const fileUrl = `/uploads/${req.file.filename}`; // สมมติเปิด static /uploads
+        const imageData = {
+            asset_id: req.file.filename,
+            public_id: req.file.filename,
+            url: fileUrl,
+            secure_url: fileUrl
+        };
+        // ถ้าต้องการบันทึกลง DB:
+        // await prisma.image.create({ data: imageData });
+        res.json(imageData);
     } catch (err) {
-        console.log(err)
-        return res.status(500).json({ message: "Server Error" })
+        console.log(err);
+        return res.status(500).json({ message: "Server Error" });
     }
-}
+};
 
 exports.removeImage = async (req, res) => {
     try {
-
-        const { public_id } = req.body
-        // console.log(req.body.public_id)
-        cloudinary.uploader.destroy(public_id, (result) => {
-
-            res.json("ลบรูปแล้ว!!!..")
-        })
-
+        const { filename } = req.body; // รับชื่อไฟล์ที่ต้องการลบ
+        if (!filename) {
+            return res.status(400).json({ message: "No filename provided" });
+        }
+        const fs = require("fs");
+        const filePath = path.join(__dirname, "../uploads", filename);
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ message: "Failed to delete file" });
+            }
+            res.json({ message: "ลบรูปแล้ว!!!.." });
+        });
     } catch (err) {
-        console.log(err)
-        return res.status(500).json({ message: "Server Error" })
+        console.log(err);
+        return res.status(500).json({ message: "Server Error" });
     }
-}
-
+};
 
 
 exports.login = async (req, res) => {
