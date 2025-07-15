@@ -13,7 +13,7 @@ const initialState = {
   assignedFloor: ""
 }
 
-const ManageEditUser = () => {
+const AdminUserEdit = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const token = useAuthStore((state) => state.token)
@@ -99,4 +99,4 @@ const ManageEditUser = () => {
   )
 }
 
-export default ManageEditUser
+export default AdminUserEdit

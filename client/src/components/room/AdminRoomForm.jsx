@@ -15,7 +15,7 @@ const initialState = {
 
 }
 
-const FormRoom = () => {
+const AdminRoomForm = () => {
 
     const token = useRoomStore((state) => state.token)
     const getRoomType = useRoomStore((state) => state.getRoomType)
@@ -241,4 +241,4 @@ const FormRoom = () => {
     )
 }
 
-export default FormRoom
+export default AdminRoomForm

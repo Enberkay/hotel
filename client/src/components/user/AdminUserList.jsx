@@ -17,7 +17,7 @@ const initialState = {
   assignedFloor: "",
 }
 
-const ManageUser = () => {
+const AdminUserList = () => {
   const token = useAuthStore((state) => state.token)
   const getUser = useAuthStore((state) => state.getUser)
   const users = useAuthStore((state) => state.users)
@@ -340,4 +340,4 @@ const ManageUser = () => {
     </div>
   )
 }
-export default ManageUser
+export default AdminUserList
