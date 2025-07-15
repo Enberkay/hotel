@@ -11,7 +11,7 @@ const initialState = {
   floor: ""
 }
 
-const FormEditRoom = () => {
+const AdminRoomEditForm = () => {
 
   const { id } = useParams()
   const navigate = useNavigate()
@@ -162,4 +162,4 @@ const FormEditRoom = () => {
   )
 }
 
-export default FormEditRoom
+export default AdminRoomEditForm

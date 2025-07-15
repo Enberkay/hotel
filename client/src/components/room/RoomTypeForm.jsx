@@ -6,7 +6,7 @@ import { Pencil } from "lucide-react"
 
 const initialState = { roomTypeName: "", price: 0 }
 
-const FormRoomType = () => {
+const RoomTypeForm = () => {
     const token = useRoomStore((state) => state.token)
     const getRoomType = useRoomStore((state) => state.getRoomType)
     const roomTypes = useRoomStore((state) => state.roomTypes)
@@ -100,4 +100,4 @@ const FormRoomType = () => {
         </div>
     )
 }
-export default FormRoomType
+export default RoomTypeForm
