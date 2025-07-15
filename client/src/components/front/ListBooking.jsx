@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useBookingStore from "../../store/booking-store";
+import useAuthStore from "../../store/auth-store";
 import CountdownTimer from "../../routes/CountdownTimer"
 import dayjs from "dayjs"
 import { Link } from "react-router-dom"
@@ -9,9 +10,9 @@ import "react-datepicker/dist/react-datepicker.css"
 
 //หมายเหตุ มีการกรอกวันก็จริงแต่อย่าลืมว่าข้อมูลถูกส่งมาทั้งหมด
 const ListBooking = () => {
-    const token = useHotelStore((state) => state.token)
-    const getBooking = useHotelStore((state) => state.getBooking)
-    const bookings = useHotelStore((state) => state.bookings)
+    const token = useAuthStore((state) => state.token);
+    const getBooking = useBookingStore((state) => state.getBooking);
+    const bookings = useBookingStore((state) => state.bookings);
 
     const [lastBookingIds, setLastBookingIds] = useState([])
     const [newBookings, setNewBookings] = useState([])

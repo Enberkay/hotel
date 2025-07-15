@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useRoomStore from "../../store/room-store"
+import useAuthStore from "../../store/auth-store"
 import { Star, BedDouble, BedSingle, Bed, CircleX } from "lucide-react"
 import { changeRoomStatus, groupRoom, ungroupRoom } from "../../api/room"
 import { toast } from "react-toastify"
 import { Link } from "react-router-dom"
 
 const RoomManage = () => {
-  const token = useHotelStore((state) => state.token)
-  const getRoom = useHotelStore((state) => state.getRoom)
-  const rooms = useHotelStore((state) => state.rooms)
+  const token = useAuthStore((state) => state.token)
+  const getRoom = useRoomStore((state) => state.getRoom)
+  const rooms = useRoomStore((state) => state.rooms)
 
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [selectedPair, setSelectedPair] = useState(null)

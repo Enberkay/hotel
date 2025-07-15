@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useRoomStore from "../../store/room-store";
+import useAuthStore from "../../store/auth-store";
 import { Star, BedDouble, BedSingle, Bed, Trash2, Edit } from "lucide-react"
 import { toast } from "react-toastify"
 import { cleaningRequest } from "../../api/cleaning"
@@ -8,9 +9,9 @@ import { useLocation } from "react-router-dom"
 const FormCleaningRequest = () => {
   const location = useLocation()
   const state = location.state
-  const token = useHotelStore((state) => state.token)
-  const getRoom = useHotelStore((state) => state.getRoom)
-  const rooms = useHotelStore((state) => state.rooms)
+  const token = useAuthStore((state) => state.token);
+  const getRoom = useRoomStore((state) => state.getRoom);
+  const rooms = useRoomStore((state) => state.rooms);
 
   // State สำหรับเก็บห้องที่ถูกเลือก
   const [selectedRooms, setSelectedRooms] = useState([])

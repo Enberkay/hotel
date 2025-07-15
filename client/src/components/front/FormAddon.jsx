@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useAddonStore from "../../store/addon-store";
+import useAuthStore from "../../store/auth-store";
 import { createAddon, readAddon, updateAddon } from "../../api/addon"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
@@ -7,9 +8,9 @@ import { Pencil } from "lucide-react"
 const initialState = { addonName: "", price: 0 }
 
 const FormAddon = () => {
-  const token = useHotelStore((state) => state.token)
-  const getAddon = useHotelStore((state) => state.getAddon)
-  const addons = useHotelStore((state) => state.addons)
+  const token = useAuthStore((state) => state.token);
+  const getAddon = useAddonStore((state) => state.getAddon);
+  const addons = useAddonStore((state) => state.addons);
 
   const [form, setForm] = useState(initialState)
   const [editForm, setEditForm] = useState(initialState)

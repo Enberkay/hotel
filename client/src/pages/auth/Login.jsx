@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import useHotelStore from "../../store/hotel-store";
+import useAuthStore from "../../store/auth-store";
 import { useNavigate } from "react-router-dom";
 import { User, KeyRound } from "lucide-react";
 import image from "../../assets/Images/test3.png";
@@ -8,8 +8,8 @@ import image from "../../assets/Images/test3.png";
 const Login = () => {
   //JavaScript
   const navigate = useNavigate();
-  const actionLogin = useHotelStore((state) => state.actionLogin);
-  const user = useHotelStore((state) => state.user);
+  const actionLogin = useAuthStore((state) => state.actionLogin);
+  const user = useAuthStore((state) => state.user);
   // console.log("user form zustand", user)
 
   const [form, setForm] = useState({

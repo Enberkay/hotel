@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store";
+import useRoomStore from "../../store/room-store";
+import useAddonStore from "../../store/addon-store";
+import usePaymentStore from "../../store/payment-store";
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { toast } from "react-toastify"
@@ -19,16 +22,16 @@ const initialState = {
 
 const FormBooking = () => {
   const navigate = useNavigate()
-  const token = useHotelStore((state) => state.token)
-  const profile = useHotelStore((state) => state.profile)
-  const getProfile = useHotelStore((state) => state.getProfile)
-  const getRoomType = useHotelStore((state) => state.getRoomType)
-  const roomtypes = useHotelStore((state) => state.roomTypes)
-  const getAddon = useHotelStore((state) => state.getAddon)
-  const addons = useHotelStore((state) => state.addons)
+  const token = useAuthStore((state) => state.token)
+  const profile = useAuthStore((state) => state.profile)
+  const getProfile = useAuthStore((state) => state.getProfile)
+  const getRoomType = useRoomStore((state) => state.getRoomType)
+  const roomtypes = useRoomStore((state) => state.roomTypes)
+  const getAddon = useAddonStore((state) => state.getAddon)
+  const addons = useAddonStore((state) => state.addons)
 
-  // const getPaymentMethod = useHotelStore((state) => state.getPaymentMethod)
-  // const paymentMethods = useHotelStore((state) => state.paymentMethods)
+  // const getPaymentMethod = usePaymentStore((state) => state.getPaymentMethod)
+  // const paymentMethods = usePaymentStore((state) => state.paymentMethods)
 
   const [form, setForm] = useState(initialState)
   const [selectedAddons, setSelectedAddons] = useState(null)
