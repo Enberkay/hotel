@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import dayjs from "dayjs"
-import useHotelStore from "../../store/hotel-store"
+import useRepairStore from "../../store/repair-store"
 import { notedRepairRequest, repairReport } from "../../api/repair"
 
 const FormRepairReport = () => {
     const navigate = useNavigate()
-    const token = useHotelStore((state) => state.token)
-    const repairStatuses = useHotelStore((state) => state.repairStatuses)
-    const getRepairStatus = useHotelStore((state) => state.getRepairStatus)
-    const getRepairRequest = useHotelStore((state) => state.getRepairRequest)
-    const repairRequests = useHotelStore((state) => state.repairRequests)
+    const token = useRepairStore((state) => state.token)
+    const repairStatuses = useRepairStore((state) => state.repairStatuses)
+    const getRepairStatus = useRepairStore((state) => state.getRepairStatus)
+    const getRepairRequest = useRepairStore((state) => state.getRepairRequest)
+    const repairRequests = useRepairStore((state) => state.repairRequests)
 
     const [selectedRequest, setSelectedRequest] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)

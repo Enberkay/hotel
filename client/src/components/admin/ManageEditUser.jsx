@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store"
 import { toast } from "react-toastify"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { readUser, updateUser } from "../../api/admin"
@@ -16,7 +16,7 @@ const initialState = {
 const ManageEditUser = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const token = useHotelStore((state) => state.token)
+  const token = useAuthStore((state) => state.token)
   const [form, setForm] = useState(initialState)
 
   useEffect(() => {

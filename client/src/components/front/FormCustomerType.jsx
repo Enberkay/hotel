@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { createCustomerType, readCustomerType, updateCustomerType } from "../../api/customerType"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store"
+import useCustomerTypeStore from "../../store/customer-type-store"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
 
@@ -10,9 +11,9 @@ const initialState = {
 }
 
 const FormCustomerType = () => {
-  const token = useHotelStore((state) => state.token)
-  const customertypes = useHotelStore((state) => state.customertypes)
-  const getCustomerType = useHotelStore((state) => state.getCustomerType)
+  const token = useAuthStore((state) => state.token)
+  const getCustomerType = useCustomerTypeStore((state) => state.getCustomerType)
+  const customerTypes = useCustomerTypeStore((state) => state.customerTypes)
 
   const [form, setForm] = useState(initialState)
   const [editForm, setEditForm] = useState(initialState)
@@ -73,7 +74,7 @@ const FormCustomerType = () => {
         </div>
       </form>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {customertypes.map((item) => (
+        {customerTypes.map((item) => (
           <div key={item.customerTypeId} className="p-4 border rounded-md shadow-md flex justify-between items-center">
             <div>
               <h2 className="font-bold">{item.customerTypeName}</h2>

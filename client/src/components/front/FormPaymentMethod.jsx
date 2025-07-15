@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import usePaymentStore from "../../store/payment-store"
 import { createPaymentMethod, readPaymentMethod, updatePaymentMethod } from "../../api/paymentMethod"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
@@ -7,9 +7,9 @@ import { Pencil } from "lucide-react"
 const initialState = { paymentMethodName: "" }
 
 const FormPaymentMethod = () => {
-    const token = useHotelStore((state) => state.token)
-    const getPaymentMethod = useHotelStore((state) => state.getPaymentMethod)
-    const paymentMethods = useHotelStore((state) => state.paymentMethods)
+    const token = usePaymentStore((state) => state.token)
+    const getPaymentMethod = usePaymentStore((state) => state.getPaymentMethod)
+    const paymentMethods = usePaymentStore((state) => state.paymentMethods)
 
     const [form, setForm] = useState(initialState)
     const [editForm, setEditForm] = useState(initialState)

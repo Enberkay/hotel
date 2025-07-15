@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { readRepairRequest, notedRepairRequest } from "../../api/repair"
-import useHotelStore from "../../store/hotel-store"
+import useRepairStore from "../../store/repair-store"
 import { useNavigate } from "react-router-dom"
 import dayjs from "dayjs"
 
@@ -10,7 +10,7 @@ const ListRepairRequestDetail = () => {
 
     const { id } = useParams()
     const navigate = useNavigate()
-    const token = useHotelStore((state) => state.token)
+    const token = useRepairStore((state) => state.token)
     const [requestDetail, setRequestDetail] = useState(null)
 
     const fetchRepairRequests = async () => {

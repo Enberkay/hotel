@@ -1,15 +1,15 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react"
 import { Link } from "react-router-dom"
-import useHotelStore from "../../store/hotel-store"
+import useRepairStore from "../../store/repair-store"
 import dayjs from "dayjs"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import CountdownTimer from "../../routes/CountdownTimer"
 
 const ListRepairRequest = () => {
-    const token = useHotelStore((state) => state.token)
-    const getRepairRequest = useHotelStore((state) => state.getRepairRequest)
-    const repairRequests = useHotelStore((state) => state.repairRequests)
+    const token = useRepairStore((state) => state.token)
+    const getRepairRequest = useRepairStore((state) => state.getRepairRequest)
+    const repairRequests = useRepairStore((state) => state.repairRequests)
 
     const [startDate, setStartDate] = useState(dayjs().toDate())
     const [endDate, setEndDate] = useState(dayjs().toDate())

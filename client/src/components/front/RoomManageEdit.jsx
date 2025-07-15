@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useRoomStore from "../../store/room-store"
 import { toast } from "react-toastify"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { readRoom, updateRoom } from "../../api/room"
@@ -19,11 +19,11 @@ const RoomManageEdit = () => {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const token = useHotelStore((state) => state.token)
-  const getRoomType = useHotelStore((state) => state.getRoomType)
-  const roomtypes = useHotelStore((state) => state.roomTypes)
-  const getRoomStatus = useHotelStore((state) => state.getRoomStatus)
-  const roomStatuses = useHotelStore((state) => state.roomStatuses)
+  const token = useRoomStore((state) => state.token)
+  const getRoomType = useRoomStore((state) => state.getRoomType)
+  const roomtypes = useRoomStore((state) => state.roomTypes)
+  const getRoomStatus = useRoomStore((state) => state.getRoomStatus)
+  const roomStatuses = useRoomStore((state) => state.roomStatuses)
 
   const [form, setForm] = useState(initalState)
 

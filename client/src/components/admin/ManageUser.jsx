@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useAuthStore from "../../store/auth-store"
 import { createUser, deleteUser } from "../../api/admin"
 import { toast } from "react-toastify"
 import { Pencil, Trash } from "lucide-react"
@@ -18,9 +18,9 @@ const initialState = {
 }
 
 const ManageUser = () => {
-  const token = useHotelStore((state) => state.token)
-  const getUser = useHotelStore((state) => state.getUser)
-  const users = useHotelStore((state) => state.users)
+  const token = useAuthStore((state) => state.token)
+  const getUser = useAuthStore((state) => state.getUser)
+  const users = useAuthStore((state) => state.users)
 
   const [form, setForm] = useState({
     userEmail: "",

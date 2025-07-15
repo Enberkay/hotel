@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useRoomStore from "../../store/room-store"
 import dayjs from "dayjs"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { readBooking, confirmBooking, checkIn, checkOut } from "../../api/booking"
@@ -10,9 +10,9 @@ const ListBookingDetail = () => {
     const { id } = useParams()
     const navigate = useNavigate()
 
-    const token = useHotelStore((state) => state.token)
-    const getRoom = useHotelStore((state) => state.getRoom)
-    const rooms = useHotelStore((state) => state.rooms)
+    const token = useRoomStore((state) => state.token)
+    const getRoom = useRoomStore((state) => state.getRoom)
+    const rooms = useRoomStore((state) => state.rooms)
 
     const [form, setForm] = useState([])
 
