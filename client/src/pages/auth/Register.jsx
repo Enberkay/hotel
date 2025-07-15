@@ -6,7 +6,7 @@ import useAuthStore from "../../store/auth-store";
 import { useNavigate } from "react-router-dom"
 import { listCustomerType } from "../../api/customerType"
 const API_URL = import.meta.env.VITE_API_URL
-import UploadFile from "../shared/UploadFile"
+import UploadFile from "../../components/shared/UploadFile"
 import image from "../../assets/Images/test3.png"
 
 const Register = () => {
