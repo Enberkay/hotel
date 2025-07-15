@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react"
 import { Link } from "react-router-dom"
-import useHotelStore from "../../store/hotel-store"
+import useCleaningStore from "../../store/cleaning-store"
 import dayjs from "dayjs"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -8,7 +8,7 @@ import CountdownTimer from "../../routes/CountdownTimer"
 import { listCleaningReport } from "../../api/cleaning"
 
 const ListCleaningReport = () => {
-    const token = useHotelStore((state) => state.token)
+    const token = useCleaningStore((state) => state.token)
     const [cleaningReports, setCleaningReports] = useState([])
     const [startDate, setStartDate] = useState(dayjs().toDate())
     const [endDate, setEndDate] = useState(dayjs().toDate())

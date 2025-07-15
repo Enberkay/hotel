@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useCleaningStore from "../../store/cleaning-store"
 import { Link } from "react-router-dom"
 import dayjs from "dayjs"
 import DatePicker from "react-datepicker"
@@ -7,9 +7,9 @@ import "react-datepicker/dist/react-datepicker.css"
 import CountdownTimer from "../../routes/CountdownTimer"
 
 const ListCleaningRequest = () => {
-    const token = useHotelStore((state) => state.token)
-    const getCleaningRequest = useHotelStore((state) => state.getCleaningRequest)
-    const cleaningRequests = useHotelStore((state) => state.cleaningRequests)
+    const token = useCleaningStore((state) => state.token)
+    const getCleaningRequest = useCleaningStore((state) => state.getCleaningRequest)
+    const cleaningRequests = useCleaningStore((state) => state.cleaningRequests)
 
     const [startDate, setStartDate] = useState(dayjs().toDate())
     const [endDate, setEndDate] = useState(dayjs().toDate())

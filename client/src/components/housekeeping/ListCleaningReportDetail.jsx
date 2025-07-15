@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { useParams } from "react-router-dom"
-import useHotelStore from "../../store/hotel-store"
+import useCleaningStore from "../../store/cleaning-store"
 import dayjs from "dayjs"
 import { readCleaningReport } from "../../api/cleaning"
 import { toast } from "react-toastify"
@@ -9,7 +9,7 @@ import { toast } from "react-toastify"
 const ListCleaningReportDetail = () => {
 
   const { id } = useParams()
-  const token = useHotelStore((state) => state.token)
+  const token = useCleaningStore((state) => state.token)
   const [report, setReport] = useState(null)
   const [selectedRoom, setSelectedRoom] = useState(null)
 

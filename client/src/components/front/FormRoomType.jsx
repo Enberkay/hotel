@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useRoomStore from "../../store/room-store"
 import { createRoomType, readRoomType, updateRoomType } from "../../api/roomType"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
@@ -7,9 +7,9 @@ import { Pencil } from "lucide-react"
 const initialState = { roomTypeName: "", price: 0 }
 
 const FormRoomType = () => {
-    const token = useHotelStore((state) => state.token)
-    const getRoomType = useHotelStore((state) => state.getRoomType)
-    const roomTypes = useHotelStore((state) => state.roomTypes)
+    const token = useRoomStore((state) => state.token)
+    const getRoomType = useRoomStore((state) => state.getRoomType)
+    const roomTypes = useRoomStore((state) => state.roomTypes)
 
     const [form, setForm] = useState(initialState)
     const [editForm, setEditForm] = useState(initialState)

@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import useHotelStore from "../../store/hotel-store"
+import useCleaningStore from "../../store/cleaning-store"
 
 
 const ChecklistCleaningReport = () => {
     const location = useLocation()
     const navigate = useNavigate()
-    const token = useHotelStore((state) => state.token)
-    const getCleaningListItem = useHotelStore((state) => state.getCleaningListItem)
-    const cleaningListItems = useHotelStore((state) => state.cleaningListItems)
+    const token = useCleaningStore((state) => state.token)
+    const getCleaningListItem = useCleaningStore((state) => state.getCleaningListItem)
+    const cleaningListItems = useCleaningStore((state) => state.cleaningListItems)
 
     const { requestId, roomId } = location.state || {}
     const storageKey = `roomId_${roomId}`

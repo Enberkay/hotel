@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import dayjs from "dayjs"
-import useHotelStore from "../../store/hotel-store"
+import useCleaningStore from "../../store/cleaning-store"
 import { cleaningReport, notedCleaningRequest } from "../../api/cleaning"
 
 const FormCleaningReport = () => {
@@ -10,9 +10,9 @@ const FormCleaningReport = () => {
     const location = useLocation()
     const requestIdFromState = location.state?.requestId
 
-    const token = useHotelStore((state) => state.token)
-    const getCleaningRequest = useHotelStore((state) => state.getCleaningRequest)
-    const cleaningRequests = useHotelStore((state) => state.cleaningRequests)
+    const token = useCleaningStore((state) => state.token)
+    const getCleaningRequest = useCleaningStore((state) => state.getCleaningRequest)
+    const cleaningRequests = useCleaningStore((state) => state.cleaningRequests)
     const [selectedRequest, setSelectedRequest] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
 

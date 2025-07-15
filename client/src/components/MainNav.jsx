@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
 import { Link, NavLink, useNavigate } from "react-router-dom"
-import useHotelStore from "../store/hotel-store"
+import useAuthStore from "../store/auth-store"
 import { CircleUserRound, Menu } from "lucide-react"
 import logo from "/src/assets/Images/Logo.png"
 
 const MainNav = () => {
-    const { user, token, logout, isTokenExpired } = useHotelStore()
+    const { user, token, logout, isTokenExpired } = useAuthStore()
     const [role, setRole] = useState("guest")
     const navigate = useNavigate()
     const [dropdownOpen, setDropdownOpen] = useState(false)

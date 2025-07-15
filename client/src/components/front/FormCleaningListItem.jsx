@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import useHotelStore from "../../store/hotel-store"
+import useCleaningStore from "../../store/cleaning-store"
 import { createCleaningListItem, readCleaningListItem, updateCleaningListItem } from "../../api/cleaningListItem"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
@@ -7,9 +7,9 @@ import { Pencil } from "lucide-react"
 const initialState = { itemName: "" }
 
 const FormCleaningListItem = () => {
-    const token = useHotelStore((state) => state.token)
-    const getCleaningListItem = useHotelStore((state) => state.getCleaningListItem)
-    const cleaningListItems = useHotelStore((state) => state.cleaningListItems)
+    const token = useCleaningStore((state) => state.token)
+    const getCleaningListItem = useCleaningStore((state) => state.getCleaningListItem)
+    const cleaningListItems = useCleaningStore((state) => state.cleaningListItems)
 
     const [form, setForm] = useState(initialState)
     const [editForm, setEditForm] = useState(initialState)

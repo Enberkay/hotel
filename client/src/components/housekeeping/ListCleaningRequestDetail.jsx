@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { readCleaningRequest, notedCleaningRequest } from "../../api/cleaning"
-import useHotelStore from "../../store/hotel-store"
+import useCleaningStore from "../../store/cleaning-store"
 import { useNavigate } from "react-router-dom"
 import dayjs from "dayjs"
 
 const ListCleaningRequestDetail = () => {
     const { id } = useParams()
     const navigate = useNavigate()
-    const token = useHotelStore((state) => state.token)
+    const token = useCleaningStore((state) => state.token)
     const [requestDetail, setRequestDetail] = useState(null)
 
     // ฟังก์ชันดึงข้อมูลใบแจ้งทำความสะอาด
