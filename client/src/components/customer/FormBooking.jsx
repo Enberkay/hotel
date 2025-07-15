@@ -414,7 +414,8 @@ const FormBooking = () => {
           <div className="text-center">
             <button
               type="submit"
-              className="bg-brown hover:bg-light-yellow text-white font-bold py-2 px-6 rounded-md shadow-md"
+              className="bg-[var(--color-brown)] hover:bg-[var(--color-light-yellow)] text-white font-bold py-2 px-6 rounded-md shadow-md"
+              style={{'--color-brown':'#6A503D','--color-light-yellow':'#FEF6B3'}}
             >
               ยืนยันการจอง
             </button>

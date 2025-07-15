@@ -79,13 +79,13 @@ const ListAllCleaningReport = () => {
     return (
         <div className="w-10/12 mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-semibold text-brown">PHUPHAN PLACE</h1>
+                <h1 className="text-3xl font-semibold text-[var(--color-brown)]" style={{'--color-brown':'#6A503D'}}>PHUPHAN PLACE</h1>
                 <CountdownTimer duration={15} onReset={fetchCleaningReports} />
             </div>
 
             <div className="flex justify-center space-x-4 mb-4">
                 {[{ id: "today", label: "วันนี้" }, { id: "week", label: "อาทิตย์นี้" }, { id: "month", label: "เดือนนี้" }, { id: "all", label: "ทั้งหมด" }].map(({ id, label }) => (
-                    <button key={id} onClick={() => setDateRange(id)} className={`p-2 border rounded-md transition duration-300 ${dateRangeClick === id ? "bg-brown text-white" : "bg-gray-100 hover:bg-gray-200"}`}>
+                    <button key={id} onClick={() => setDateRange(id)} className={`p-2 border rounded-md transition duration-300 ${dateRangeClick === id ? "bg-[var(--color-brown)] text-white" : "bg-gray-100 hover:bg-gray-200"}`} style={dateRangeClick === id ? {'--color-brown':'#6A503D'} : {}}>
                         {label}
                     </button>
                 ))}
@@ -96,7 +96,7 @@ const ListAllCleaningReport = () => {
             <div className="grid grid-cols-3 gap-2 border-b pb-3 border-gray-300 text-center text-lg font-medium text-gray-600">
                 {[{ id: null, label: "ทั้งหมด" }, { id: 1, label: "รอการตรวจสอบ" }, { id: 2, label: "ตรวจสอบแล้ว" }].map(({ id, label }) => (
                     <button key={id} onClick={() => setSelectedStatus(id)}
-                        className={`w-full p-2 rounded-lg transition duration-300 ${selectedStatus === id ? "bg-brown text-white" : "hover:bg-gray-100"}`}>
+                        className={`w-full p-2 rounded-lg transition duration-300 ${selectedStatus === id ? "bg-[var(--color-brown)] text-white" : "hover:bg-gray-100"}`} style={selectedStatus === id ? {'--color-brown':'#6A503D'} : {}}>
                         {label}
                     </button>
                 ))}

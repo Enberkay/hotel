@@ -91,7 +91,7 @@ const ListBooking = () => {
     return (
         <div className="w-10/12 mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-semibold text-brown">PHUPHAN PLACE</h1>
+                <h1 className="text-3xl font-semibold text-[var(--color-brown)]" style={{'--color-brown':'#6A503D'}}>PHUPHAN PLACE</h1>
                 <CountdownTimer duration={15} onReset={fetchBookings} />
             </div>
 
@@ -140,8 +140,8 @@ const ListBooking = () => {
                     <button
                         key={id}
                         onClick={() => setSelectedStatus(id)}
-                        className={`p-2 rounded-lg transition duration-300 ${selectedStatus === id ? "bg-brown text-white" : "hover:bg-gray-100"
-                            }`}>
+                        className={`p-2 rounded-lg transition duration-300 ${selectedStatus === id ? "bg-[var(--color-brown)] text-white" : "hover:bg-gray-100"
+                            }`} style={selectedStatus === id ? {'--color-brown':'#6A503D'} : {}}>
                         {label}
                     </button>
                 ))}

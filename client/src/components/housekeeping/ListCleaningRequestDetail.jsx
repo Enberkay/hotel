@@ -51,7 +51,7 @@ const ListCleaningRequestDetail = () => {
             {/* จอเล็ก */}
             <div className="lg:hidden md:hidden bg-white shadow-md rounded-lg py-5 px-4 mt-14">
                 <header className="grid justify-items-center gap-2 py-2">
-                    <div className="text-lg font-semibold text-brown">
+                    <div className="text-lg font-semibold text-[var(--color-brown)]" style={{'--color-brown':'#6A503D'}}>
                         <h1>รายละเอียดใบแจ้งทำความสะอาด</h1>
                     </div>
                 </header>
@@ -68,7 +68,7 @@ const ListCleaningRequestDetail = () => {
                     </div>
 
                     <div className="grid gap-2 py-2">
-                        <h2 className="text-lg font-semibold text-brown">รายละเอียดห้อง</h2>
+                        <h2 className="text-lg font-semibold text-[var(--color-brown)]" style={{'--color-brown':'#6A503D'}}>รายละเอียดห้อง</h2>
                         {requestDetail.CleaningRequestRoom.map((detail, index) => (
                             <div key={index} className="border p-4 rounded-lg bg-gray-50 mb-2">
                                 <p><span>ห้องหมายเลข:</span> {detail.room.roomNumber}</p>
@@ -105,7 +105,7 @@ const ListCleaningRequestDetail = () => {
 
             {/* {จอใหญ่} */}
             <div className="hidden lg:flex md:flex xl:flex flex-col max-w-3xl mx-auto mt-8 p-6 bg-white shadow-md rounded-lg md:mt-14 ">
-                <h1 className="text-2xl font-semibold text-brown mb-4">รายละเอียดใบแจ้งทำความสะอาด</h1>
+                <h1 className="text-2xl font-semibold text-[var(--color-brown)]" style={{'--color-brown':'#6A503D'}} mb-4>รายละเอียดใบแจ้งทำความสะอาด</h1>
 
                 <div className="border p-4 rounded-lg bg-gray-100 mb-4">
                     <p><span className="font-semibold">หมายเลขใบแจ้ง:</span> {requestDetail.requestId}</p>

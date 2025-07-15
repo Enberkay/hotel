@@ -78,7 +78,7 @@ const MyListBooking = () => {
                 to={to}
                 className={({ isActive }) =>
                   `block px-4 py-3 rounded-md transition ${isActive
-                    ? "bg-brown text-white shadow-md"
+                    ? "bg-[var(--color-brown)] text-white shadow-md"
                     : "hover:bg-[#d7ccc8] text-[#5a3e2b]"
                   }`
                 }

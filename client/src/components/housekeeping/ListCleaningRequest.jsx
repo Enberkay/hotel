@@ -86,7 +86,7 @@ const ListCleaningRequest = () => {
                         </div>
                     )}
 
-                    <div className="text-2xl font-semibold text-brown">
+                    <div className="text-2xl font-semibold text-[var(--color-brown)]" style={{'--color-brown':'#6A503D'}}>
                         <h1>PHUPHAN PLACE</h1>
                     </div>
                     <DatePicker selected={startDate} onChange={(date) =>
@@ -164,7 +164,7 @@ const ListCleaningRequest = () => {
             {/* จอใหญ่ */}
             <div className="hidden md:grid md:grid-cols-1 w-10/12 mx-auto md:mt-14 xl:mt-8 p-6 bg-white shadow-md rounded-lg ">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-semibold text-brown">PHUPHAN PLACE</h1>
+                    <h1 className="text-3xl font-semibold text-[var(--color-brown)]" style={{'--color-brown':'#6A503D'}}>PHUPHAN PLACE</h1>
                     <CountdownTimer duration={15} onReset={fetchCleaningRequests} />
                 </div>
 
@@ -182,7 +182,7 @@ const ListCleaningRequest = () => {
 
                     <div className="2xl:col-start-1 2xl:col-span-2 md:grid md:grid-cols-4 md:gap-2 md:border-b-0 pb-3 border-gray-300 text-center text-lg font-medium text-gray-600">
                         {[{ id: "today", label: "วันนี้" }, { id: "week", label: "อาทิตย์นี้" }, { id: "month", label: "เดือนนี้" }, { id: "all", label: "ทั้งหมด" }].map(({ id, label }) => (
-                            <button key={id} onClick={() => setDateRange(id)} className={`w-full p-2 rounded-lg transition duration-300 ${dateRangeClick === id ? "bg-brown text-white" : "bg-gray-100 hover:bg-gray-200"}`}>
+                            <button key={id} onClick={() => setDateRange(id)} className={`w-full p-2 rounded-lg transition duration-300 ${dateRangeClick === id ? "bg-[var(--color-brown)] text-white" : "bg-gray-100 hover:bg-gray-200"}`}>
                                 {label}
                             </button>
                         ))}
@@ -191,7 +191,7 @@ const ListCleaningRequest = () => {
                     <div className="2xl:col-start-2 2xl:col-span-3 2xl:order-last xl:order-last grid grid-cols-4 gap-2 xl:border-b-0 pb-3 border-gray-300 text-center text-lg font-medium text-gray-600">
                         {[{ id: null, label: "ทั้งหมด" }, { id: 1, label: "รอดำเนินการ" }, { id: 2, label: "รับเรื่องแล้ว" }, { id: 3, label: "เสร็จสิ้น" }].map(({ id, label }) => (
                             <button key={id} onClick={() => setSelectedStatus(id)}
-                                className={`w-full p-2 rounded-lg transition duration-300 ${selectedStatus === id ? "bg-brown text-white" : "hover:bg-gray-200"}`}>
+                                className={`w-full p-2 rounded-lg transition duration-300 ${selectedStatus === id ? "bg-[var(--color-brown)] text-white" : "hover:bg-gray-200"}`} style={selectedStatus === id ? {'--color-brown':'#6A503D'} : {}}>
                                 {label}
                             </button>
                         ))}

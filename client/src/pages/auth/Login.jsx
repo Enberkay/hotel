@@ -97,7 +97,7 @@ const Login = () => {
               </div>
             </label>
 
-            <button className="w-full py-3 px-6 bg-brown text-white text-lg rounded-md hover:bg-brown/80 transition shadow-md">
+            <button className="w-full py-3 px-6 bg-[var(--color-brown)] text-white text-lg rounded-md hover:bg-[var(--color-brown)]/80 transition shadow-md" style={{'--color-brown':'#6A503D'}}>
               Login
             </button>
           </form>
