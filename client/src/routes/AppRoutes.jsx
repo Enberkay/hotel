@@ -80,14 +80,6 @@ const AppRoutes = () => {
           <Route path="rooms" element={<AdminRoomForm />} />
           <Route path="rooms/:id" element={<AdminRoomEditForm />} />
           <Route path="users/:id" element={<AdminUserEdit />} />
-          <Route path="room-status" element={<FormRoomStatus />} />
-          <Route path="booking-status" element={<FormBookingStatus />} />
-          <Route path="payment-status" element={<FormPaymentStatus />} />
-          <Route path="cleaning-request-status" element={<FormCleaningRequestStatus />} />
-          <Route path="cleaning-report-status" element={<FormCleaningReportStatus />} />
-          <Route path="cleaning-status" element={<FormCleaningStatus />} />
-          <Route path="repair-request-status" element={<FormRepairRequestStatus />} />
-          <Route path="repair-status" element={<FormRepairStatus />} />
         </Route>
 
         {/* Customer */}
