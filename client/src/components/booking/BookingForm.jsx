@@ -20,7 +20,7 @@ const initialState = {
   paymentMethodId: "",
 }
 
-const FormBooking = () => {
+const BookingForm = () => {
   const navigate = useNavigate()
   const token = useAuthStore((state) => state.token)
   const profile = useAuthStore((state) => state.profile)
@@ -426,4 +426,4 @@ const FormBooking = () => {
   )
 }
 
-export default FormBooking
+export default BookingForm

@@ -9,7 +9,7 @@ import "react-datepicker/dist/react-datepicker.css"
 
 
 //หมายเหตุ มีการกรอกวันก็จริงแต่อย่าลืมว่าข้อมูลถูกส่งมาทั้งหมด
-const ListBooking = () => {
+const BookingList = () => {
     const token = useAuthStore((state) => state.token);
     const getBooking = useBookingStore((state) => state.getBooking);
     const bookings = useBookingStore((state) => state.bookings);
@@ -177,4 +177,4 @@ const ListBooking = () => {
     )
 }
 
-export default ListBooking
+export default BookingList

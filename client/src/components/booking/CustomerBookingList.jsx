@@ -7,7 +7,7 @@ import { cancelledBooking } from "../../api/myBooking"
 import { toast } from "react-toastify"
 import { Menu, X } from "lucide-react" // ไอคอนสำหรับเมนู
 
-const MyListBooking = () => {
+const CustomerBookingList = () => {
 
   const navigate = useNavigate()
   const token = useAuthStore((state) => state.token)
@@ -213,4 +213,4 @@ const MyListBooking = () => {
     </div>
   )
 }
-export default MyListBooking
+export default CustomerBookingList

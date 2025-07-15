@@ -6,7 +6,7 @@ import { readBooking, confirmBooking, checkIn, checkOut } from "../../api/bookin
 import { toast } from "react-toastify"
 import { Undo2, BedDouble, BedSingle, Bed, Star } from "lucide-react"
 
-const ListBookingDetail = () => {
+const BookingDetail = () => {
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -406,4 +406,4 @@ const ListBookingDetail = () => {
     )
 }
 
-export default ListBookingDetail
+export default BookingDetail
