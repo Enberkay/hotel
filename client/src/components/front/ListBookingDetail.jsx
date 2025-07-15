@@ -186,40 +186,44 @@ const ListBookingDetail = () => {
                                     setShowPopup(true)
                                 }}
                                 className={`rounded-md p-2 shadow-md transition duration-200 
-                                        ${form.bookingStatusId === 1
+                                        ${form.bookingStatus === 'RESERVED'
                                         ? "bg-yellow-500 hover:scale-105 hover:-translate-y-1 cursor-pointer"
                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     }`}
-                                disabled={form.bookingStatusId !== 1}
+                                disabled={form.bookingStatus !== 'RESERVED'}
                             >
                                 เลือกห้อง
                             </button>
 
                             {/* ปุ่มเลือกห้อง จะกดได้เฉพาะ bookingStatusId = 2 เพราะ 2 คือ "อนุมัติแล้ว" รอทำการ checkIn ต่อ */}
-                            <button
-                                className={`rounded-md p-2 shadow-md transition duration-200
-                                        ${form.bookingStatusId === 2
+                            {form.bookingStatus === 'APPROVED' && (
+                                <button
+                                    className={`rounded-md p-2 shadow-md transition duration-200
+                                        ${form.bookingStatus === 'APPROVED'
                                         ? "bg-blue-500 hover:scale-105 hover:-translate-y-1 text-white"
                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     }`}
-                                onClick={() => handleCheckIn(form.bookingId)}
-                                disabled={form.bookingStatusId !== 2} // ปิดการใช้งานเมื่อไม่ใช่สถานะ 2
-                            >
-                                Check-In
-                            </button>
+                                    onClick={() => handleCheckIn(form.bookingId)}
+                                    disabled={form.bookingStatus !== 'APPROVED'} // ปิดการใช้งานเมื่อไม่ใช่สถานะ 2
+                                >
+                                    Check-In
+                                </button>
+                            )}
 
                             {/* ปุ่มเลือกห้อง จะกดได้เฉพาะ bookingStatudId = 3 เพราะ 3 คือ "checkIn" รอทำการ checkOutและแจ้งทำความสะอาด */}
-                            <button
-                                className={`rounded-md p-2 shadow-md transition duration-200
-                                        ${form.bookingStatusId === 3
+                            {form.bookingStatus === 'CHECKED_IN' && (
+                                <button
+                                    className={`rounded-md p-2 shadow-md transition duration-200
+                                        ${form.bookingStatus === 'CHECKED_IN'
                                         ? "bg-blue-500 hover:scale-105 hover:-translate-y-1 text-white"
                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     }`}
-                                onClick={() => handleCheckOut(form.bookingId)}
-                                disabled={form.bookingStatusId !== 3}
-                            >
-                                Check-Out
-                            </button>
+                                    onClick={() => handleCheckOut(form.bookingId)}
+                                    disabled={form.bookingStatus !== 'CHECKED_IN'}
+                                >
+                                    Check-Out
+                                </button>
+                            )}
 
 
                             {/* ปุ่มใหม่ ลิงก์ไปหน้าอ่านการจอง */}
@@ -281,21 +285,22 @@ const ListBookingDetail = () => {
                         <div className="flex flex-wrap gap-4 mt-5">
                             {rooms.map((room, index) => {
                                 let statusColor = "";
-                                switch (room.roomStatus?.roomStatusId) {
-                                    case 1:
-                                        statusColor = "bg-green-500"; // ห้องว่าง
+                                // ใช้ room.roomStatus เป็น string แทน roomStatusId
+                                switch (room.roomStatus) {
+                                    case 'AVAILABLE':
+                                        statusColor = statusColors.AVAILABLE;
                                         break;
-                                    case 2:
-                                        statusColor = "bg-gray-500"; // มีคนเข้าพัก
+                                    case 'OCCUPIED':
+                                        statusColor = statusColors.OCCUPIED;
                                         break;
-                                    case 3:
-                                        statusColor = "bg-yellow-500"; // จอง
+                                    case 'RESERVED':
+                                        statusColor = statusColors.RESERVED;
                                         break;
-                                    case 4:
-                                        statusColor = "bg-blue-500"; // รอทำความสะอาด
+                                    case 'CLEANING':
+                                        statusColor = statusColors.CLEANING;
                                         break;
-                                    case 5:
-                                        statusColor = "bg-red-500"; // แจ้งซ่อม
+                                    case 'REPAIR':
+                                        statusColor = statusColors.REPAIR;
                                         break;
                                     default:
                                         statusColor = "bg-black";
@@ -314,10 +319,10 @@ const ListBookingDetail = () => {
                                     <button
                                         key={index}
                                         className={`flex flex-col items-center justify-center w-20 h-20 border rounded-lg shadow-md ${statusColor} hover:bg-opacity-80 transition duration-200 
-                                                    ${room.roomStatus.roomStatusId !== 1 ? "opacity-50 cursor-not-allowed" : ""} 
+                                                    ${room.roomStatus !== 'AVAILABLE' ? "opacity-50 cursor-not-allowed" : ""} 
                                                     ${(isSelected || isPairSelected) ? "border-4 border-yellow-500 bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
-                                        onClick={() => room.roomStatus.roomStatusId === 1 && setSelectedRoom(room.roomId)}
-                                        disabled={room.roomStatus.roomStatusId !== 1}
+                                        onClick={() => room.roomStatus === 'AVAILABLE' && setSelectedRoom(room.roomId)}
+                                        disabled={room.roomStatus !== 'AVAILABLE'}
                                     >
                                         {roomTypeName === "Standard(เตียงเดี่ยว)" ? (
                                             <BedSingle size={32} className="text-white" />

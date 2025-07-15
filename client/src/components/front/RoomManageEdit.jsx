@@ -128,19 +128,21 @@ const RoomManageEdit = () => {
         </div>
 
         <div>
-          <label htmlFor="roomStatusId" className="block text-sm font-semibold mb-1">สถานะห้อง</label>
+          <label htmlFor="roomStatus" className="block text-sm font-semibold mb-1">สถานะห้อง</label>
           <select
             className="border rounded-md p-2 w-full"
-            name="roomStatusId"
+            name="roomStatus"
             onChange={handleOnChange}
             required
-            value={form.roomStatusId}
-            id="roomStatusId"
+            value={form.roomStatus}
+            id="roomStatus"
           >
             <option value="" disabled>Select Status</option>
-            {roomStatuses.map((item, index) => (
-              <option key={index} value={item.roomStatusId}>{item.roomStatusName}</option>
-            ))}
+            <option value="AVAILABLE">ว่าง</option>
+            <option value="OCCUPIED">มีคนเข้าพัก</option>
+            <option value="RESERVED">ถูกจอง</option>
+            <option value="CLEANING">กำลังทำความสะอาด</option>
+            <option value="REPAIR">กำลังซ่อมแซม</option>
           </select>
         </div>
 

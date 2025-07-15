@@ -70,6 +70,12 @@ const ListAllCleaningReport = () => {
         })
     }, [cleaningReports, selectedStatus, startDate, endDate])
 
+    // mapping สีตาม cleaningReportStatus
+    const statusColors = {
+        PENDING: "bg-red-100 text-red-600",
+        VERIFIED: "bg-green-100 text-green-600",
+    }
+
     return (
         <div className="w-10/12 mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
             <div className="flex justify-between items-center mb-6">
@@ -113,12 +119,9 @@ const ListAllCleaningReport = () => {
                                         รายงานทำความสะอาดที่ {item.reportId}
                                     </p>
                                     <span
-                                        className={`px-3 py-1 text-sm font-semibold rounded-full ${item.cleaningReportStatusId === 1
-                                            ? "bg-red-100 text-red-600"
-                                            : "bg-green-100 text-green-600"
-                                            }`}
+                                        className={`px-3 py-1 text-sm font-semibold rounded-full ${statusColors[item.cleaningReportStatus] || "bg-gray-200 text-gray-600"}`}
                                     >
-                                        {item.cleaningReportStatus.cleaningReportStatusName || "ไม่ระบุสถานะ"}
+                                        {item.cleaningReportStatus}
                                     </span>
                                 </div>
                                 <p className="text-gray-700 mt-2">

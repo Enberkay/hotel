@@ -45,6 +45,9 @@ const ListAllCleaningReportDetail = () => {
 
     if (!report) return <p className="text-center py-6">Loading...</p>
 
+    // ใช้ cleaningReportStatus เป็น string แทน cleaningReportStatusId
+    const isVerified = report.cleaningReportStatus === 'VERIFIED';
+
     return (
         <div className="w-10/12 mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
             <h1 className="text-3xl font-semibold text-brown mb-4">รายละเอียดรายงานทำความสะอาด</h1>
@@ -73,13 +76,11 @@ const ListAllCleaningReportDetail = () => {
             {/* เรียกใช้งานฟังชั่น comfirmReport */}
             <div
                 className={`mt-4 px-6 py-3 font-semibold rounded-lg shadow-md transition duration-300 transform 
-                        ${report.cleaningReportStatusId === 2
-                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                        : "bg-green-500 text-white hover:bg-green-600 hover:scale-105 active:scale-95"}`
+                        ${isVerified ? "bg-gray-400 text-gray-200 cursor-not-allowed" : "bg-green-500 text-white hover:bg-green-600 hover:scale-105 active:scale-95"}`
                 }
-                onClick={() => report.cleaningReportStatusId !== 2 && handleNoted(id)}
+                onClick={() => !isVerified && handleNoted(id)}
             >
-                <button className="w-full h-full focus:outline-none" disabled={report.cleaningReportStatusId === 2}>
+                <button className="w-full h-full focus:outline-none" disabled={isVerified}>
                     ✅ รับทราบข้อมูล
                 </button>
             </div>

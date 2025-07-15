@@ -9,20 +9,12 @@ import { listRoom } from "../api/room"
 import { listCustomerType } from "../api/customerType"
 import { listUser } from "../api/admin"
 import { listBooking } from "../api/booking"
-import { listRoomStatus } from "../api/roomStatus"
 import { listAddon } from "../api/addon"
-import { listBookingStatus } from "../api/bookingStatus"
-import { listPaymentStatus } from "../api/paymentStatus"
 import { myBookings } from "../api/myBooking"
 import { listPaymentMethod } from "../api/paymentMethod"
 import { myProfile } from "../api/profile"
 import { listCleaningRequest } from "../api/cleaning"
-import { listCleaningRequestStatus } from "../api/cleaningRequestStatus"
 import { listCleaningListItem } from "../api/cleaningListItem"
-import { listCleaningReportStatus } from "../api/cleaningReportStatus"
-import { listCleaningStatus } from "../api/cleaningStatus"
-import { listRepairRequestStatus } from "../api/repairRequestStatus"
-import { listRepairStatus } from "../api/repairStatus"
 import { listRepairRequest } from "../api/repair"
 import { jwtDecode } from "jwt-decode"
 
@@ -34,27 +26,18 @@ const hotelStore = (set) => ({
     roomTypes: [],
     customertypes: [],
     rooms: [],
-    roomStatuses: [],
     users: [],
     bookings: [],
     addons: [],
-    bookingStatuses: [],
-    paymentStatuses: [],
     myBookings: [],
     paymentMethods: [],
     profile: [],
     hasCheckedToken: false,
 
     cleaningRequests: [],
-    cleaningRequestStatuses: [],
     cleaningListItems: [],
-    cleaningReportStatuses: [],
-    cleaningStatuses: [],
 
     repairRequests: [],
-    repairRequestStatuses: [],
-
-    repairStatuses: [],
 
     actionLogin: async (form) => {
         try {
@@ -152,16 +135,6 @@ const hotelStore = (set) => ({
             console.log(err)
         }
     },
-    getRoomStatus: async (token) => {
-        try {
-            const res = await listRoomStatus(token)
-            set({
-                roomStatuses: res.data
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    },
     getUser: async (token) => {
         try {
             const res = await listUser(token)
@@ -188,26 +161,6 @@ const hotelStore = (set) => ({
             const res = await listAddon(token)
             set({
                 addons: res.data
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    },
-    getBookingStatus: async (token) => {
-        try {
-            const res = await listBookingStatus(token)
-            set({
-                bookingStatuses: res.data
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    },
-    getPaymentStatus: async (token) => {
-        try {
-            const res = await listPaymentStatus(token)
-            set({
-                paymentStatuses: res.data
             })
         } catch (err) {
             console.log(err)
@@ -254,61 +207,11 @@ const hotelStore = (set) => ({
             set({ cleaningRequests: [] })
         }
     },
-    getCleaningRequestStatus: async (token) => {
-        try {
-            const res = await listCleaningRequestStatus(token)
-            set({
-                cleaningRequestStatuses: res.data
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    },
     getCleaningListItem: async (token) => {
         try {
             const res = await listCleaningListItem(token)
             set({
                 cleaningListItems: res.data
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    },
-    getCleaningReportStatus: async (token) => {
-        try {
-            const res = await listCleaningReportStatus(token)
-            set({
-                cleaningReportStatuses: res.data
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    },
-    getCleaningStatus: async (token) => {
-        try {
-            const res = await listCleaningStatus(token)
-            set({
-                cleaningStatuses: res.data
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    },
-    getRepairRequestStatus: async (token) => {
-        try {
-            const res = await listRepairRequestStatus(token)
-            set({
-                repairRequestStatuses: res.data
-            })
-        } catch (err) {
-            console.log(err)
-        }
-    },
-    getRepairStatus: async (token) => {
-        try {
-            const res = await listRepairStatus(token)
-            set({
-                repairStatuses: res.data
             })
         } catch (err) {
             console.log(err)

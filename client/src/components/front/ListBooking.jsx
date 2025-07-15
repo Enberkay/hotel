@@ -70,13 +70,22 @@ const ListBooking = () => {
     const filteredBookings = useMemo(() => {
         return bookings.filter((item) => {
             const bookingDate = dayjs(item.createdAt)
-            const isStatusMatch = selectedStatus !== null ? item.bookingStatus.bookingStatusId === selectedStatus : true
+            const isStatusMatch = selectedStatus !== null ? item.bookingStatus === selectedStatus : true
             const isInDateRange =
                 (!startDate || bookingDate.isAfter(dayjs(startDate).startOf("day"))) &&
                 (!endDate || bookingDate.isBefore(dayjs(endDate).endOf("day")))
             return isStatusMatch && isInDateRange
         })
     }, [bookings, selectedStatus, startDate, endDate])
+
+    // mapping สีตาม bookingStatus
+    const statusColors = {
+        PENDING: "bg-red-100 text-red-600",
+        APPROVED: "bg-green-100 text-green-600",
+        CHECKED_IN: "bg-blue-100 text-blue-600",
+        CHECKED_OUT: "bg-gray-200 text-gray-600",
+        CANCELLED: "bg-gray-400 text-gray-600",
+    }
 
     return (
         <div className="w-10/12 mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
@@ -126,7 +135,7 @@ const ListBooking = () => {
             </div>
 
             <div className="grid grid-cols-6 gap-2 border-b pb-3 border-gray-300 text-center text-lg font-medium text-gray-600">
-                {[{ id: null, label: "ทั้งหมด" }, { id: 1, label: "รอยืนยัน" }, { id: 2, label: "อนุมัติแล้ว" }, { id: 3, label: "เช็คอินแล้ว" }, { id: 4, label: "เช็คเอาท์" }, { id: 5, label: "ยกเลิกจอง" }].map(({ id, label }) => (
+                {[{ id: null, label: "ทั้งหมด" }, { id: "PENDING", label: "รอยืนยัน" }, { id: "APPROVED", label: "อนุมัติแล้ว" }, { id: "CHECKED_IN", label: "เช็คอินแล้ว" }, { id: "CHECKED_OUT", label: "เช็คเอาท์" }, { id: "CANCELLED", label: "ยกเลิกจอง" }].map(({ id, label }) => (
                     <button
                         key={id}
                         onClick={() => setSelectedStatus(id)}
@@ -147,13 +156,8 @@ const ListBooking = () => {
                             <div className="flex justify-between items-center">
                                 <p className="text-xl font-medium text-gray-800">เลขใบจองที่ {item.bookingId}</p>
                                 <span
-                                    className={`px-3 py-1 text-sm font-semibold rounded-full ${item.bookingStatus.bookingStatusId === 1
-                                        ? "bg-red-100 text-red-600"
-                                        : item.bookingStatus.bookingStatusId === 2
-                                            ? "bg-green-100 text-green-600"
-                                            : "bg-gray-200 text-gray-600"
-                                        }`}>
-                                    {item.bookingStatus.bookingStatusName}
+                                    className={`px-3 py-1 text-sm font-semibold rounded-full ${statusColors[item.bookingStatus] || "bg-gray-200 text-gray-600"}`}>
+                                    {item.bookingStatus}
                                 </span>
                             </div>
                             <p className="text-gray-700 mt-2">คุณ {item.customer.user.userName} {item.customer.user.userSurName}</p>

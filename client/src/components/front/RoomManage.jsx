@@ -9,15 +9,12 @@ const RoomManage = () => {
   const token = useHotelStore((state) => state.token)
   const getRoom = useHotelStore((state) => state.getRoom)
   const rooms = useHotelStore((state) => state.rooms)
-  const getRoomStatus = useHotelStore((state) => state.getRoomStatus)
-  const roomStatuses = useHotelStore((state) => state.roomStatuses)
 
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [selectedPair, setSelectedPair] = useState(null)
 
   useEffect(() => {
     getRoom(token)
-    getRoomStatus(token)
   }, [])
 
   const pairableRooms = [
@@ -77,7 +74,7 @@ const RoomManage = () => {
     return acc
   }, {})
 
-  const handleStatusChange = (roomId, roomStatusId) => {
+  const handleStatusChange = (roomId, roomStatus) => {
     const room = rooms.find((r) => r.roomId === roomId)
 
     if (!room) {
@@ -119,8 +116,8 @@ const RoomManage = () => {
               onClick={async () => {
                 closeToast()
                 try {
-                  { console.log(roomIdsToUpdate, roomStatusId) }
-                  await changeRoomStatus(token, roomIdsToUpdate, roomStatusId)
+                  { console.log(roomIdsToUpdate, roomStatus) }
+                  await changeRoomStatus(token, roomIdsToUpdate, roomStatus)
                   toast.success("✅ อัพเดทสำเร็จ!", { position: "top-center" })
                   getRoom(token)
                 } catch (err) {
@@ -182,15 +179,14 @@ const RoomManage = () => {
             <h2 className="text-lg font-bold mb-3">ชั้น {floor}</h2>
             <div className="flex flex-wrap gap-3 justify-center">
               {groupedRooms[floor].map((room) => {
-                const statusColors = [
-                  "bg-green-500",
-                  "bg-gray-500",
-                  "bg-yellow-500",
-                  "bg-blue-500",
-                  "bg-red-500",
-                ]
-                const statusColor =
-                  statusColors[room.roomStatus?.roomStatusId - 1] || "bg-black"
+                const statusColors = {
+                  AVAILABLE: "bg-green-500",
+                  OCCUPIED: "bg-gray-500",
+                  RESERVED: "bg-yellow-500",
+                  CLEANING: "bg-blue-500",
+                  REPAIR: "bg-red-500",
+                }
+                const statusColor = statusColors[room.roomStatus] || "bg-black"
                 const roomIcon = room.roomType?.roomTypeName.includes(
                   "เตียงเดี่ยว"
                 )
@@ -275,33 +271,18 @@ const RoomManage = () => {
 
             {/* ปุ่มเลือกสถานะห้อง พร้อมสีพื้นหลัง */}
             <div className="grid gap-3">
-              {roomStatuses.map((status) => {
-                // กำหนดสีพื้นหลังตาม roomStatusId
-                const statusColors = {
-                  1: "bg-green-500 text-white", // ว่าง
-                  2: "bg-gray-500 text-white", // มีคนเข้าพัก
-                  3: "bg-yellow-500 text-black", // ติดจอง
-                  4: "bg-blue-500 text-white", // แจ้งทำความสะอาด
-                  5: "bg-red-500 text-white", // แจ้งซ่อม
-                }
-
-                return (
-                  <button
-                    key={status.roomStatusId}
-                    className={`p-3 rounded-lg ${statusColors[status.roomStatusId]
-                      } hover:opacity-80 transition duration-200`}
-                    onClick={() => {
-                      handleStatusChange(
-                        selectedRoom.roomId,
-                        status.roomStatusId
-                      )
-                      setSelectedRoom(null) // ปิด popup
-                    }}
-                  >
-                    {status.roomStatusName}
-                  </button>
-                )
-              })}
+              {Object.entries(statusColors).map(([status, color]) => (
+                <button
+                  key={status}
+                  className={`p-3 rounded-lg ${color} hover:opacity-80 transition duration-200`}
+                  onClick={() => {
+                    handleStatusChange(selectedRoom.roomId, status)
+                    setSelectedRoom(null) // ปิด popup
+                  }}
+                >
+                  {status}
+                </button>
+              ))}
             </div>
 
             {/* ปุ่มด้านล่าง */}

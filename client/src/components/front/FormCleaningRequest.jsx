@@ -114,13 +114,13 @@ const FormCleaningRequest = () => {
     return acc
   }, {})
 
-  // สีของสถานะห้อง
+  // mapping สีของสถานะห้อง
   const statusColors = {
-    1: "bg-green-500", // ว่าง
-    2: "bg-gray-500", // มีคนเข้าพัก
-    3: "bg-yellow-500", // ติดจอง
-    4: "bg-blue-500", // แจ้งทำความสะอาด
-    5: "bg-red-500", // แจ้งซ่อม
+    AVAILABLE: "bg-green-500",
+    OCCUPIED: "bg-gray-500",
+    RESERVED: "bg-yellow-500",
+    CLEANING: "bg-blue-500",
+    REPAIR: "bg-red-500",
   }
 
   return (
@@ -172,14 +172,13 @@ const FormCleaningRequest = () => {
                   : roomTypeName.includes("เตียงคู่")
                     ? BedDouble
                     : Bed
-                const roomStatusColor =
-                  statusColors[room.roomStatusId] || "bg-gray-300"
+                const roomStatusColor = statusColors[room.roomStatus] || "bg-gray-300"
 
                 // ตรวจสอบว่าห้องถูกเลือกหรือไม่
                 const isSelected = selectedRooms.some(
                   (r) => r.roomId === room.roomId
                 )
-                const isDisabled = room.roomStatusId === 4
+                const isDisabled = room.roomStatus === 'CLEANING'
 
                 return (
                   <button
