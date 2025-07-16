@@ -28,26 +28,12 @@ exports.addUser = async (req, res) => {
                 userRole,
                 userName,
                 userSurName,
-                userNumPhone
+                userNumPhone,
+                assignedFloor
             }
         })
 
-        // ✅ กำหนดข้อมูลเพิ่มเติมตาม role
-        let data;
-        if (userRole === "front") {
-            data = await prisma.front.create({ data: { userId: addUser.userId } })
-        } else if (userRole === "housekeeping") {
-            if (!assignedFloor) {
-                return res.status(400).json({ message: "assignedFloor is required for housekeeping!" })
-            }
-            data = await prisma.housekeeping.create({
-                data: { userId: addUser.userId, assignedFloor }
-            })
-        } else if (userRole === "maintenance") {
-            data = await prisma.maintenance.create({ data: { userId: addUser.userId } })
-        }
-
-        console.log(addUser, data)
+        console.log(addUser)
         res.json({ message: "User added successfully." })
 
     } catch (err) {
@@ -69,16 +55,14 @@ exports.listUser = async (req, res) => {
                 userEmail: true,
                 userRole: true,
                 userEnable: true,
-                Housekeeping: { // ✅ ต้องใช้ตัวพิมพ์ใหญ่ให้ตรง schema
-                    select: { assignedFloor: true }
-                }
+                assignedFloor: true
             }
         });
 
         // ✅ จัดโครงสร้างข้อมูลใหม่
         const formattedUsers = users.map(user => ({
             ...user,
-            assignedFloor: user.userRole === "housekeeping" ? user.Housekeeping?.assignedFloor || null : null
+            assignedFloor: user.assignedFloor || null
         }));
 
         res.json(formattedUsers);
@@ -102,7 +86,8 @@ exports.readUser = async (req, res) => {
                 userName: true,
                 userSurName: true,
                 userRole: true,
-                Housekeeping: { select: { assignedFloor: true } }
+                userEnable: true,
+                assignedFloor: true
             }
         });
 
@@ -110,7 +95,7 @@ exports.readUser = async (req, res) => {
 
         res.json({
             ...user,
-            assignedFloor: user.userRole === "housekeeping" ? user.Housekeeping?.assignedFloor || null : null
+            assignedFloor: user.assignedFloor || null
         });
     } catch (err) {
         console.error(err)
@@ -124,14 +109,14 @@ exports.updateUser = async (req, res) => {
         const userId = parseInt(req.params.id);
         if (isNaN(userId)) return res.status(400).json({ message: "Invalid user ID" });
 
-        const { userName, userSurName, userEmail, userNumPhone } = req.body;
+        const { userName, userSurName, userEmail, userNumPhone, assignedFloor } = req.body;
         if (!userName || !userSurName || !userEmail || !userNumPhone) {
             return res.status(400).json({ message: "All fields are required!" });
         }
 
         const user = await prisma.user.update({
             where: { userId },
-            data: { userName, userSurName, userEmail, userNumPhone }
+            data: { userName, userSurName, userEmail, userNumPhone, assignedFloor }
         });
 
         res.json({ message: "User updated successfully", user });
@@ -150,11 +135,6 @@ exports.deleteUser = async (req, res) => {
         // ✅ ตรวจสอบว่าผู้ใช้มีอยู่หรือไม่
         const existingUser = await prisma.user.findUnique({ where: { userId } });
         if (!existingUser) return res.status(404).json({ message: "User not found" });
-
-        // ✅ ลบข้อมูลที่เกี่ยวข้องก่อน (ป้องกัน foreign key constraint error)
-        await prisma.housekeeping.deleteMany({ where: { userId } });
-        await prisma.maintenance.deleteMany({ where: { userId } });
-        await prisma.front.deleteMany({ where: { userId } });
 
         // ✅ ลบผู้ใช้
         const deletedUser = await prisma.user.delete({ where: { userId } });

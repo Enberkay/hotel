@@ -18,19 +18,19 @@ exports.repairRequest = async (req, res) => {
         }
 
         //ค้นหา frontId จาก userId
-        const front = await prisma.front.findUnique({ where: { userId } })
+        const front = await prisma.user.findUnique({ where: { userId, userRole: 'front' } })
         if (!front) {
             return res.status(403).json({ message: "Unauthorized: User is not a front desk staff" })
         }
 
-        const frontId = front.frontId
+        const frontId = front.userId
 
         // ใช้ Transaction เพื่อความปลอดภัย
         const repairRequest = await prisma.$transaction(async (prisma) => {
             //1. สร้างใบแจ้งซ่อม
             const newRepairRequest = await prisma.repairRequest.create({
                 data: {
-                    frontId,
+                    userId: frontId,
                     repairRequestStatus: 'PENDING',
                     RepairRequestRoom: {
                         create: rooms.map((room) => ({
@@ -66,7 +66,7 @@ exports.listRepairRequest = async (req, res) => {
     try {
         const repairRequest = await prisma.repairRequest.findMany({
             include: {
-                front: {
+                user: {
                     include: {
                         user: {
                             select: {
@@ -110,7 +110,7 @@ exports.readRepairRequest = async (req, res) => {
                 requestId: parseInt(id)
             },
             include: {
-                front: {
+                user: {
                     include: {
                         user: {
                             select: {
@@ -163,11 +163,7 @@ exports.noteRepairRequest = async (req, res) => {
             return res.status(404).json({ message: "ไม่พบข้อมูลใบแจ้งซ่อม" })
         }
 
-        const maintenance = await prisma.maintenance.findFirst({
-            where: {
-                userId
-            }
-        })
+        const maintenance = await prisma.user.findUnique({ where: { userId, userRole: 'maintenance' } })
 
         if (!maintenance) {
             return res.status(403).json({ message: "User is not authorized for maintenance" })
@@ -178,7 +174,7 @@ exports.noteRepairRequest = async (req, res) => {
                 requestId: Number(requestId)
             },
             data: {
-                maintenanceId: maintenance.maintenanceId,
+                userId: maintenance.userId,
                 repairRequestStatus: 'IN_PROGRESS'
             }
         })
@@ -213,11 +209,7 @@ exports.repairReport = async (req, res) => {
         }
 
         // ตรวจสอบว่าผู้ใช้มีสิทธิ์ในการทำการบำรุงรักษาหรือไม่
-        const maintenance = await prisma.maintenance.findFirst({
-            where: {
-                userId
-            }
-        })
+        const maintenance = await prisma.user.findUnique({ where: { userId, userRole: 'maintenance' } })
 
         if (!maintenance) {
             return res.status(403).json({ message: "User is not authorized for maintenance" })
@@ -227,8 +219,8 @@ exports.repairReport = async (req, res) => {
         const repairReport = await prisma.repairReport.create({
             data: {
                 requestId: Number(requestId),
-                maintenanceId: maintenance.maintenanceId,
-                frontId: request.frontId,
+                userId: maintenance.userId,
+                frontId: request.userId,
                 // ตั้งวันที่ให้เป็นปัจจุบัน
                 reportAt: new Date(),
             }

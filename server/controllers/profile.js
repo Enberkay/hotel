@@ -14,22 +14,7 @@ exports.getProfile = async (req, res) => {
                 userSurName: true,
                 userNumPhone: true,
                 licensePlate: true,
-                Customer: {
-                    select: {
-                        stdId: true,
-                        idCard: true,
-                        customerType: {
-                            select: {
-                                customerTypeId: true,
-                                customerTypeName: true,
-                                discount: true
-                            }
-                        },
-                        images: true
-                    }
-
-                },
-                Front: true
+                images: true
             }
         })
 

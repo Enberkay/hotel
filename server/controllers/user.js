@@ -5,41 +5,36 @@ exports.myBookings = async (req, res) => {
     try {
         const userId = req.user.userId // ดึง userId จาก JWT Token (Middleware)
 
-        // ค้นหาข้อมูลการจองของลูกค้า
-        const customer = await prisma.customer.findUnique({
-            where: { userId: userId },
+        // ดึงข้อมูลการจองของลูกค้าโดยใช้ userId
+        const bookings = await prisma.booking.findMany({
+            where: { customerId: userId },
             include: {
-                Booking: {
-                    include: {
-                        bookingStatus: true,
-                        paymentStatus: true,
-                        room: {
-                            select: {
-                                roomNumber: true,
-                                floor: true,
-                                roomType: true
-                            }
-                        },
-                        // ✅ ดึงข้อมูล pairRoom ถ้ามี
-                        pairRoom: {
-                            select: {
-                                roomNumber: true,
-                                floor: true
-                            }
-                        },
-                        roomType: true,
-                        paymentMethod: true
-                    },
-                    orderBy: { createdAt: "desc" }
-                }
-            }
+                bookingStatus: true,
+                paymentStatus: true,
+                room: {
+                    select: {
+                        roomNumber: true,
+                        floor: true,
+                        roomType: true
+                    }
+                },
+                pairRoom: {
+                    select: {
+                        roomNumber: true,
+                        floor: true
+                    }
+                },
+                roomType: true,
+                paymentMethod: true
+            },
+            orderBy: { createdAt: "desc" }
         })
 
-        if (!customer || !customer.Booking.length) {
+        if (!bookings || bookings.length === 0) {
             return res.status(404).json({ message: "ไม่พบข้อมูลการจองของคุณ" })
         }
 
-        return res.json(customer.Booking)
+        return res.json(bookings)
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: "Server Error" })
@@ -58,16 +53,12 @@ exports.bookingDetail = async (req, res) => {
             },
             include: {
                 customer: {
-                    include: {
-                        user: {
-                            select: {
-                                userEmail: true,
-                                userName: true,
-                                userSurName: true,
-                                userNumPhone: true,
-                                prefix: true
-                            }
-                        }
+                    select: {
+                        userEmail: true,
+                        userName: true,
+                        userSurName: true,
+                        userNumPhone: true,
+                        prefix: true
                     }
                 },
                 BookingAddonList: {
