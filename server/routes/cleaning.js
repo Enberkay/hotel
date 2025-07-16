@@ -14,9 +14,18 @@ const {
 } = require("../controllers/cleaning")
 
 const { authCheck, frontCheck } = require("../middlewares/authCheck")
+const { z } = require('zod');
+const validateWithZod = require('../middlewares/validateWithZod');
+
+const cleaningRequestSchema = z.object({
+  rooms: z.array(z.object({
+    roomId: z.number(),
+    note: z.string().optional()
+  }))
+});
 
 // 🔹 สร้างใบแจ้งทำความสะอาด (Create Cleaning Request)
-router.post("/cleaning-requests", authCheck, frontCheck, cleaningRequest)
+router.post("/cleaning-requests", authCheck, frontCheck, validateWithZod(cleaningRequestSchema), cleaningRequest)
 
 // 🔹 แสดงรายการใบแจ้งทำความสะอาดทั้งหมด (List Cleaning Requests)
 router.get("/cleaning-requests", authCheck, listCleaningRequest)

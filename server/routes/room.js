@@ -6,11 +6,20 @@ const { create, read, list, update, remove, groupRoom, unGroupRoom } = require("
 const { changeStatusRoom } = require("../controllers/changeStatusRoom")
 
 const { authCheck } = require("../middlewares/authCheck")
+const { z } = require('zod');
+const validateWithZod = require('../middlewares/validateWithZod');
+
+const roomCreateSchema = z.array(z.object({
+  roomNumber: z.string().min(1),
+  roomTypeId: z.number(),
+  roomStatusId: z.number(),
+  floor: z.number()
+}));
 
 //@ENDPOINT http://localhost:8000/api
 
 // 🔹 เพิ่มห้อง (Create Room)
-router.post("/rooms", create)
+router.post("/rooms", validateWithZod(roomCreateSchema), create)
 
 // 🔹 ดูห้องทั้งหมด (List Rooms)
 router.get("/rooms", authCheck, list)
