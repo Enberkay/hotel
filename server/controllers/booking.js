@@ -1,10 +1,11 @@
 const prisma = require("../config/prisma")
+const { calculateBookingTotal, processAddons } = require('../services/bookingService');
 
 // ฟังก์ชันสำหรับสร้างการจองใหม่
 exports.createBooking = async (req, res) => {
     try {
-        const { count, roomTypeId, checkInDate, checkOutDate, addon, paymentMethodId } = req.body
-        const { userEmail } = req.user // ได้จาก authCheck middleware
+        const { count, roomTypeId, checkInDate, checkOutDate, addon } = req.validated;
+        const { userEmail } = req.user;
 
         // ดึงข้อมูล user ที่เป็น customer จาก userEmail
         const customer = await prisma.user.findFirst({
@@ -14,98 +15,41 @@ exports.createBooking = async (req, res) => {
             },
             select: {
                 userId: true,
-                // ถ้าต้องการ field เฉพาะ customer เช่น discount ให้เพิ่มตรงนี้
             }
-        })
+        });
 
         if (!customer) {
-            return res.status(403).json({ message: "Customer not found or unauthorized" })
+            return res.status(403).json({ message: "Customer not found or unauthorized" });
         }
+        const customerId = customer.userId;
+        const customerDiscount = 0;
 
-        const customerId = customer.userId
-        // const customerDiscount = ... // ถ้ามี field discount ใน user ให้ดึงตรงนี้
-        const customerDiscount = 0 // (ตัวอย่าง: ไม่มี discount)
-
-        if (!count || !checkInDate || !checkOutDate) {
-            return res.status(400).json({ message: "Missing required fields" })
-        }
-
-        const checkIn = new Date(checkInDate)
-        const checkOut = new Date(checkOutDate)
-
+        // ตรวจสอบวันที่
+        const checkIn = new Date(checkInDate);
+        const checkOut = new Date(checkOutDate);
         if (checkIn >= checkOut) {
-            return res.status(400).json({ message: "Check-in date must be before check-out date" })
+            return res.status(400).json({ message: "Check-in date must be before check-out date" });
         }
 
+        // ดึงราคา roomType
         const roomType = await prisma.roomType.findUnique({
-            where: {
-                roomTypeId: Number(roomTypeId)
-            },
-            select: {
-                price: true
-            }
-        })
-
+            where: { roomTypeId: Number(roomTypeId) },
+            select: { price: true }
+        });
         if (!roomType) {
-            return res.status(400).json({ message: "Invalid room type" })
+            return res.status(400).json({ message: "Invalid room type" });
         }
 
-        const daysBooked = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24))
-        const roomTotal = roomType.price * daysBooked
+        // ใช้ service สำหรับคำนวณราคาและ addon
+        const daysBooked = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        const { totalAddon, addonListData } = await processAddons(addon);
+        const lastTotal = calculateBookingTotal(roomType.price, daysBooked, totalAddon, customerDiscount);
 
-        let totalAddon = 0
-        let addonListData = []
-
-        // Validation & Cleanup สำหรับ addon
-        const validAddons = Array.isArray(addon)
-            ? addon.filter(a => a.addonId !== undefined && a.quantity !== undefined)
-            : []
-
-        if (addon.length > 0 && validAddons.length !== addon.length) {
-            return res.status(400).json({ message: "Invalid addon format. Each addon must have addonId and quantity." })
-        }
-
-        if (validAddons.length > 0) {
-            const addonsData = await prisma.addon.findMany({
-                where: {
-                    addonId: {
-                        in: validAddons.map(a => a.addonId)
-                    }
-                },
-                select: {
-                    addonId: true,
-                    price: true
-                }
-            })
-
-            addonListData = validAddons.map((addonItem) => {
-                const addonId = addonItem.addonId
-                const quantity = addonItem.quantity
-                const foundAddon = addonsData.find((a) => a.addonId === addonId)
-
-                if (foundAddon) {
-                    totalAddon += foundAddon.price * Number(quantity)
-                    return {
-                        addonId: Number(addonId),
-                        quantity: Number(quantity)
-                    }
-                }
-                return null
-            }).filter((a) => a !== null)
-        }
-
-        const total = roomTotal + totalAddon
-        const lastTotal = total - customerDiscount
-
-        // สร้าง Booking ก่อน (เพราะเป็นหัวหลักของระบบ)
+        // สร้าง Booking
         const newBooking = await prisma.booking.create({
             data: {
-                customer: {
-                    connect: { userId: customerId }
-                },
-                roomType: {
-                    connect: { roomTypeId: Number(roomTypeId) }
-                },
+                customer: { connect: { userId: customerId } },
+                roomType: { connect: { roomTypeId: Number(roomTypeId) } },
                 count: Number(count),
                 checkInDate: checkIn,
                 checkOutDate: checkOut,
@@ -113,37 +57,33 @@ exports.createBooking = async (req, res) => {
                 confirmedAt: null,
                 bookingStatus: 'PENDING',
             }
-        })
+        });
 
         // ถ้ามี Addon ให้สร้าง BookingAddonList และ BookingAddon
         if (addonListData.length > 0) {
-            const newBookingAddonList = await prisma.bookingAddonList.create({
-                data: {}
-            })
-
+            const newBookingAddonList = await prisma.bookingAddonList.create({ data: {} });
             await prisma.bookingAddon.createMany({
                 data: addonListData.map(a => ({
                     bookingAddonListId: newBookingAddonList.bookingAddonListId,
                     addonId: a.addonId,
                     quantity: a.quantity
                 }))
-            })
-
+            });
             await prisma.bookingAddonListRelation.create({
                 data: {
                     bookingId: newBooking.bookingId,
                     bookingAddonListId: newBookingAddonList.bookingAddonListId,
                     price: totalAddon
                 }
-            })
+            });
         }
 
-        res.status(201).json({ message: "Booking created successfully", booking: newBooking })
+        res.status(201).json({ message: "Booking created successfully", booking: newBooking });
     } catch (err) {
-        console.error(err)
-        res.status(500).json({ message: "Failed to create booking", error: err.message })
+        console.error(err);
+        res.status(500).json({ message: "Failed to create booking", error: err.message });
     }
-}
+};
 
 // ฟังก์ชันสำหรับดึงรายการการจองทั้งหมด
 exports.listBookings = async (req, res) => {

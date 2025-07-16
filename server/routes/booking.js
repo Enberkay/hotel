@@ -5,9 +5,22 @@ const { createBooking, listBookings, readBooking, confirmBooking } = require("..
 const { checkIn, checkOut } = require("../controllers/checkInAndCheckOut")
 
 const { authCheck, frontCheck } = require("../middlewares/authCheck")
+const { z } = require('zod');
+const validateWithZod = require('../middlewares/validateWithZod');
+
+const bookingCreateSchema = z.object({
+  count: z.string().or(z.number()).min(1),
+  roomTypeId: z.string().or(z.number()),
+  checkInDate: z.string().min(1),
+  checkOutDate: z.string().min(1),
+  addon: z.array(z.object({
+    addonId: z.number(),
+    quantity: z.number()
+  })).optional()
+});
 
 // 🔹 สร้าง Booking (ลูกค้าจองห้อง)
-router.post("/bookings", authCheck, createBooking); // ✅ เปลี่ยน "/booking" → "/bookings"
+router.post("/bookings", authCheck, validateWithZod(bookingCreateSchema), createBooking); // ✅ เปลี่ยน "/booking" → "/bookings"
 
 // 🔹 ดูรายการ Booking ทั้งหมด
 router.get("/bookings", authCheck, listBookings);
