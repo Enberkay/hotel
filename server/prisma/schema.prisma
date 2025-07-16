@@ -43,6 +43,9 @@ model User {
     repairRequestsAsFront RepairRequest[] @relation("FrontRepairRequest")
     repairReportsAsMaintenance RepairReport[] @relation("MaintenanceRepairReport")
     repairReportsAsFront RepairReport[] @relation("FrontRepairReport")
+
+    @@index([userEmail])
+    @@index([userId])
 }
 
 enum UserRole {
@@ -279,6 +282,9 @@ model Room {
 
     // ความสัมพันธ์ M:N กับ RepairReport ผ่าน RepairReportRoom
     RepairReportRoom RepairReportRoom[]
+
+    @@index([roomNumber])
+    @@index([roomId])
 }
 
 model RoomType {
@@ -288,6 +294,8 @@ model RoomType {
 
     Room    Room[]
     Booking Booking[]
+
+    @@index([roomTypeId])
 }
 
 enum RoomStatus {
@@ -340,6 +348,12 @@ model Booking {
     bookingStatus BookingStatus @default(PENDING)
     BookingAddonListRelation BookingAddonListRelation[]
     Receipt Receipt?
+
+    @@index([bookingId])
+    @@index([customerId])
+    @@index([roomId])
+    @@index([frontId])
+    @@index([roomTypeId])
 }
 
 model BookingAddonListRelation {
@@ -377,6 +391,8 @@ model Addon {
     addonName    String
     price        Int
     BookingAddon BookingAddon[]
+
+    @@index([addonId])
 }
 
 model Receipt {
@@ -395,4 +411,9 @@ model Receipt {
 
     bookingId Int     @unique
     booking   Booking @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
+
+    @@index([customerId])
+    @@index([roomId])
+    @@index([frontId])
+    @@index([bookingId])
 }
