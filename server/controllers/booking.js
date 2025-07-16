@@ -6,20 +6,15 @@ exports.createBooking = async (req, res) => {
         const { count, roomTypeId, checkInDate, checkOutDate, addon, paymentMethodId } = req.body
         const { userEmail } = req.user // ได้จาก authCheck middleware
 
-        // ดึงข้อมูล customer จาก userEmail
-        const customer = await prisma.customer.findFirst({
+        // ดึงข้อมูล user ที่เป็น customer จาก userEmail
+        const customer = await prisma.user.findFirst({
             where: {
-                user: {
-                    userEmail
-                }
+                userEmail,
+                userRole: 'customer'
             },
             select: {
-                customerId: true,
-                customerType: {
-                    select: {
-                        discount: true
-                    }
-                }
+                userId: true,
+                // ถ้าต้องการ field เฉพาะ customer เช่น discount ให้เพิ่มตรงนี้
             }
         })
 
@@ -27,8 +22,9 @@ exports.createBooking = async (req, res) => {
             return res.status(403).json({ message: "Customer not found or unauthorized" })
         }
 
-        const customerId = customer.customerId
-        const customerDiscount = customer.customerType.discount
+        const customerId = customer.userId
+        // const customerDiscount = ... // ถ้ามี field discount ใน user ให้ดึงตรงนี้
+        const customerDiscount = 0 // (ตัวอย่าง: ไม่มี discount)
 
         if (!count || !checkInDate || !checkOutDate) {
             return res.status(400).json({ message: "Missing required fields" })
@@ -65,12 +61,10 @@ exports.createBooking = async (req, res) => {
             ? addon.filter(a => a.addonId !== undefined && a.quantity !== undefined)
             : []
 
-        // ถ้า addon ที่ส่งมาไม่ครบ (บางตัวขาด addonId หรือ quantity) จะ reject ทันที
         if (addon.length > 0 && validAddons.length !== addon.length) {
             return res.status(400).json({ message: "Invalid addon format. Each addon must have addonId and quantity." })
         }
 
-        // ถ้ามี addon ที่ถูกต้อง ให้ไปดึงราคาจาก DB
         if (validAddons.length > 0) {
             const addonsData = await prisma.addon.findMany({
                 where: {
@@ -100,7 +94,6 @@ exports.createBooking = async (req, res) => {
             }).filter((a) => a !== null)
         }
 
-        // คำนวณราคาสุทธิหลังหักส่วนลด
         const total = roomTotal + totalAddon
         const lastTotal = total - customerDiscount
 
@@ -108,7 +101,7 @@ exports.createBooking = async (req, res) => {
         const newBooking = await prisma.booking.create({
             data: {
                 customer: {
-                    connect: { customerId }
+                    connect: { userId: customerId }
                 },
                 roomType: {
                     connect: { roomTypeId: Number(roomTypeId) }
@@ -169,11 +162,6 @@ exports.listBookings = async (req, res) => {
                                 userSurName: true,
                                 userEmail: true,
                                 userNumPhone: true
-                            }
-                        },
-                        customerType: {
-                            select: {
-                                customerTypeName: true
                             }
                         }
                     }
@@ -239,13 +227,8 @@ exports.readBooking = async (req, res) => {
                                 userNumPhone: true,
                                 licensePlate: true
                             }
-                        },
-                        customerType: {
-                            select: { customerTypeName: true }
-                        },
-                        images: true
+                        }
                     }
-
                 },
                 roomType: {
                     select: {
@@ -336,9 +319,12 @@ exports.confirmBooking = async (req, res) => {
         }
 
         // ค้นหา frontId ของพนักงานที่ล็อกอินอยู่
-        const frontUser = await prisma.front.findFirst({
-            where: { user: { userEmail } },
-            select: { frontId: true }
+        const frontUser = await prisma.user.findFirst({
+            where: {
+                userEmail,
+                userRole: 'front'
+            },
+            select: { userId: true }
         });
 
         if (!frontUser) {
@@ -362,7 +348,7 @@ exports.confirmBooking = async (req, res) => {
                 data: {
                     room: { connect: { roomId: Number(mainRoomId) } },
                     pairRoom: secondRoomId ? { connect: { roomId: Number(secondRoomId) } } : undefined,
-                    front: { connect: { frontId: frontUser.frontId } },
+                    front: { connect: { userId: frontUser.userId } },
                     bookingStatus: 'CONFIRMED',
                     confirmedAt: new Date()
                 }

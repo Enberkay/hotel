@@ -5,7 +5,6 @@ import { toast } from "react-toastify"
 
 import { Link } from "react-router-dom"
 import { Pencil, Trash } from 'lucide-react'
-import UploadFile from "../shared/UploadFile"
 
 const initialState = {
     roomNumber: "",

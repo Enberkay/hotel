@@ -14,8 +14,8 @@ exports.cleaningRequest = async (req, res) => {
         }
 
         // ค้นหา frontId จากตาราง Front ตาม userId
-        const front = await prisma.front.findUnique({
-            where: { userId },
+        const front = await prisma.user.findUnique({
+            where: { userId, userRole: 'front' }
         })
 
         if (!front) {
@@ -24,14 +24,14 @@ exports.cleaningRequest = async (req, res) => {
                 .json({ message: "Unauthorized: User is not a front desk staff" })
         }
 
-        const frontId = front.frontId // ใช้ frontId ที่หาได้จาก userId
+        const frontId = front.userId // ใช้ frontId ที่หาได้จาก userId
 
         // ใช้ transaction เพื่อให้แน่ใจว่าทั้งการสร้าง request และการอัปเดตห้องสำเร็จพร้อมกัน
         const result = await prisma.$transaction(async (prisma) => {
             // สร้างคำขอทำความสะอาด
             const cleaningRequest = await prisma.cleaningRequest.create({
                 data: {
-                    frontId,
+                    userId,
                     cleaningRequestStatus: 'PENDING',
                     CleaningRequestRoom: {
                         create: rooms.map(({ roomId, description }) => ({
@@ -69,17 +69,16 @@ exports.cleaningRequest = async (req, res) => {
 
 exports.listCleaningRequest = async (req, res) => {
     try {
-        const { userEmail } = req.user // ได้จาก authCheck middleware
+        const { userId } = req.user // ได้จาก authCheck middleware
 
         // ค้นหา housekeeping ที่ดูแลชั้นไหน
-        const housekeeping = await prisma.housekeeping.findFirst({
+        const housekeeping = await prisma.user.findFirst({
             where: {
-                user: {
-                    userEmail
-                }
+                userId,
+                userRole: 'housekeeping'
             },
             select: {
-                housekeepingId: true,
+                userId: true,
                 assignedFloor: true
             }
         })
@@ -114,7 +113,7 @@ exports.listCleaningRequest = async (req, res) => {
                     }
                 },
                 cleaningRequestStatus: true, // ดึงสถานะของคำขอทำความสะอาด
-                front: {
+                user: {
                     include: {
                         user: {
                             select: {
@@ -157,7 +156,7 @@ exports.readCleaningRequest = async (req, res) => {
                     }
                 },
                 cleaningRequestStatus: true, // ดึงสถานะของคำขอทำความสะอาด
-                front: {
+                user: {
                     include: {
                         user: {
                             select: {
@@ -203,7 +202,7 @@ exports.cleaningReport = async (req, res) => {
             return res.status(404).json({ message: "CleaningRequest not found" })
         }
 
-        const housekeeping = await prisma.housekeeping.findFirst({ where: { userId } })
+        const housekeeping = await prisma.user.findFirst({ where: { userId } })
         if (!housekeeping) {
             return res.status(403).json({ message: "User is not authorized for housekeeping" })
         }
@@ -213,7 +212,7 @@ exports.cleaningReport = async (req, res) => {
             report = await prisma.cleaningReport.create({
                 data: {
                     requestId,
-                    housekeepingId: housekeeping.housekeepingId,
+                    userId: housekeeping.userId,
                     reportAt: new Date()
                 }
             })
@@ -310,17 +309,16 @@ exports.cleaningReport = async (req, res) => {
 //สำหรับแม่บ้าน
 exports.listCleaningReport = async (req, res) => {
     try {
-        const { userEmail } = req.user // ได้จาก authCheck middleware
+        const { userId } = req.user // ได้จาก authCheck middleware
 
         // ค้นหา housekeeping ที่ดูแลชั้นไหน
-        const housekeeping = await prisma.housekeeping.findFirst({
+        const housekeeping = await prisma.user.findFirst({
             where: {
-                user: {
-                    userEmail
-                }
+                userId,
+                userRole: 'housekeeping'
             },
             select: {
-                housekeepingId: true,
+                userId: true,
                 assignedFloor: true
             }
         })
@@ -343,7 +341,7 @@ exports.listCleaningReport = async (req, res) => {
                 }
             },
             include: {
-                housekeeping: {
+                user: {
                     include: {
                         user: {
                             select: {
@@ -386,7 +384,7 @@ exports.readCleaningReport = async (req, res) => {
                         cleaningStatus: true // ดึงสถานะการทำความสะอาด
                     }
                 },
-                housekeeping: {
+                user: {
                     select: {
                         user: {
                             select: {
@@ -419,7 +417,7 @@ exports.allListCleaningReport = async (req, res) => {
     try {
         const cleaningReport = await prisma.cleaningReport.findMany({
             include: {
-                housekeeping: {
+                user: {
                     include: {
                         user: {
                             select: {
@@ -469,7 +467,7 @@ exports.noteReport = async (req, res) => {
             return res.status(404).json({ message: "ไม่พบข้อมูลใบรายงานการทำความสะอาด" })
         }
 
-        const front = await prisma.front.findFirst(
+        const front = await prisma.user.findFirst(
             {
                 where: {
                     userId
@@ -487,7 +485,7 @@ exports.noteReport = async (req, res) => {
             },
             data: {
                 cleaningReportStatus: 'CHECKED',
-                frontId: front.frontId
+                userId: front.userId
             }
         })
         res.json(noted)
@@ -516,7 +514,7 @@ exports.noteRequest = async (req, res) => {
             return res.status(404).json({ message: "ไม่พบข้อมูลใบแจ้งทำความสะอาด" })
         }
 
-        const housekeeping = await prisma.housekeeping.findFirst({
+        const housekeeping = await prisma.user.findFirst({
             where: {
                 userId
             }
@@ -531,7 +529,7 @@ exports.noteRequest = async (req, res) => {
                 requestId: Number(requestId)
             },
             data: {
-                housekeepingId: housekeeping.housekeepingId,
+                userId: housekeeping.userId,
                 cleaningRequestStatus: 'IN_PROGRESS'
             }
         })

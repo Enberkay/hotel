@@ -24,15 +24,26 @@ model User {
     userNumPhone String?  @unique // เบอร์โทรศัพท์เก็บใน User
     userRole     UserRole @default(customer)
     prefix       String? //คำนำหน้า
-    licensePlate String?
+    licensePlate String? // สำหรับ customer
+    stdId        String? // สำหรับ customer
+    idCard       String? // สำหรับ customer
+    assignedFloor String? // สำหรับ housekeeping
     userEnable   Boolean  @default(true)
     createdAt    DateTime @default(now())
-
-    // Relationships
-    Customer     Customer?
-    Housekeeping Housekeeping?
-    Maintenance  Maintenance?
-    Front        Front?
+    // Relations
+    bookingsAsCustomer Booking[] @relation("CustomerBooking")
+    bookingsAsFront Booking[] @relation("FrontBooking")
+    receiptsAsCustomer Receipt[] @relation("CustomerReceipt")
+    receiptsAsFront Receipt[] @relation("FrontReceipt")
+    cleaningRequestsAsHousekeeping CleaningRequest[] @relation("HousekeepingCleaningRequest")
+    cleaningRequestsAsFront CleaningRequest[] @relation("FrontCleaningRequest")
+    cleaningReportsAsHousekeeping CleaningReport[] @relation("HousekeepingCleaningReport")
+    cleaningReportsAsFront CleaningReport[] @relation("FrontCleaningReport")
+    repairRequestsAsMaintenance RepairRequest[] @relation("MaintenanceRepairRequest")
+    repairRequestsAsFront RepairRequest[] @relation("FrontRepairRequest")
+    repairReportsAsMaintenance RepairReport[] @relation("MaintenanceRepairReport")
+    repairReportsAsFront RepairReport[] @relation("FrontRepairReport")
+    images Image[] @relation("CustomerImage")
 }
 
 enum UserRole {
@@ -43,57 +54,7 @@ enum UserRole {
     maintenance
 }
 
-model Customer {
-    customerId Int     @id @default(autoincrement())
-    stdId      String? @unique
-    idCard     String?
-    userId     Int     @unique // Foreign key to User model
-    user       User    @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship with User
-
-    customerTypeId Int          @default(1) // FK to CustomerType
-    customerType   CustomerType @relation(fields: [customerTypeId], references: [customerTypeId])
-
-    Receipt Receipt[]
-    Booking Booking[]
-
-    images Image[]
-}
-
-model CustomerType {
-    customerTypeId   Int    @id @default(autoincrement())
-    customerTypeName String
-    discount         Int
-
-    Customer Customer[]
-}
-
-model Front {
-    frontId Int @id @default(autoincrement())
-
-    userId Int  @unique // Foreign key to User model
-    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship with User
-
-    CleaningRequest CleaningRequest[]
-    CleaningReport  CleaningReport[]
-    RepairRequest   RepairRequest[]
-    RepairReport    RepairReport[]
-
-    Booking Booking[]
-
-    Receipt Receipt[]
-}
-
-model Housekeeping {
-    housekeepingId Int @id @default(autoincrement())
-
-    assignedFloor String @default("3")
-
-    userId Int  @unique // Foreign key to User model
-    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship with User
-
-    CleaningRequest CleaningRequest[]
-    CleaningReport  CleaningReport[]
-}
+// ลบ model Customer, Housekeeping, Maintenance, Front และอัปเดตความสัมพันธ์ใน model อื่น ๆ ให้ใช้ userId แทน ...
 
 model CleaningRequest {
     requestId Int @id @default(autoincrement())
@@ -108,10 +69,10 @@ model CleaningRequest {
     updatedAt DateTime @default(now()) @updatedAt // **เพิ่มค่า default**
 
     housekeepingId Int?
-    housekeeping   Housekeeping? @relation(fields: [housekeepingId], references: [housekeepingId])
+    housekeeping   User? @relation("HousekeepingCleaningRequest", fields: [housekeepingId], references: [userId])
 
     frontId Int
-    front   Front @relation(fields: [frontId], references: [frontId])
+    front   User @relation("FrontCleaningRequest", fields: [frontId], references: [userId])
 
     cleaningRequestStatus CleaningRequestStatus @default(PENDING)
     CleaningRequestRoom CleaningRequestRoom[]
@@ -147,10 +108,10 @@ model CleaningReport {
     reportAt DateTime @default(now())
 
     housekeepingId Int
-    housekeeping   Housekeeping @relation(fields: [housekeepingId], references: [housekeepingId])
+    housekeeping   User @relation("HousekeepingCleaningReport", fields: [housekeepingId], references: [userId])
 
     frontId Int?
-    front   Front? @relation(fields: [frontId], references: [frontId])
+    front   User? @relation("FrontCleaningReport", fields: [frontId], references: [userId])
 
     // เชื่อมกับ CleaningRequest แบบ 1:1
     requestId       Int             @unique
@@ -211,15 +172,6 @@ enum CleaningStatus {
     PROBLEM
 }
 
-model Maintenance {
-    maintenanceId Int  @id @default(autoincrement())
-    userId        Int  @unique // Foreign key to User model
-    user          User @relation(fields: [userId], references: [userId], onDelete: Cascade) // Relationship with User
-
-    RepairRequest RepairRequest[]
-    RepairReport  RepairReport[]
-}
-
 //ใบแจ้งซ่อม
 model RepairRequest {
     requestId Int @id @default(autoincrement())
@@ -228,10 +180,10 @@ model RepairRequest {
     requestAt DateTime @default(now())
 
     maintenanceId Int?
-    maintenance   Maintenance? @relation(fields: [maintenanceId], references: [maintenanceId])
+    maintenance   User? @relation("MaintenanceRepairRequest", fields: [maintenanceId], references: [userId])
 
     frontId Int
-    front   Front @relation(fields: [frontId], references: [frontId])
+    front   User @relation("FrontRepairRequest", fields: [frontId], references: [userId])
 
     repairRequestStatus RepairRequestStatus @default(PENDING)
     RepairRequestRoom RepairRequestRoom[]
@@ -265,10 +217,10 @@ model RepairReport {
     reportAt DateTime @default(now())
 
     maintenanceId Int
-    maintenance   Maintenance @relation(fields: [maintenanceId], references: [maintenanceId])
+    maintenance   User @relation("MaintenanceRepairReport", fields: [maintenanceId], references: [userId])
 
     frontId Int
-    front   Front @relation(fields: [frontId], references: [frontId])
+    front   User @relation("FrontRepairReport", fields: [frontId], references: [userId])
 
     requestId     Int           @unique //RepairReport 1:1 RepairRequest
     repairRequest RepairRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
@@ -376,7 +328,7 @@ model Booking {
     count     Int @default(1) //จำนวนคน 
 
     customerId Int // Foreign key to Customer
-    customer   Customer @relation(fields: [customerId], references: [customerId]) // Relationship with Customer
+    customer   User @relation("CustomerBooking", fields: [customerId], references: [userId]) // Relationship with Customer
 
     roomId Int? // ห้องหลัก
     room   Room? @relation("MainRoom", fields: [roomId], references: [roomId]) // ตั้งชื่อ relation "MainRoom"
@@ -388,7 +340,7 @@ model Booking {
     roomType   RoomType? @relation(fields: [roomTypeId], references: [roomTypeId])
 
     frontId Int?
-    front   Front? @relation(fields: [frontId], references: [frontId])
+    front   User? @relation("FrontBooking", fields: [frontId], references: [userId])
 
     total Float @default(0)
 
@@ -454,13 +406,13 @@ model Receipt {
     createdAt DateTime @default(now())
 
     customerId Int
-    customer   Customer @relation(fields: [customerId], references: [customerId], onDelete: Cascade)
+    customer   User @relation("CustomerReceipt", fields: [customerId], references: [userId])
 
     roomId Int
     room   Room @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
 
     frontId Int
-    front   Front @relation(fields: [frontId], references: [frontId], onDelete: Cascade)
+    front   User @relation("FrontReceipt", fields: [frontId], references: [userId])
 
     bookingId Int     @unique
     booking   Booking @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
@@ -479,5 +431,5 @@ model Image {
     booking   Booking? @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
 
     customerId Int
-    customer   Customer @relation(fields: [customerId], references: [customerId], onDelete: Cascade)
+    customer   User @relation("CustomerImage", fields: [customerId], references: [userId], onDelete: Cascade)
 }
