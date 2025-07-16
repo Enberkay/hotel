@@ -13,8 +13,7 @@ exports.getProfile = async (req, res) => {
                 userName: true,
                 userSurName: true,
                 userNumPhone: true,
-                licensePlate: true,
-                images: true
+                licensePlate: true
             }
         })
 

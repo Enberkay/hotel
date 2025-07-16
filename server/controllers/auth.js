@@ -8,7 +8,6 @@ const path = require("path");
 exports.register = async (req, res) => {
     try {
         const { userEmail, userPassword, userName, userSurName, userNumPhone, prefix, licensePlate } = req.body
-        console.log(images)
         // Step 1 Validate body, DO NOT EMPTY
         if (!userEmail) {
             return res.status(400).json({ message: 'Email is required!!!' })
@@ -73,53 +72,6 @@ exports.register = async (req, res) => {
         return res.status(500).json({ message: "Auth controller register error" })
     }
 }
-
-exports.createImages = async (req, res) => {
-    try {
-        // Multer จะเพิ่ม req.file เข้ามา
-        if (!req.file) {
-            return res.status(400).json({ message: "No file uploaded" });
-        }
-        // ตัวอย่างการบันทึกข้อมูลไฟล์ลง DB (หรือจะส่งกลับ client อย่างเดียวก็ได้)
-        // สมมติว่า images table มี field: asset_id, public_id, url, secure_url
-        // ในที่นี้จะใช้ filename เป็น asset_id/public_id และ path เป็น url
-        const fileUrl = `/uploads/${req.file.filename}`; // สมมติเปิด static /uploads
-        const imageData = {
-            asset_id: req.file.filename,
-            public_id: req.file.filename,
-            url: fileUrl,
-            secure_url: fileUrl
-        };
-        // ถ้าต้องการบันทึกลง DB:
-        // await prisma.image.create({ data: imageData });
-        res.json(imageData);
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Server Error" });
-    }
-};
-
-exports.removeImage = async (req, res) => {
-    try {
-        const { filename } = req.body; // รับชื่อไฟล์ที่ต้องการลบ
-        if (!filename) {
-            return res.status(400).json({ message: "No filename provided" });
-        }
-        const fs = require("fs");
-        const filePath = path.join(__dirname, "../uploads", filename);
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({ message: "Failed to delete file" });
-            }
-            res.json({ message: "ลบรูปแล้ว!!!.." });
-        });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Server Error" });
-    }
-};
-
 
 exports.login = async (req, res) => {
     try {

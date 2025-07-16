@@ -25,7 +25,6 @@ import ProtectRouteCustomer from "../routes/ProtectRouteCustomer";
 import CustomerBookingList from "../components/booking/CustomerBookingList";
 import CustomerProfile from "../components/user/CustomerProfile";
 import BookingForm from "../components/booking/BookingForm";
-import PaymentForm from "../components/payment/PaymentForm";
 // Front
 import LayoutFront from "../layouts/LayoutFront";
 import ProtectRouteFront from "../routes/ProtectRouteFront";
@@ -86,7 +85,6 @@ const AppRoutes = () => {
           <Route path="book-room" element={<BookingForm />} />
           <Route path="my-bookings" element={<CustomerBookingList />} />
           <Route path="customer-profile" element={<CustomerProfile />} />
-          <Route path="payment" element={<PaymentForm />} />
         </Route>
 
         {/* Front */}

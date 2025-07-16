@@ -182,15 +182,6 @@ const CustomerProfile = () => {
                                 )}
                             </div>
                         ))}
-
-                        {form.Customer?.customerType?.customerTypeId === 2 &&
-                            form.Customer?.images?.length > 0 && (
-                                <img
-                                    src={form.Customer.images[0].url}
-                                    alt="Customer Image"
-                                    className="w-32 h-32 rounded-lg shadow-md border"
-                                />
-                            )}
                     </div>
 
                     {/* Buttons */}

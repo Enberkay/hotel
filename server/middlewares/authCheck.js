@@ -1,34 +1,6 @@
 const jwt = require("jsonwebtoken")
 const prisma = require("../config/prisma")
 
-// exports.authCheck = async (req, res, next) => {
-//     try {
-
-//         const headerToken = req.headers.authorization
-//         // console.log("Token Header:", headerToken)
-
-//         if (!headerToken) {
-//             return res.status(401).json({ message: "no Token, Authorization" })
-//         }
-//         const token = headerToken.split(" ")[1]
-//         const decode = jwt.verify(token, process.env.SECRET)
-//         req.user = decode
-
-//         const user = await prisma.user.findFirst({
-//             where: {
-//                 userEmail: req.user.userEmail
-//             }
-//         })
-//         if (!user.userEnable) {
-//             return res.status(400).json({ message: "This account cannot access." })
-//         }
-//         next()
-//     } catch (error) {
-//         console.log(error)
-//         res.status(500).json({ message: "Token invalid" })
-//     }
-// }
-
 exports.authCheck = async (req, res, next) => {
     try {
         const headerToken = req.headers.authorization;
