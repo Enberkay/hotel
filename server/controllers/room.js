@@ -44,7 +44,7 @@ const prisma = require("../config/prisma")
 //สำหรับเพิ่มห้องทั้งหมดใน postman
 exports.create = async (req, res) => {
     try {
-        const roomsData = req.body;
+        const roomsData = req.validated;
 
         if (!Array.isArray(roomsData) || roomsData.length === 0) {
             return res.status(400).json({ message: "Invalid payload format! Expected an array of rooms." });

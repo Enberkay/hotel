@@ -28,7 +28,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { prefix, userName, userSurName, userNumPhone } = req.body
+        const { prefix, userName, userSurName, userNumPhone } = req.validated;
         console.log(prefix, userName, userSurName, userNumPhone)
 
         // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่

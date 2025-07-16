@@ -2,7 +2,7 @@ const prisma = require("../config/prisma")
 
 exports.create = async (req, res) => {
     try {
-        const { addonName, price } = req.body
+        const { addonName, price } = req.validated;
         console.log(addonName, price)
 
         const addon = await prisma.addon.create({

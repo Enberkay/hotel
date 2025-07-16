@@ -3,7 +3,7 @@ const prisma = require("../config/prisma")
 exports.cleaningRequest = async (req, res) => {
     try {
         const { userId } = req.user // ดึง userId จาก JWT Token
-        const { rooms } = req.body // รับข้อมูลห้องที่ต้องทำความสะอาด
+        const { rooms } = req.validated // รับข้อมูลห้องที่ต้องทำความสะอาด
 
         // console.log("Check : ", rooms)
 
