@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom"
-import SidebarMaintenance from "../components/maintenance/SidebarMaintenance"
+import MaintenanceSidebar from "../components/maintenance/MaintenanceSidebar"
 
 const LayoutMaintenance = () => {
   return (
     <div className="flex h-screen">
       <div className="h-full">
-        <SidebarMaintenance />
+        <MaintenanceSidebar />
       </div>
       <main className="w-full overflow-auto">
         <Outlet />

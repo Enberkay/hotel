@@ -6,7 +6,7 @@ import UploadFile from "../shared/UploadFile"
 //chat gpt 100%
 const PaymentForm = () => {
     const location = useLocation()
-    const { bookingId, total } = location.state || {} // รับค่าจาก MyListBooking
+    const { bookingId, total } = location.state || {}
 
     const [form, setForm] = useState({ images: [] })
 
