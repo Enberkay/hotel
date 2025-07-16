@@ -9,12 +9,12 @@ exports.myBookings = async (req, res) => {
         const bookings = await prisma.booking.findMany({
             where: { customerId: userId },
             include: {
-                bookingStatus: true,
+                bookingStatus: { select: { bookingStatus: true } },
                 room: {
                     select: {
                         roomNumber: true,
                         floor: true,
-                        roomType: true
+                        roomType: { select: { roomTypeName: true } }
                     }
                 },
                 pairRoom: {
@@ -23,7 +23,7 @@ exports.myBookings = async (req, res) => {
                         floor: true
                     }
                 },
-                roomType: true
+                roomType: { select: { roomTypeName: true, price: true } }
             },
             orderBy: { createdAt: "desc" }
         })
@@ -63,12 +63,17 @@ exports.bookingDetail = async (req, res) => {
                     include: {
                         BookingAddon: {
                             include: {
-                                addon: true
+                                addon: { select: { addonName: true, price: true } }
                             }
                         }
                     }
                 },
-                pairRoom: true
+                pairRoom: {
+                    select: {
+                        roomNumber: true,
+                        floor: true
+                    }
+                }
             }
         })
 
