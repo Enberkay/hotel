@@ -128,15 +128,6 @@ const SidebarFront = () => {
           ประเภทห้อง
         </NavLink>
 
-        <NavLink to="payment-method" className={({ isActive }) =>
-          isActive
-            ? "bg-slate-200/30 backdrop-blur-md rounded-md text-[#FEF6B3] px-4 py-2 flex items-center"
-            : "text-white px-4 py-2 hover:bg-slate-200/30 backdrop-blur-md hover:text-white rounded flex items-center"
-        }>
-          <CreditCard className="mr-2" />
-          PaymentMethod
-        </NavLink>
-
         <NavLink
           to={"/"}
           className={({ isActive }) =>

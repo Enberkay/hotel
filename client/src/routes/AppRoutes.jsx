@@ -19,8 +19,6 @@ import AdminRoomEditForm from "../components/room/AdminRoomEditForm";
 import AdminUserEdit from "../components/user/AdminUserEdit";
 import AdminRoomForm from "../components/room/AdminRoomForm";
 import CustomerTypeForm from "../components/user/CustomerTypeForm";
-// (ยังไม่มีการย้าย/รีเนม FormBookingStatus, FormCleaningRequestStatus, FormRoomStatus, FormPaymentStatus, FormCleaningReportStatus, FormCleaningStatus, FormRepairRequestStatus, FormRepairStatus)
-import PaymentMethodForm from "../components/payment/PaymentMethodForm";
 // Customer
 import LayoutCustomer from "../layouts/LayoutCustomer";
 import ProtectRouteCustomer from "../routes/ProtectRouteCustomer";
@@ -100,7 +98,6 @@ const AppRoutes = () => {
           <Route path="cleaning-request" element={<CleaningRequestForm />} />
           <Route path="add-on" element={<AddonForm />} />
           <Route path="customer-type" element={<CustomerTypeForm />} />
-          <Route path="payment-method" element={<PaymentMethodForm />} />
           <Route path="room-type" element={<RoomTypeForm />} />
           <Route path="cleaning-list-item" element={<CleaningListItemForm />} />
           <Route path="list-cleaning-report" element={<CleaningReportList />} />
