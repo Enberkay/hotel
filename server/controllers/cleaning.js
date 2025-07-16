@@ -73,8 +73,6 @@ exports.cleaningRequest = async (req, res) => {
 exports.listCleaningRequest = async (req, res) => {
     try {
         const { userId } = req.user // ได้จาก authCheck middleware
-
-        // ค้นหา housekeeping ที่ดูแลชั้นไหน
         const housekeeping = await prisma.user.findFirst({
             where: {
                 userId,
@@ -85,25 +83,21 @@ exports.listCleaningRequest = async (req, res) => {
                 assignedFloor: true
             }
         })
-
         if (!housekeeping) {
             return res.status(404).json({ message: "ไม่พบข้อมูลพนักงานทำความสะอาด" })
         }
-
         const housekeepingFloor = housekeeping.assignedFloor
-
-        // ดึงคำขอทำความสะอาดที่เกี่ยวข้องกับชั้นที่พนักงานดูแล
         const cleaningRequests = await prisma.cleaningRequest.findMany({
             where: {
                 CleaningRequestRoom: {
                     some: {
                         room: {
-                            floor: housekeepingFloor // เฉพาะห้องที่อยู่ในชั้นที่พนักงานดูแล
+                            floor: housekeepingFloor
                         }
                     }
                 }
             },
-            orderBy: { requestAt: "desc" }, // เรียงตามเวลาที่แจ้งล่าสุด
+            orderBy: { requestAt: "desc" },
             include: {
                 CleaningRequestRoom: {
                     include: {
@@ -115,22 +109,10 @@ exports.listCleaningRequest = async (req, res) => {
                         }
                     }
                 },
-                cleaningRequestStatus: true, // ดึงสถานะของคำขอทำความสะอาด
-                user: {
-                    include: {
-                        user: {
-                            select: {
-                                userName: true,
-                                userSurName: true,
-                                prefix: true,
-                                userNumPhone: true
-                            }
-                        }
-                    }
-                },
+                cleaningRequestStatus: true, // ถ้าเป็น enum หรือ object เดียว ให้ select เฉพาะ field ที่ใช้
+                user: { select: { userName: true, userSurName: true, prefix: true, userNumPhone: true } },
             }
         })
-
         return res.json(cleaningRequests)
     } catch (err) {
         console.log(err)
@@ -140,13 +122,9 @@ exports.listCleaningRequest = async (req, res) => {
 
 exports.readCleaningRequest = async (req, res) => {
     try {
-        const { id } = req.params // รับ ID ของคำขอจาก URL
-
-        // ค้นหาข้อมูลคำขอทำความสะอาดโดยใช้ ID
+        const { id } = req.params
         const cleaningRequest = await prisma.cleaningRequest.findUnique({
-            where: {
-                requestId: Number(id) // แปลง ID เป็นตัวเลข
-            },
+            where: { requestId: Number(id) },
             include: {
                 CleaningRequestRoom: {
                     include: {
@@ -158,26 +136,13 @@ exports.readCleaningRequest = async (req, res) => {
                         }
                     }
                 },
-                cleaningRequestStatus: true, // ดึงสถานะของคำขอทำความสะอาด
-                user: {
-                    include: {
-                        user: {
-                            select: {
-                                userName: true,
-                                userSurName: true,
-                                prefix: true,
-                                userNumPhone: true
-                            }
-                        }
-                    }
-                },
+                cleaningRequestStatus: true,
+                user: { select: { userName: true, userSurName: true, prefix: true, userNumPhone: true } },
             }
         })
-
         if (!cleaningRequest) {
             return res.status(404).json({ message: "ไม่พบข้อมูลใบแจ้งทำความสะอาด" })
         }
-
         return res.json(cleaningRequest)
     } catch (err) {
         console.log(err)
