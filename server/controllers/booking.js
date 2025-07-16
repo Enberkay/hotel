@@ -90,45 +90,27 @@ exports.createBooking = async (req, res) => {
 // ฟังก์ชันสำหรับดึงรายการการจองทั้งหมด
 exports.listBookings = async (req, res) => {
     try {
-        // ดึงข้อมูลการจองทั้งหมดจากฐานข้อมูล
         const bookings = await prisma.booking.findMany({
             include: {
                 customer: {
-                    include: {
-                        user: {
-                            select: {
-                                prefix: true,
-                                userName: true,
-                                userSurName: true,
-                                userEmail: true,
-                                userNumPhone: true
-                            }
-                        }
-                    }
-                },
-                bookingStatus: {
                     select: {
-                        bookingStatusName: true,
-                        bookingStatusId: true
+                        userId: true,
+                        userEmail: true,
+                        userName: true,
+                        userSurName: true,
+                        userNumPhone: true,
+                        prefix: true
                     }
                 },
-                roomType: {
-                    select: {
-                        roomTypeName: true
-                    }
-                },
+                bookingStatus: true, // ถ้า bookingStatus มี field เดียว ให้ select เฉพาะ field นั้น
+                roomType: { select: { roomTypeName: true } },
                 BookingAddonListRelation: {
                     include: {
                         bookingAddonList: {
                             include: {
                                 BookingAddon: {
                                     include: {
-                                        addon: {
-                                            select: {
-                                                addonName: true,
-                                                price: true
-                                            }
-                                        }
+                                        addon: { select: { addonName: true, price: true } }
                                     }
                                 }
                             }
@@ -142,7 +124,7 @@ exports.listBookings = async (req, res) => {
         })
         res.status(200).json(bookings)
     } catch (err) {
-        console.error(err)
+        logger.error('List bookings error: %s', err.stack || err.message);
         res.status(500).json({
             message: "Failed to retrieve bookings",
             error: err.message,
@@ -153,41 +135,27 @@ exports.listBookings = async (req, res) => {
 exports.readBooking = async (req, res) => {
     try {
         const { id } = req.params
-
         const booking = await prisma.booking.findFirst({
             where: { bookingId: Number(id) },
             include: {
                 customer: {
-                    include: {
-                        user: {
-                            select: {
-                                userName: true,
-                                userSurName: true,
-                                userEmail: true,
-                                userNumPhone: true,
-                                licensePlate: true
-                            }
-                        }
-                    }
-                },
-                roomType: {
                     select: {
-                        roomTypeName: true,
-                        price: true
+                        userId: true,
+                        userEmail: true,
+                        userName: true,
+                        userSurName: true,
+                        userNumPhone: true,
+                        prefix: true
                     }
                 },
-                BookingAddonListRelation: { // 👈 แก้ตรงนี้
+                roomType: { select: { roomTypeName: true, price: true } },
+                BookingAddonListRelation: {
                     include: {
-                        bookingAddonList: { // ดึง bookingAddonList ที่อยู่ใน relation
+                        bookingAddonList: {
                             include: {
-                                BookingAddon: { // แล้วดึง BookingAddon ต่อ
+                                BookingAddon: {
                                     include: {
-                                        addon: {
-                                            select: {
-                                                addonName: true,
-                                                price: true
-                                            }
-                                        }
+                                        addon: { select: { addonName: true, price: true } }
                                     }
                                 }
                             }
@@ -196,40 +164,13 @@ exports.readBooking = async (req, res) => {
                 }
             }
         })
-
         if (!booking) {
             return res.status(404).json({ message: "Booking not found" })
         }
-
-        const { total } = booking
-
-        // ✅ ดึงรายการ Addon
-        let addonList = []
-        let totalAddonPrice = 0
-
-        for (const relation of booking.BookingAddonListRelation) {
-            const bookingAddonList = relation.bookingAddonList
-            for (const bookingAddon of bookingAddonList.BookingAddon) {
-                if (bookingAddon.addon) {
-                    const { addonName, price } = bookingAddon.addon
-                    const quantity = bookingAddon.quantity || 0
-                    const addonTotal = price * quantity
-
-                    totalAddonPrice += addonTotal
-                    addonList.push({ addonName, price, quantity, total: addonTotal })
-                }
-            }
-        }
-
-        res.json({
-            ...booking,
-            addons: addonList,
-            totalAddon: totalAddonPrice,
-            total
-        })
+        res.status(200).json(booking)
     } catch (err) {
-        console.error("❌ Server Error:", err)
-        res.status(500).json({ message: "Server error" })
+        logger.error('Read booking error: %s', err.stack || err.message);
+        res.status(500).json({ message: "Failed to retrieve booking", error: err.message })
     }
 }
 
