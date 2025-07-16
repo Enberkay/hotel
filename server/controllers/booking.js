@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma")
 const { calculateBookingTotal, processAddons } = require('../services/bookingService');
+const logger = require('../utils/logger');
 
 // ฟังก์ชันสำหรับสร้างการจองใหม่
 exports.createBooking = async (req, res) => {
@@ -79,8 +80,9 @@ exports.createBooking = async (req, res) => {
         }
 
         res.status(201).json({ message: "Booking created successfully", booking: newBooking });
+        logger.info('Create booking: userId=%s, bookingId=%s', customerId, newBooking.bookingId);
     } catch (err) {
-        console.error(err);
+        logger.error('Create booking error: %s', err.stack || err.message);
         res.status(500).json({ message: "Failed to create booking", error: err.message });
     }
 };
@@ -315,8 +317,9 @@ exports.confirmBooking = async (req, res) => {
         }
 
         res.status(200).json({ message, booking: updatedBooking });
+        logger.info('Confirm booking: bookingId=%s, roomId=%s, userEmail=%s', id, roomId, userEmail);
     } catch (err) {
-        console.error("❌ Error:", err);
+        logger.error('Confirm booking error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" });
     }
 };

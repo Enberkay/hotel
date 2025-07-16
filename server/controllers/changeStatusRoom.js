@@ -1,8 +1,10 @@
 const prisma = require("../config/prisma")
+const logger = require('../utils/logger');
 
 exports.changeStatusRoom = async (req, res) => {
     try {
         const { roomIds, roomStatusId } = req.body;
+        logger.info('Change room status: roomIds=%o, roomStatusId=%s', roomIds, roomStatusId);
         console.log(roomIds)
 
         if (!roomIds || !Array.isArray(roomIds) || roomIds.length === 0) {
@@ -34,7 +36,7 @@ exports.changeStatusRoom = async (req, res) => {
         });
 
     } catch (err) {
-        console.error(err);
+        logger.error('Change room status error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" });
     }
 };

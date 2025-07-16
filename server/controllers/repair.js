@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma")
+const logger = require('../utils/logger');
 
 exports.repairRequest = async (req, res) => {
     try {
@@ -56,7 +57,7 @@ exports.repairRequest = async (req, res) => {
             repairRequest
         })
     } catch (err) {
-        console.error("Error:", err)
+        logger.error('Create repair request error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" })
     }
 }

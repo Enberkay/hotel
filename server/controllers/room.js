@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma")
+const logger = require('../utils/logger');
 
 // exports.create = async (req, res) => {
 //     try {
@@ -77,9 +78,10 @@ exports.create = async (req, res) => {
         }
 
         res.json({ message: "Rooms processed", data: createdRooms });
+        logger.info('Create room: %o', createdRooms.map(r => r.roomNumber || r.roomNumberStr));
 
     } catch (err) {
-        console.error(err);
+        logger.error('Create room error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" });
     }
 };
@@ -182,8 +184,10 @@ exports.remove = async (req, res) => {
         })
 
         res.send("remove room")
+        logger.info('Remove room: roomId=%s', id);
+
     } catch (err) {
-        console.log(err)
+        logger.error('Remove room error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" })
     }
 }

@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma")
+const logger = require('../utils/logger');
 
 exports.cleaningRequest = async (req, res) => {
     try {
@@ -56,12 +57,14 @@ exports.cleaningRequest = async (req, res) => {
             return cleaningRequest
         })
         console.log(result)
+        logger.info('Create cleaning request: userId=%s, rooms=%o', userId, rooms.map(r => r.roomId));
 
         res.status(201).json({
             message: "สร้างคำขอทำความสะอาดสำเร็จ และอัปเดตสถานะห้องแล้ว",
             cleaningRequest: result,
         })
     } catch (err) {
+        logger.error('Create cleaning request error: %s', err.stack || err.message);
         console.error(err)
         res.status(500).json({ message: "Server error" })
     }
