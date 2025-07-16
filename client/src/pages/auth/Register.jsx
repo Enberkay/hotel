@@ -6,8 +6,7 @@ import useAuthStore from "../../store/auth-store";
 import { useNavigate } from "react-router-dom"
 import { listCustomerType } from "../../api/customerType"
 const API_URL = import.meta.env.VITE_API_URL
-import UploadFile from "../../components/shared/UploadFile"
-import image from "../../assets/Images/test3.png"
+
 
 const Register = () => {
 
@@ -26,7 +25,6 @@ const Register = () => {
     customertypeId: "",
     prefix: "",
     licensePlate: "",
-    images: []
   })
 
 
@@ -82,9 +80,7 @@ const Register = () => {
     }
 
     // ตรวจสอบว่าหากเลือกประเภทลูกค้าเป็น Student (customertypeId === "2") ต้องอัปโหลดรูปภาพ
-    if (form.customertypeId === "2" && form.images.length === 0) {
-      return toast.error("กรุณาอัปโหลดรูปภาพ")
-    }
+    // ลบ import UploadFile, field images, และ logic ที่เกี่ยวข้องกับการอัปโหลดรูปทั้งหมด
 
     //Send to Backend
     try {
@@ -211,7 +207,6 @@ const Register = () => {
             </select>
           </label>
 
-          {form.customertypeId === "2" && <UploadFile form={form} setForm={setForm} />}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="block space-y-2">

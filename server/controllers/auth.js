@@ -7,7 +7,7 @@ const path = require("path");
 
 exports.register = async (req, res) => {
     try {
-        const { userEmail, userPassword, userName, userSurName, userNumPhone, prefix, licensePlate, images, customertypeId } = req.body
+        const { userEmail, userPassword, userName, userSurName, userNumPhone, prefix, licensePlate } = req.body
         console.log(images)
         // Step 1 Validate body, DO NOT EMPTY
         if (!userEmail) {
@@ -66,23 +66,7 @@ exports.register = async (req, res) => {
         //     return res.json("admin for tset")
         // }
 
-        const customer = await prisma.customer.create({
-            data: {
-                userId: newUser.userId,
-                customerTypeId: Number(customertypeId),
-                images: {
-                    create: images.map((item) => ({
-                        asset_id: item.asset_id,
-                        public_id: item.public_id,
-                        url: item.url,
-                        secure_url: item.secure_url
-                    }))
-                }
-            }
-        })
-
         console.log(newUser)
-        console.log(customer)
         res.json({ message: "Register success!!." })
     } catch (error) {
         console.log(error)
