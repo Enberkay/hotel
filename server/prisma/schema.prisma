@@ -43,7 +43,6 @@ model User {
     repairRequestsAsFront RepairRequest[] @relation("FrontRepairRequest")
     repairReportsAsMaintenance RepairReport[] @relation("MaintenanceRepairReport")
     repairReportsAsFront RepairReport[] @relation("FrontRepairReport")
-    images Image[] @relation("CustomerImage")
 }
 
 enum UserRole {
@@ -310,19 +309,6 @@ enum BookingStatus {
   NO_SHOW
 }
 
-enum PaymentStatus {
-  PENDING
-  PAID
-  REFUNDED
-  CANCELLED
-}
-
-enum PaymentMethod {
-  CASH
-  CREDIT_CARD
-  QR
-}
-
 model Booking {
     bookingId Int @id @default(autoincrement())
     count     Int @default(1) //จำนวนคน 
@@ -351,16 +337,9 @@ model Booking {
     confirmedAt DateTime?
     cancelledAt DateTime?
 
-    // paymentAt   DateTime?
-
-    paymentStatus PaymentStatus @default(PENDING)
     bookingStatus BookingStatus @default(PENDING)
-    paymentMethod PaymentMethod?
-
-    image Image[]
-
     BookingAddonListRelation BookingAddonListRelation[]
-    Receipt                  Receipt?
+    Receipt Receipt?
 }
 
 model BookingAddonListRelation {
@@ -416,20 +395,4 @@ model Receipt {
 
     bookingId Int     @unique
     booking   Booking @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
-}
-
-model Image {
-    id         Int      @id @default(autoincrement())
-    asset_id   String
-    public_id  String
-    url        String
-    secure_url String
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-
-    bookingId Int?
-    booking   Booking? @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
-
-    customerId Int
-    customer   User @relation("CustomerImage", fields: [customerId], references: [userId], onDelete: Cascade)
 }

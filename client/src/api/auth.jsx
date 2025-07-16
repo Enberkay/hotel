@@ -63,17 +63,6 @@ export const currentMaintenance = async (token) => {
     )
 }
 
-export const uploadFiles = async (token, file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    return axios.post(`${API_URL}/images`, formData, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-        },
-    });
-};
-
 export const removeFiles = async (token, filename) => {
     return axios.post(`${API_URL}/removeimages`, { filename }, {
         headers: {

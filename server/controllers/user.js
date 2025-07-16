@@ -10,7 +10,6 @@ exports.myBookings = async (req, res) => {
             where: { customerId: userId },
             include: {
                 bookingStatus: true,
-                paymentStatus: true,
                 room: {
                     select: {
                         roomNumber: true,
@@ -24,8 +23,7 @@ exports.myBookings = async (req, res) => {
                         floor: true
                     }
                 },
-                roomType: true,
-                paymentMethod: true
+                roomType: true
             },
             orderBy: { createdAt: "desc" }
         })

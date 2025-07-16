@@ -47,11 +47,6 @@ const CustomerBookingList = () => {
     }
   }
 
-  const handlePayment = (bookingId, total) => {
-    console.log(bookingId, total)
-    navigate("/customer/payment", { state: { bookingId, total } })
-  }
-
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* ปุ่ม Toggle Menu บนมือถือ */}
@@ -162,7 +157,7 @@ const CustomerBookingList = () => {
                       <div>
                         <button
                           className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
-                          onClick={() => handlePayment(item.bookingId, item.total)}
+                          onClick={() => console.log("ไปหน้าชำระเงิน")}
                         >
                           ชำระเงิน
                         </button>
@@ -192,14 +187,6 @@ const CustomerBookingList = () => {
                         <p>
                           <span className="font-semibold">วันที่อนุมัติ:</span>{" "}
                           {formatDateTime(item.confirmedAt)}
-                          {item.paymentMethodId === 1 && (
-                            <button
-                              className="ml-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-md"
-                              onClick={() => console.log("ไปหน้าชำระเงิน")}
-                            >
-                              ชำระเงิน
-                            </button>
-                          )}
                         </p>
                       </div>
                     )}

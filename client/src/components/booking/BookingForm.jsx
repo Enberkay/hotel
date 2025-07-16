@@ -17,7 +17,6 @@ const initialState = {
   licensePlate: "",
   checkInDate: null,
   checkOutDate: null,
-  paymentMethodId: "",
 }
 
 const BookingForm = () => {
@@ -53,14 +52,6 @@ const BookingForm = () => {
       setForm((prev) => ({ ...prev, checkOutDate: null }))
     }
   }, [form.checkInDate])
-
-  //เลือกประเภทการชำระ
-  // const handlePaymentChange = (event) => {
-  //   setForm((prev) => ({
-  //     ...prev,
-  //     paymentMethodId: event.target.value, // อัปเดตค่าที่เลือก
-  //   }))
-  // }
 
   //เลือกประเภทห้อง
   const roomOptions = roomtypes.map((roomtype) => ({

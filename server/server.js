@@ -3,6 +3,8 @@ const express = require("express")
 const cors = require("cors")
 const morgan = require("morgan")
 const { readdirSync } = require("fs")
+const security = require('./middlewares/security');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express()
 const port = process.env.PORT || 8001
@@ -11,9 +13,11 @@ const port = process.env.PORT || 8001
 app.use(morgan("dev"))
 app.use(express.json({limit: "20mb"}))  // {limit: "20mb"} Allow ให้ server ของเราส่งข้อมูลได้เยอะๆ จะมีปัญญาตอนทำพวกรูปภาพ
 app.use(cors())
+security(app);
 
 //  Routes, @ENDPOINT http://localhost:8000/api
 readdirSync("./routes").map((item) => app.use("/api", require("./routes/" + item)))
+app.use(errorHandler);
 
 //Server
 app.listen(port,()=>{

@@ -112,8 +112,6 @@ exports.createBooking = async (req, res) => {
                 total: lastTotal,
                 confirmedAt: null,
                 bookingStatus: 'PENDING',
-                paymentStatus: 'PENDING',
-                paymentMethod: paymentMethodId ? paymentMethodId : undefined,
             }
         })
 

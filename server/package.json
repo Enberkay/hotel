@@ -16,11 +16,14 @@
     "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "moment-timezone": "^0.5.47",
     "morgan": "^1.10.0",
     "multer": "^2.0.1",
     "nodemon": "^3.1.9",
-    "prisma": "^6.2.0"
+    "prisma": "^6.2.0",
+    "zod": "^4.0.5"
   }
 }

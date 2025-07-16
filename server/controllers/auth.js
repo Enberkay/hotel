@@ -3,8 +3,6 @@ const prisma = require("../config/prisma")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
-const path = require("path");
-
 exports.register = async (req, res) => {
     try {
         const { userEmail, userPassword, userName, userSurName, userNumPhone, prefix, licensePlate } = req.body
@@ -16,10 +14,6 @@ exports.register = async (req, res) => {
         if (!userPassword) {
             return res.status(400).json({ message: 'Password is required!!!' })
         }
-
-        // if (!userName || !userSurName) {
-        //     return res.status(400).json({ message: 'Full name is required!!!' })
-        // }
 
         // Step 2 Check Email in DB already ?
         const user = await prisma.user.findFirst({
@@ -59,11 +53,6 @@ exports.register = async (req, res) => {
                 licensePlate: licensePlate
             }
         })
-
-        // test admin
-        // if (newUser.userRole === "admin") {
-        //     return res.json("admin for tset")
-        // }
 
         console.log(newUser)
         res.json({ message: "Register success!!." })
