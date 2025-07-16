@@ -67,27 +67,11 @@ exports.listRepairRequest = async (req, res) => {
     try {
         const repairRequest = await prisma.repairRequest.findMany({
             include: {
-                user: {
-                    include: {
-                        user: {
-                            select: {
-                                userName: true,
-                                userSurName: true,
-                                userNumPhone: true
-                            }
-                        }
-                    }
-                },
-                repairRequestStatus: {
-                    select: {
-                        repairRequestStatusId: true,
-                        repairRequestStatusName: true
-                    }
-                },
-                // เพิ่มการดึงข้อมูลจาก RepairRequestRoom
+                user: { select: { userName: true, userSurName: true, userNumPhone: true } },
+                repairRequestStatus: true, // ถ้าเป็น enum หรือ object เดียว ให้ select เฉพาะ field ที่ใช้
                 RepairRequestRoom: {
                     include: {
-                        room: true, // รวมข้อมูลห้อง
+                        room: { select: { roomNumber: true, floor: true } },
                     }
                 }
             },
@@ -102,42 +86,19 @@ exports.listRepairRequest = async (req, res) => {
 
 exports.readRepairRequest = async (req, res) => {
     try {
-
         const { id } = req.params
-
         const reportRequest = await prisma.repairRequest.findFirst({
-
-            where: {
-                requestId: parseInt(id)
-            },
+            where: { requestId: parseInt(id) },
             include: {
-                user: {
-                    include: {
-                        user: {
-                            select: {
-                                userName: true,
-                                userSurName: true,
-                                userNumPhone: true
-                            }
-                        }
-                    }
-                },
+                user: { select: { userName: true, userSurName: true, userNumPhone: true } },
                 repairRequestStatus: true,
                 RepairRequestRoom: {
                     include: {
-                        room: {
-                            select: {
-                                roomNumber: true,
-                                floor: true
-                            }
-                        }
+                        room: { select: { roomNumber: true, floor: true } }
                     }
                 }
             }
-
-
         })
-
         res.json(reportRequest)
     } catch (err) {
         console.error("Error:", err)
