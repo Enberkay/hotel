@@ -4,8 +4,10 @@ import useAuthStore from "../../store/auth-store";
 import { useNavigate } from "react-router-dom";
 import { User, KeyRound } from "lucide-react";
 import image from "../../assets/Images/test3.png";
+import { useTranslation } from 'react-i18next';
 
 const Login = () => {
+  const { t } = useTranslation();
   //JavaScript
   const navigate = useNavigate();
   const actionLogin = useAuthStore((state) => state.actionLogin);
@@ -19,26 +21,19 @@ const Login = () => {
   });
 
   const handleOnChange = (e) => {
-    // console.log(e.target.name, e.target.value)
     setForm({
-      // "..." is copy old data
       ...form,
-      // key:value
       [e.target.name]: e.target.value,
     });
   };
   const handleSubmit = async (e) => {
-    // e.preventDefault() ป้องกันการ refresh
     e.preventDefault();
-    // console.log(form)
     try {
       const res = await actionLogin(form);
-      console.log(res);
       const role = res.data.payload.userRole;
       roleRedirect(role);
-      toast.success("Welcome Back");
+      toast.success(t('login_success'));
     } catch (err) {
-      console.log(err);
       const errMsg = err.response?.data?.message;
       toast.error(errMsg);
     }
@@ -66,11 +61,11 @@ const Login = () => {
       style={{ backgroundImage: `url(${image})` }}
     >
       <div className="w-full sm:w-[400px] md:w-[400px] lg:w-[500px] xl:w-[500px] p-12 bg-white bg-opacity-95 shadow-lg rounded-lg">
-          <h2 className="text-2xl font-bold mb-6 text-center">เข้าสู่ระบบ</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">{t('login')}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <label className="block space-y-2">
-              <span className="text-gray-700">Email</span>
+              <span className="text-gray-700">{t('email')}</span>
               <div className="flex items-center border p-3 rounded-md focus-within:ring-2 focus-within:ring-brown/50">
                 <User className="text-gray-500 mr-3" size={24} />
                 <input
@@ -79,12 +74,13 @@ const Login = () => {
                   name="userEmail"
                   type="email"
                   required
+                  placeholder={t('enter_email')}
                 />
               </div>
             </label>
 
             <label className="block space-y-2">
-              <span className="text-gray-700">Password</span>
+              <span className="text-gray-700">{t('password')}</span>
               <div className="flex items-center border p-3 rounded-md focus-within:ring-2 focus-within:ring-brown/50">
                 <KeyRound className="text-gray-500 mr-3" size={24} />
                 <input
@@ -93,12 +89,13 @@ const Login = () => {
                   name="userPassword"
                   type="password"
                   required
+                  placeholder={t('enter_password')}
                 />
               </div>
             </label>
 
             <button className="w-full py-3 px-6 bg-[var(--color-brown)] text-white text-lg rounded-md hover:bg-[var(--color-brown)]/80 transition shadow-md" style={{'--color-brown':'#6A503D'}}>
-              Login
+              {t('login')}
             </button>
           </form>
       </div>

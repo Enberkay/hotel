@@ -1,5 +1,11 @@
 {
   "welcome": "ยินดีต้อนรับ",
   "language": "ภาษา",
-  "hello": "สวัสดี"
+  "hello": "สวัสดี",
+  "login": "เข้าสู่ระบบ",
+  "email": "อีเมล",
+  "password": "รหัสผ่าน",
+  "enter_email": "กรอกอีเมล",
+  "enter_password": "กรอกรหัสผ่าน",
+  "login_success": "เข้าสู่ระบบสำเร็จ"
 } 

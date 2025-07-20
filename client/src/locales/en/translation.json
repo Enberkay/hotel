@@ -1,5 +1,11 @@
 {
   "welcome": "Welcome",
   "language": "Language",
-  "hello": "Hello"
+  "hello": "Hello",
+  "login": "Login",
+  "email": "Email",
+  "password": "Password",
+  "enter_email": "Enter email",
+  "enter_password": "Enter password",
+  "login_success": "Login successful"
 } 
