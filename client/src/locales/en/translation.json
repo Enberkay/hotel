@@ -56,7 +56,7 @@
   "save": "Save",
   "cancel": "Cancel",
   "update_success": "Profile updated successfully",
-  "error_update": "An error occurred",
+  "error_update": "An error occurred while updating",
   "no_data": "No data",
   "id_card": "ID Card",
   "std_id": "Student ID",
@@ -99,5 +99,6 @@
   "please_wait": "Please wait",
   "admin_room_management": "Admin Room Management",
   "edit_room": "Edit Room",
-  "delete_room": "Delete Room"
+  "delete_room": "Delete Room",
+  "edit_room_data": "Edit Room Data"
 } 

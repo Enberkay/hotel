@@ -56,7 +56,7 @@
   "save": "บันทึก",
   "cancel": "ยกเลิก",
   "update_success": "แก้ไขข้อมูลเรียบร้อย",
-  "error_update": "เกิดข้อผิดพลาด",
+  "error_update": "เกิดข้อผิดพลาดในการแก้ไขข้อมูล",
   "no_data": "ไม่มีข้อมูล",
   "id_card": "รหัสบัตรประชาชน",
   "std_id": "รหัสนักศึกษา",
@@ -90,7 +90,7 @@
   "status": "สถานะ",
   "add_room": "เพิ่มห้องพัก",
   "add_room_success": "เพิ่มห้องพักสำเร็จ",
-  "edit_room_success": "แก้ไขห้องพักสำเร็จ",
+  "edit_room_success": "แก้ไขห้องสำเร็จ",
   "delete_room_success": "ลบห้องพักสำเร็จ",
   "not_found_title": "ไม่พบหน้าที่คุณต้องการ",
   "not_found_message": "ขออภัย ไม่พบหน้าที่คุณค้นหา",
@@ -99,5 +99,6 @@
   "please_wait": "กรุณารอสักครู่",
   "admin_room_management": "จัดการห้อง (แอดมิน)",
   "edit_room": "แก้ไขห้อง",
-  "delete_room": "ลบห้อง"
+  "delete_room": "ลบห้อง",
+  "edit_room_data": "แก้ไขข้อมูลห้อง"
 } 
