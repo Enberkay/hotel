@@ -3,9 +3,11 @@
 
 import { useEffect, useState } from "react"
 import { Navigate } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 
-const LoadingToredirect = () => {
+const LoadingToRedirect = () => {
 
+    const { t } = useTranslation();
     const [count, setCount] = useState(3)
     const [redirect, setRedirect] = useState(false)
 
@@ -32,7 +34,8 @@ const LoadingToredirect = () => {
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white shadow-lg rounded-lg p-6 text-center">
                 <h2 className="text-xl font-semibold text-red-500">Access Denied</h2>
-                <p className="mt-2 text-gray-600">Redirecting in <span className="font-bold">{count}</span> seconds...</p>
+                <p className="mt-2 text-gray-600">{t('redirecting')}</p>
+                <p className="mt-2 text-gray-600">{t('please_wait')}</p>
                 <div className="mt-4 w-full h-2 bg-gray-300 rounded-full overflow-hidden">
                     <div
                         className="h-full bg-red-500 transition-all ease-linear"
@@ -43,4 +46,4 @@ const LoadingToredirect = () => {
         </div>
     )
 }
-export default LoadingToredirect
+export default LoadingToRedirect

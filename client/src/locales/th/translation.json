@@ -91,5 +91,10 @@
   "add_room": "เพิ่มห้องพัก",
   "add_room_success": "เพิ่มห้องพักสำเร็จ",
   "edit_room_success": "แก้ไขห้องพักสำเร็จ",
-  "delete_room_success": "ลบห้องพักสำเร็จ"
+  "delete_room_success": "ลบห้องพักสำเร็จ",
+  "not_found_title": "ไม่พบหน้าที่คุณต้องการ",
+  "not_found_message": "ขออภัย ไม่พบหน้าที่คุณค้นหา",
+  "back_to_home": "กลับสู่หน้าแรก",
+  "redirecting": "กำลังเปลี่ยนเส้นทาง...",
+  "please_wait": "กรุณารอสักครู่"
 } 
