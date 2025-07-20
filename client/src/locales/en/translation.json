@@ -96,5 +96,17 @@
   "not_found_message": "Sorry, the page you are looking for does not exist.",
   "back_to_home": "Back to Home",
   "redirecting": "Redirecting...",
-  "please_wait": "Please wait"
+  "please_wait": "Please wait",
+  "admin_room_management": "Admin Room Management",
+  "room_number": "Room Number",
+  "floor": "Floor",
+  "room_type": "Room Type",
+  "status": "Status",
+  "add_room": "Add Room",
+  "edit_room": "Edit Room",
+  "delete_room": "Delete Room",
+  "add_room_success": "Room added successfully",
+  "edit_room_success": "Room updated successfully",
+  "delete_room_success": "Room deleted successfully",
+  "error_required": "Please fill in all required fields"
 } 

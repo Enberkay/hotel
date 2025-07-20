@@ -5,6 +5,7 @@ import { toast } from "react-toastify"
 
 import { Link } from "react-router-dom"
 import { Pencil, Trash } from 'lucide-react'
+import { useTranslation } from 'react-i18next';
 
 const initialState = {
     roomNumber: "",
@@ -15,6 +16,7 @@ const initialState = {
 }
 
 const AdminRoomForm = () => {
+    const { t } = useTranslation();
 
     const token = useRoomStore((state) => state.token)
     const getRoomType = useRoomStore((state) => state.getRoomType)
@@ -52,23 +54,23 @@ const AdminRoomForm = () => {
 
         //check data in form 
         if (!form.roomNumber) {
-            return toast.error("กรุณากรอกข้อมูลให้ครบถ้วน")
+            return toast.error(t('room_number_required'))
         }
 
         if (form.roomNumber.length < 3) {
-            return toast.error("มึงหลอนเบาะ ใส่ให้ครบ 3 ตัวดิ")
+            return toast.error(t('room_number_too_short'))
         }
 
         if (form.roomNumber.length > 3) {
-            return toast.error("มึงหลอนเบาะ  มีแค่ 3 ตัว")
+            return toast.error(t('room_number_too_long'))
         }
 
         if (form.roomNumber[0] != form.floor) {
-            return toast.error("ชั้นกับเลขห้องไม่ตรงกัน")
+            return toast.error(t('floor_and_room_number_mismatch'))
         }
 
         if (form.roomNumber[1] == "0" && form.roomNumber[2] == "0") {
-            return toast.error("ไม่ลงท้ายด้วย 0")
+            return toast.error(t('room_number_cannot_end_with_zero'))
         }
 
         try {
@@ -76,7 +78,7 @@ const AdminRoomForm = () => {
             console.log(res)
             setForm(initialState)
             getRoom(token)
-            toast.success(`เพิ่มห้อง ${res.data.roomNumber} สำเร็จ`)
+            toast.success(t('room_added_successfully', { roomNumber: res.data.roomNumber }))
         } catch (err) {
             console.log(err)
             const errMag = err.response?.data?.message
@@ -85,12 +87,12 @@ const AdminRoomForm = () => {
     }
 
     const handleDelete = async (roomId) => {
-        if (window.confirm("Are you sure?")) {
+        if (window.confirm(t('confirm_delete'))) {
             // console.log("ลบ " + roomId)
             try {
                 const res = await deleteRoom(token, roomId)
                 console.log(res)
-                toast.success("Deleted")
+                toast.success(t('room_deleted'))
                 getRoom(token)
             } catch (err) {
                 console.log(err)
@@ -106,16 +108,16 @@ const AdminRoomForm = () => {
         <div className="container mx-auto p-4 bg-white shadow-md" >
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <h1 className="text-2xl font-bold mb-4">เพิ่มข้อมูลห้อง</h1>
+                <h1 className="text-2xl font-bold mb-4">{t('add_room_data')}</h1>
 
                 <div>
-                    <label htmlFor="roomNumber" className="block text-sm font-semibold">เลขห้อง</label>
+                    <label htmlFor="roomNumber" className="block text-sm font-semibold">{t('room_number')}</label>
                     <input
                         type="number"
                         className="border rounded-md p-2 w-full mt-1"
                         value={form.roomNumber}
                         onChange={handleOnChange}
-                        placeholder="เลขห้อง"
+                        placeholder={t('room_number')}
                         name="roomNumber"
                         id="roomNumber"
                         required
@@ -123,7 +125,7 @@ const AdminRoomForm = () => {
                 </div>
 
                 <div>
-                    <label htmlFor="floor" className="block text-sm font-semibold">ชั้น</label>
+                    <label htmlFor="floor" className="block text-sm font-semibold">{t('floor')}</label>
                     <select
                         className="border rounded-md p-2 w-full mt-1"
                         name="floor"
@@ -132,16 +134,16 @@ const AdminRoomForm = () => {
                         value={form.floor}
                         id="floor"
                     >
-                        <option value="" disabled>Select Floor</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
+                        <option value="" disabled>{t('select_floor')}</option>
+                        <option value="3">{t('floor_3')}</option>
+                        <option value="4">{t('floor_4')}</option>
+                        <option value="5">{t('floor_5')}</option>
+                        <option value="6">{t('floor_6')}</option>
                     </select>
                 </div>
 
                 <div>
-                    <label htmlFor="roomStatusId" className="block text-sm font-semibold">สถานะห้อง</label>
+                    <label htmlFor="roomStatusId" className="block text-sm font-semibold">{t('room_status')}</label>
                     <select
                         className="border rounded-md p-2 w-full mt-1"
                         name="roomStatusId"
@@ -150,7 +152,7 @@ const AdminRoomForm = () => {
                         value={form.roomStatusId}
                         id="roomStatusId"
                     >
-                        <option value="" disabled>Select Status</option>
+                        <option value="" disabled>{t('select_status')}</option>
                         {roomStatuses.map((item, index) => (
                             <option key={index} value={item.roomStatusId}>
                                 {item.roomStatusName}
@@ -160,7 +162,7 @@ const AdminRoomForm = () => {
                 </div>
 
                 <div>
-                    <label htmlFor="roomTypeId" className="block text-sm font-semibold">ประเภทห้อง</label>
+                    <label htmlFor="roomTypeId" className="block text-sm font-semibold">{t('room_type')}</label>
                     <select
                         className="border rounded-md p-2 w-full mt-1"
                         name="roomTypeId"
@@ -169,7 +171,7 @@ const AdminRoomForm = () => {
                         value={form.roomTypeId}
                         id="roomTypeId"
                     >
-                        <option value="" disabled>Select Type</option>
+                        <option value="" disabled>{t('select_type')}</option>
                         {roomtypes.map((item, index) => (
                             <option key={index} value={item.roomTypeId}>
                                 {item.roomTypeName}
@@ -183,7 +185,7 @@ const AdminRoomForm = () => {
                 <button
                     className="bg-blue-500 text-white p-3 rounded-md shadow-md hover:bg-blue-600 transition duration-200"
                 >
-                    เพิ่มห้อง
+                    {t('add_room')}
                 </button>
             </form>
 
@@ -191,12 +193,12 @@ const AdminRoomForm = () => {
             <table className="table w-full border border-gray-300 border-collapse">
                 <thead>
                     <tr className="bg-gray-200 border border-gray-300">
-                        <th scope="col" className="border border-gray-300 px-4 py-2">No</th>
-                        <th scope="col" className="border border-gray-300 px-4 py-2">เลขห้อง</th>
-                        <th scope="col" className="border border-gray-300 px-4 py-2">ชั้น</th>
-                        <th scope="col" className="border border-gray-300 px-4 py-2">สถานะ</th>
-                        <th scope="col" className="border border-gray-300 px-4 py-2">ประเภทห้อง</th>
-                        <th scope="col" className="border border-gray-300 px-4 py-2">จัดการ</th>
+                        <th scope="col" className="border border-gray-300 px-4 py-2">{t('no')}</th>
+                        <th scope="col" className="border border-gray-300 px-4 py-2">{t('room_number')}</th>
+                        <th scope="col" className="border border-gray-300 px-4 py-2">{t('floor')}</th>
+                        <th scope="col" className="border border-gray-300 px-4 py-2">{t('status')}</th>
+                        <th scope="col" className="border border-gray-300 px-4 py-2">{t('room_type')}</th>
+                        <th scope="col" className="border border-gray-300 px-4 py-2">{t('manage')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -229,7 +231,7 @@ const AdminRoomForm = () => {
                     ) : (
                         <tr>
                             <td colSpan="6" className="text-center py-6 border border-gray-300 text-gray-500">
-                                ไม่มีข้อมูลห้อง
+                                {t('no_room_data')}
                             </td>
                         </tr>
                     )}
