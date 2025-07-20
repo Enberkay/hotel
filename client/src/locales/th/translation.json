@@ -75,5 +75,14 @@
   "bed_signature": "Signature",
   "submit": "ส่งคำขอ",
   "cleaning_request_success": "ส่งคำขอทำความสะอาดสำเร็จ",
-  "cleaning_request_error": "เกิดข้อผิดพลาดในการส่งคำขอทำความสะอาด"
+  "cleaning_request_error": "เกิดข้อผิดพลาดในการส่งคำขอทำความสะอาด",
+  "room_type_management": "จัดการประเภทห้อง",
+  "room_type_name_th": "ชื่อประเภทห้อง (TH)",
+  "room_type_name_en": "Room Type Name (EN)",
+  "price": "ราคา",
+  "add_room_type": "เพิ่มประเภทห้อง",
+  "edit_room_type": "แก้ไขประเภทห้อง",
+  "add_success": "เพิ่มประเภทห้องสำเร็จ",
+  "edit_success": "แก้ไขประเภทห้องสำเร็จ",
+  "error_required": "กรุณากรอกข้อมูลให้ครบถ้วน"
 } 
