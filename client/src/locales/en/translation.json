@@ -61,5 +61,9 @@
   "id_card": "ID Card",
   "std_id": "Student ID",
   "select": "-- Select --",
-  "floor": "Floor"
+  "floor": "Floor",
+  "normal": "Normal",
+  "problem": "Problem",
+  "enter_problem_detail": "Enter problem details...",
+  "save": "Save"
 } 
