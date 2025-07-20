@@ -83,5 +83,13 @@
   "add_room_type": "เพิ่มประเภทห้อง",
   "edit_room_type": "แก้ไขประเภทห้อง",
   "add_success": "เพิ่มประเภทห้องสำเร็จ",
-  "edit_success": "แก้ไขประเภทห้องสำเร็จ"
+  "edit_success": "แก้ไขประเภทห้องสำเร็จ",
+  "room_manage": "จัดการห้องพัก",
+  "floor_label": "ชั้น",
+  "room_number": "หมายเลขห้อง",
+  "status": "สถานะ",
+  "add_room": "เพิ่มห้องพัก",
+  "add_room_success": "เพิ่มห้องพักสำเร็จ",
+  "edit_room_success": "แก้ไขห้องพักสำเร็จ",
+  "delete_room_success": "ลบห้องพักสำเร็จ"
 } 

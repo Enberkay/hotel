@@ -83,5 +83,13 @@
   "add_room_type": "Add Room Type",
   "edit_room_type": "Edit Room Type",
   "add_success": "Room type added successfully",
-  "edit_success": "Room type updated successfully"
+  "edit_success": "Room type updated successfully",
+  "room_manage": "Room Management",
+  "floor_label": "Floor",
+  "room_number": "Room Number",
+  "status": "Status",
+  "add_room": "Add Room",
+  "add_room_success": "Room added successfully",
+  "edit_room_success": "Room updated successfully",
+  "delete_room_success": "Room deleted successfully"
 } 

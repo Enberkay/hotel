@@ -11,7 +11,7 @@ const RoomManage = () => {
   const token = useAuthStore((state) => state.token)
   const getRoom = useRoomStore((state) => state.getRoom)
   const rooms = useRoomStore((state) => state.rooms)
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [selectedPair, setSelectedPair] = useState(null)
@@ -29,7 +29,7 @@ const RoomManage = () => {
 
   const handleGroupRoom = async () => {
     if (!selectedPair) {
-      toast.error("กรุณาเลือกคู่ห้องที่ต้องการรวม!")
+      toast.error(t("please_select_pair_to_group"))
       return
     }
 
@@ -38,17 +38,17 @@ const RoomManage = () => {
     const room2 = rooms.find((r) => r.roomNumber === room2Number)
 
     if (!room1 || !room2) {
-      toast.error("ห้องที่เลือกไม่ถูกต้อง!")
+      toast.error(t("selected_rooms_are_incorrect"))
       return
     }
 
     try {
       await groupRoom(token, { roomId1: room1.roomId, roomId2: room2.roomId })
-      toast.success(`รวมห้อง ${room1Number} และ ${room2Number} สำเร็จ!`)
+      toast.success(t("group_rooms_success", { room1Number, room2Number }))
       setSelectedPair(null)
       getRoom(token)
     } catch (error) {
-      toast.error("รวมห้องล้มเหลว!")
+      toast.error(t("group_rooms_failed"))
     }
   }
 
@@ -57,16 +57,16 @@ const RoomManage = () => {
     const room2 = rooms.find((r) => r.roomNumber === room2Number)
 
     if (!room1 || !room2) {
-      toast.error("ห้องที่เลือกไม่ถูกต้อง!")
+      toast.error(t("selected_rooms_are_incorrect"))
       return
     }
 
     try {
       await ungroupRoom(token, { roomId1: room1.roomId, roomId2: room2.roomId })
-      toast.success(`ยกเลิกรวมห้อง ${room1Number} และ ${room2Number} สำเร็จ!`)
+      toast.success(t("ungroup_rooms_success", { room1Number, room2Number }))
       getRoom(token)
     } catch (error) {
-      toast.error("ยกเลิกรวมห้องล้มเหลว!")
+      toast.error(t("ungroup_rooms_failed"))
     }
   }
 
@@ -81,7 +81,7 @@ const RoomManage = () => {
     const room = rooms.find((r) => r.roomId === roomId)
 
     if (!room) {
-      toast.error("ห้องที่เลือกไม่ถูกต้อง!")
+      toast.error(t("selected_room_is_incorrect"))
       return
     }
 
@@ -106,13 +106,13 @@ const RoomManage = () => {
     toast(
       ({ closeToast }) => (
         <div className="text-center">
-          <p className="font-semibold">⚠️ ยืนยันการเปลี่ยนสถานะห้อง?</p>
+          <p className="font-semibold">{t("confirm_room_status_change")}</p>
           <div className="flex justify-center gap-3 mt-3">
             <button
               className="px-4 py-2 bg-gray-400 text-white rounded-lg"
               onClick={closeToast}
             >
-              ❌ ยกเลิก
+              {t("cancel")}
             </button>
             <button
               className="px-4 py-2 bg-blue-500 text-white rounded-lg"
@@ -121,14 +121,14 @@ const RoomManage = () => {
                 try {
                   { console.log(roomIdsToUpdate, roomStatus) }
                   await changeRoomStatus(token, roomIdsToUpdate, roomStatus)
-                  toast.success("✅ อัพเดทสำเร็จ!", { position: "top-center" })
+                  toast.success(t("update_success"), { position: "top-center" })
                   getRoom(token)
                 } catch (err) {
-                  toast.error("❌ อัพเดทล้มเหลว!", { position: "top-center" })
+                  toast.error(t("update_failed"), { position: "top-center" })
                 }
               }}
             >
-              ✅ ยืนยัน
+              {t("confirm")}
             </button>
           </div>
         </div>
@@ -145,32 +145,32 @@ const RoomManage = () => {
         {/* แจ้งสี */}
         <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-lg shadow-lg">
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-green-500" /> ว่าง
+            <Star size={20} className="text-green-500" /> {t("available")}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-gray-500" /> มีคนเข้าพัก
+            <Star size={20} className="text-gray-500" /> {t("occupied")}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-yellow-500" /> ติดจอง
+            <Star size={20} className="text-yellow-500" /> {t("reserved")}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-blue-500" /> แจ้งทำความสะอาด
+            <Star size={20} className="text-blue-500" /> {t("cleaning")}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-red-500" /> แจ้งซ่อม
+            <Star size={20} className="text-red-500" /> {t("repair")}
           </p>
         </div>
 
         {/* แจ้งไอคอนเตียง */}
         <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-lg shadow-lg">
           <p className="text-xs text-black flex items-center gap-2">
-            <BedDouble size={20} className="text-black" /> Standard (เตียงคู่)
+            <BedDouble size={20} className="text-black" /> {t("standard_double_bed")}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <BedSingle size={20} className="text-black" /> Standard (เตียงเดี่ยว)
+            <BedSingle size={20} className="text-black" /> {t("standard_single_bed")}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Bed size={20} className="text-black" /> Signature
+            <Bed size={20} className="text-black" /> {t("signature")}
           </p>
         </div>
       </div>
@@ -179,7 +179,7 @@ const RoomManage = () => {
       <div className="flex-1 p-5 grid grid-cols-2 gap-5">
         {Object.keys(groupedRooms).map((floor) => (
           <div key={floor} className="mb-6 text-center">
-            <h2 className="text-lg font-bold mb-3">ชั้น {floor}</h2>
+            <h2 className="text-lg font-bold mb-3">{t("floor", { floor })}</h2>
             <div className="flex flex-wrap gap-3 justify-center">
               {groupedRooms[floor].map((room) => {
                 const statusColors = {
@@ -222,7 +222,7 @@ const RoomManage = () => {
 
       <div className="flex mt-5">
         <div className="w-72 bg-gray-100 p-4 rounded-lg shadow-lg">
-          <h2 className="text-md font-bold mb-3">เลือกคู่ห้องที่ต้องการรวม</h2>
+          <h2 className="text-md font-bold mb-3">{t("select_pair_to_group")}</h2>
           <div className="grid gap-3">
             {pairableRooms.map(([room1, room2]) => {
               const room1Data = rooms.find((r) => r.roomNumber === room1)
@@ -237,7 +237,7 @@ const RoomManage = () => {
                     onClick={() => !isGrouped && setSelectedPair([room1, room2])}
                     disabled={isGrouped}
                   >
-                    ห้อง {room1} & {room2}
+                    {t("room", { room1, room2 })}
                   </button>
                   {isGrouped && (
                     <button
@@ -256,7 +256,7 @@ const RoomManage = () => {
             onClick={handleGroupRoom}
             disabled={!selectedPair}
           >
-            ✅ ยืนยันการรวม
+            {t("confirm_group")}
           </button>
         </div>
       </div>
@@ -268,8 +268,7 @@ const RoomManage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-2xl shadow-xl w-96">
             <h2 className="text-lg font-bold mb-4 text-center text-gray-700">
-              เลือกสถานะห้อง{" "}
-              <span className="text-blue-500">{selectedRoom.roomNumber}</span>
+              {t("select_room_status", { roomNumber: selectedRoom.roomNumber })}
             </h2>
 
             {/* ปุ่มเลือกสถานะห้อง พร้อมสีพื้นหลัง */}
@@ -294,14 +293,14 @@ const RoomManage = () => {
                 className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition duration-200"
                 onClick={() => setSelectedRoom(null)}
               >
-                ❌ ปิด
+                {t("close")}
               </button>
 
               <Link
                 to={`/front/room-manage/${selectedRoom.roomId}`}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
               >
-                🛠️ แก้ไขข้อมูลห้อง
+                {t("edit_room_data")}
               </Link>
             </div>
           </div>
