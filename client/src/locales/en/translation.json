@@ -36,5 +36,19 @@
   "confirm_delete": "Are you sure you want to delete?",
   "delete_success": "Delete successful",
   "edit": "Edit",
-  "delete": "Delete"
+  "delete": "Delete",
+  "booking_management": "Booking Management",
+  "check_in_date": "Check-in Date",
+  "check_out_date": "Check-out Date",
+  "select_check_in_date": "Select check-in date",
+  "select_check_out_date": "Select check-out date",
+  "room_type": "Room Type",
+  "select_room_type": "Select room type",
+  "user_info": "User Information",
+  "name": "Name",
+  "license_plate": "License Plate",
+  "guest_count": "Number of guests (max {{max}})",
+  "confirm_booking": "Confirm Booking",
+  "booking_success": "Booking successful",
+  "booking_error": "Booking failed"
 } 

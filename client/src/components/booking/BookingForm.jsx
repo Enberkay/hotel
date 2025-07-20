@@ -21,6 +21,7 @@ const initialState = {
 }
 
 const BookingForm = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate()
   const token = useAuthStore((state) => state.token)
   const profile = useAuthStore((state) => state.profile)
@@ -37,7 +38,6 @@ const BookingForm = () => {
   const [selectedAddons, setSelectedAddons] = useState(null)
   const [addonPrice, setAddonPrice] = useState([])
   const [selectedOption, setSelectedOption] = useState([])
-  const { i18n } = useTranslation();
 
   useEffect(() => {
     getRoomType(token)
@@ -91,7 +91,7 @@ const BookingForm = () => {
   // ✅ ตั้งค่า ComboBox Add-ons
   const addonOptions = addons.map((addon) => ({
     value: addon.addonId,
-    label: `${addon.addonName}`,
+    label: i18n.language === 'th' ? addon.addonName_th : addon.addonName_en,
     price: addon.price,
   }))
 
@@ -159,16 +159,16 @@ const BookingForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!form.checkInDate || !form.checkOutDate) {
-      return toast.error("กรุณาเลือกวันก่อน")
+    if (!form.roomTypeId || !form.checkInDate || !form.checkOutDate) {
+      return toast.error(t('error_required'))
     }
 
     if (dayjs(form.checkOutDate).isBefore(dayjs(form.checkInDate))) {
-      return toast.error("วันออกต้องมากกว่าวันเข้า")
+      return toast.error(t('check_out_after_check_in'))
     }
 
     if (!form.roomTypeId) {
-      return toast.error("กรุณาเลือกประเภทห้อง")
+      return toast.error(t('error_select_room_type'))
     }
 
     // if (!form.paymentMethodId) {
@@ -188,8 +188,8 @@ const BookingForm = () => {
       const res = await createBooking(token, payload)
       console.log(res)
       setForm(initialState)
-      toast.success(`จองสำเร็จรอการยืนยัน`)
-      navigate("/customer/my-bookings")
+      toast.success(t('booking_success'))
+      navigate("/my-bookings")
     } catch (err) {
       console.log(err)
       const errMsg = err.response?.data?.message
@@ -200,23 +200,21 @@ const BookingForm = () => {
   return (
     <div className="flex justify-center">
       <div className="mx-10 p-6 bg-white w-full lg:w-10/12 xl:w-8/12 max-w-6xl border shadow-md mt-24">
-        {/* หัวข้อ */}
         <h2 className="text-2xl font-bold text-black text-center">
-          การจัดการการจอง
+          {t('booking_management')}
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col ">
-          {/* วันที่เข้าพัก - วันที่ออก */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col">
               <label className="mb-2 text-gray-700 text-sm md:text-base">
-                วันที่เข้าพัก
+                {t('check_in_date')}
               </label>
               <DatePicker
                 selected={form.checkInDate}
                 onChange={(date) => handleDateChange(date, "checkInDate")}
                 minDate={new Date()}
-                placeholderText="เลือกวันที่เข้าพัก"
+                placeholderText={t('select_check_in_date')}
                 dateFormat="dd/MM/yyyy"
                 className="p-3 border rounded-md shadow-sm w-full bg-light-yellow"
                 popperPlacement="bottom-start"
@@ -224,66 +222,55 @@ const BookingForm = () => {
             </div>
             <div className="flex flex-col">
               <label className="mb-2 text-gray-700 text-sm md:text-base">
-                วันที่ออก
+                {t('check_out_date')}
               </label>
               <DatePicker
                 selected={form.checkOutDate}
                 onChange={(date) => handleDateChange(date, "checkOutDate")}
-                minDate={
-                  form.checkInDate
-                    ? dayjs(form.checkInDate).add(1, "day").toDate()
-                    : new Date()
-                }
-                placeholderText="เลือกวันที่ออก"
+                minDate={form.checkInDate || new Date()}
+                placeholderText={t('select_check_out_date')}
                 dateFormat="dd/MM/yyyy"
                 className="p-3 border rounded-md shadow-sm w-full bg-light-yellow"
-                popperPlacement="bottom-end"
+                popperPlacement="bottom-start"
               />
             </div>
           </div>
 
-          {/* ประเภทห้อง */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">
-              ประเภทห้อง
+              {t('room_type')}
             </label>
             <Select
               options={roomOptions}
               onChange={handleOnChangeRoomType}
-              placeholder="เลือกประเภทห้อง"
+              placeholder={t('select_room_type')}
               className="mb-2 w-[200px]"
               classNamePrefix="select"
-
             />
           </div>
 
-          {/* ฟอร์มการจอง */}
           <div className="bg-white p-4 rounded-md border-2 border-black mt-4">
-            <h3 className="text-lg font-semibold mb-2">ข้อมูลผู้ใช้</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('user_info')}</h3>
             <p>
-              <strong>ชื่อ:</strong> {profile.prefix} {profile.userName}{" "}
-              {profile.userSurName}
+              <strong>{t('name')}:</strong> {profile.prefix} {profile.userName} {profile.userSurName}
             </p>
             <p>
-              <strong>อีเมล:</strong> {profile.userEmail}
+              <strong>{t('email')}:</strong> {profile.userEmail}
             </p>
             <p>
-              <strong>ทะเบียนรถ:</strong> {profile.licensePlate}
+              <strong>{t('license_plate')}:</strong> {profile.licensePlate}
             </p>
             <p>
-              <strong>เบอร์โทร:</strong> {profile.userNumPhone}
+              <strong>{t('phone')}:</strong> {profile.userNumPhone}
             </p>
             <p>
-              <strong>ประเภทลูกค้า:</strong>{" "}
-              {profile.Customer?.customerType?.customerTypeName}
+              <strong>{t('customer_type')}:</strong> {profile.Customer?.customerType?.customerTypeName}
             </p>
           </div>
 
-          {/* จำนวนคนที่เข้าพัก */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">
-              จำนวนคนที่เข้าพัก (มากสุด {selectedOption?.value === 3 ? "4" : "2"}{" "}
-              คน)
+              {t('guest_count', { max: selectedOption?.value === 3 ? 4 : 2 })}
             </label>
             <input
               type="number"
@@ -296,121 +283,13 @@ const BookingForm = () => {
             />
           </div>
 
-          {/* Add-ons */}
-          <div className=" mt-4">
-            <h3 className=" text-lg font-semibold mb-2">รายการเสริม</h3>
-            <div className="flex items-center gap-2">
-              <Select
-                key={selectedOption?.value} // ใช้ key เพื่อบังคับให้ Select รีเรนเดอร์ใหม่
-                options={addonOptions}
-                value={selectedAddons} // ใช้ selectedAddons เป็น null เพื่อให้ placeholder กลับมาแสดง
-                onChange={setSelectedAddons}
-                placeholder="เลือกรายการเสริม"
-                className="w-[200px]"
-                classNamePrefix="select"
-              />
-              <span
-                className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded cursor-pointer"
-                onClick={handleAdd}
-              >
-                Add
-              </span>
-            </div>
-
-            <p className="text-red-500 text-sm">
-              *รายการเสริมทุกประเภทจะได้อย่างละ 1 อย่าง
-            </p>
-
-            {/*ตารางadd-on*/}
-            <table className="mt-4 w-full border border-collapse">
-              <thead>
-                <tr className="border-b">
-                  <th className="p-2 text-left">รายการ</th>
-                  <th className="p-2 text-center">ราคา</th>
-                  <th className="p-2 text-right"> </th>
-                </tr>
-              </thead>
-              <tbody>
-                {addonPrice.map((addon, index) => (
-                  <tr key={addon.value} className="border-b">
-                    <td className="p-2">
-                      {index + 1}. {addon.label}
-                    </td>
-                    <td className="p-2 text-center">{addon.price}.-</td>
-                    <td className="p-2 text-right">
-                      <span
-                        className="text-red-500 cursor-pointer"
-                        onClick={() => handleRemove(addon.value)}
-                      >
-                        ลบ
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div className="mt-4 border-t pt-2">
-              <div className="flex justify-between py-1">
-                <strong>ราคารวมรายการเสริม</strong>
-                <span>฿ {totalAddonPrice}</span>
-              </div>
-              {checkIn && checkOut && (
-                <div className="flex justify-between py-1">
-                  <strong>ราคาห้อง</strong>
-                  {totalRoomPrice && daysBooked > 0 ? (
-                    <span>
-                      ฿ {roomTotal} ( ฿{totalRoomPrice} x {daysBooked} วัน)
-                    </span>
-                  ) : (
-                    <span>กรุณาเลือกวัน</span>
-                  )}
-                </div>
-              )}
-              <div className="flex justify-between py-1 text-red-500">
-                <strong>ส่วนลด</strong>
-                {totalRoomPrice &&
-                  daysBooked &&
-                  totalRoomPrice > 0 &&
-                  daysBooked > 0 ? (
-                  <span>฿ -{discount}</span>
-                ) : null}
-              </div>
-              <div className="flex justify-between py-1">
-                <strong>ราคารวมทั้งหมด</strong>
-                <span>฿ {totalPrice}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* <div>
-            <p>
-              <strong>ประเภทการชำระเงิน</strong>
-            </p>
-            {paymentMethods.map((value) => (
-              <div key={value.paymentMethodId} className="mx-5">
-                <span className="ml-3">{value.paymentMethodName}</span>
-                <input
-                  className="ml-5"
-                  type="radio"
-                  name="paymentMethodId"
-                  value={value.paymentMethodId}
-                  onChange={handlePaymentChange}
-                  checked={
-                    form.paymentMethodId === value.paymentMethodId.toString()
-                  }
-                />
-              </div>
-            ))}
-          </div> */}
-
           <div className="text-center">
             <button
               type="submit"
               className="bg-[var(--color-brown)] hover:bg-[var(--color-light-yellow)] text-white font-bold py-2 px-6 rounded-md shadow-md"
               style={{'--color-brown':'#6A503D','--color-light-yellow':'#FEF6B3'}}
             >
-              ยืนยันการจอง
+              {t('confirm_booking')}
             </button>
           </div>
         </form>

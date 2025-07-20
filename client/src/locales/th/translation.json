@@ -36,5 +36,19 @@
   "confirm_delete": "คุณแน่ใจหรือไม่ว่าต้องการลบ?",
   "delete_success": "ลบข้อมูลสำเร็จ",
   "edit": "แก้ไข",
-  "delete": "ลบ"
+  "delete": "ลบ",
+  "booking_management": "การจัดการการจอง",
+  "check_in_date": "วันที่เข้าพัก",
+  "check_out_date": "วันที่ออก",
+  "select_check_in_date": "เลือกวันที่เข้าพัก",
+  "select_check_out_date": "เลือกวันที่ออก",
+  "room_type": "ประเภทห้อง",
+  "select_room_type": "เลือกประเภทห้อง",
+  "user_info": "ข้อมูลผู้ใช้",
+  "name": "ชื่อ",
+  "license_plate": "ทะเบียนรถ",
+  "guest_count": "จำนวนคนที่เข้าพัก (มากสุด {{max}} คน)",
+  "confirm_booking": "ยืนยันการจอง",
+  "booking_success": "จองห้องสำเร็จ",
+  "booking_error": "เกิดข้อผิดพลาดในการจอง"
 } 
