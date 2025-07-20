@@ -4,10 +4,12 @@ import useAuthStore from "../../store/auth-store";
 import { createAddon, readAddon, updateAddon } from "../../api/addon"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
+import { useTranslation } from 'react-i18next';
 
-const initialState = { addonName: "", price: 0 }
+const initialState = { addonName_en: "", addonName_th: "", price: 0 }
 
 const FormAddon = () => {
+  const { i18n, t } = useTranslation();
   const token = useAuthStore((state) => state.token);
   const getAddon = useAddonStore((state) => state.getAddon);
   const addons = useAddonStore((state) => state.addons);
@@ -21,21 +23,19 @@ const FormAddon = () => {
   }, [])
 
   const handleOnChange = (e) => {
-    // console.log(e.target.name, e.target.value)
-    // ...form คือ operator spread
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.addonName || !form.price) {
+    if (!form.addonName_en || !form.addonName_th || !form.price) {
       return toast.error("กรุณากรอกข้อมูลให้ครบถ้วน")
     }
     try {
       const res = await createAddon(token, form)
       setForm(initialState)
       getAddon(token)
-      toast.success(`เพิ่มรายการเสริม ${res.data.addonName} สำเร็จ`)
+      toast.success(`เพิ่มรายการเสริม ${i18n.language === 'th' ? res.data.addonName_th : res.data.addonName_en} สำเร็จ`)
     } catch (err) {
       console.log(err)
     }
@@ -51,7 +51,14 @@ const FormAddon = () => {
     }
   }
 
+  const handleEditChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value })
+  }
+
   const handleUpdate = async () => {
+    if (!editForm.addonName_en || !editForm.addonName_th || !editForm.price) {
+      return toast.error("กรุณากรอกข้อมูลให้ครบถ้วน")
+    }
     try {
       await updateAddon(token, editForm.addonId, editForm)
       setIsEditOpen(false)
@@ -67,7 +74,8 @@ const FormAddon = () => {
       <h1 className="text-2xl font-bold mb-4">Addon Management</h1>
       <form className="my-4" onSubmit={handleSubmit}>
         <div className="flex flex-col space-y-4">
-          <input type="text" name="addonName" value={form.addonName} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="ชื่อรายการเสริม" required />
+          <input type="text" name="addonName_th" value={form.addonName_th} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="ชื่อรายการเสริม (TH)" required />
+          <input type="text" name="addonName_en" value={form.addonName_en} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="Addon Name (EN)" required />
           <input type="number" name="price" value={form.price} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="ราคา" required />
           <button className="bg-blue-500 text-white p-2 rounded-md">Add Addon</button>
         </div>
@@ -76,7 +84,7 @@ const FormAddon = () => {
         {addons.map((item) => (
           <div key={item.addonId} className="p-4 border rounded-md shadow-md flex justify-between items-center">
             <div>
-              <h2 className="font-bold">{item.addonName}</h2>
+              <h2 className="font-bold">{i18n.language === 'th' ? item.addonName_th : item.addonName_en}</h2>
               <p>{item.price} บาท</p>
             </div>
             <button onClick={() => handleEditClick(item.addonId)} className="text-blue-500">
@@ -90,8 +98,9 @@ const FormAddon = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
           <div className="bg-white p-6 rounded-md shadow-md w-96">
             <h2 className="text-xl font-bold mb-4">แก้ไขรายการเสริม</h2>
-            <input type="text" name="addonName" value={editForm.addonName} onChange={(e) => setEditForm({ ...editForm, addonName: e.target.value })} className="border p-2 w-full rounded-md mb-2" />
-            <input type="number" name="price" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} className="border p-2 w-full rounded-md mb-4" />
+            <input type="text" name="addonName_th" value={editForm.addonName_th} onChange={handleEditChange} className="border p-2 w-full rounded-md mb-2" placeholder="ชื่อรายการเสริม (TH)" />
+            <input type="text" name="addonName_en" value={editForm.addonName_en} onChange={handleEditChange} className="border p-2 w-full rounded-md mb-2" placeholder="Addon Name (EN)" />
+            <input type="number" name="price" value={editForm.price} onChange={handleEditChange} className="border p-2 w-full rounded-md mb-4" placeholder="ราคา" />
             <div className="flex justify-between">
               <button onClick={() => setIsEditOpen(false)} className="bg-gray-500 text-white p-2 rounded-md">ยกเลิก</button>
               <button onClick={handleUpdate} className="bg-green-500 text-white p-2 rounded-md">ยืนยัน</button>

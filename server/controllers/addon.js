@@ -2,12 +2,14 @@ const prisma = require("../config/prisma")
 
 exports.create = async (req, res) => {
     try {
-        const { addonName, price } = req.validated;
-        console.log(addonName, price)
+        const { addonName, price, addonName_en, addonName_th } = req.validated || req.body;
+        console.log(addonName, price, addonName_en, addonName_th)
 
         const addon = await prisma.addon.create({
             data: {
-                addonName: addonName,
+                addonName: addonName || addonName_th || addonName_en,
+                addonName_en: addonName_en || addonName,
+                addonName_th: addonName_th || addonName,
                 price: Number(price)
             }
         })
@@ -46,10 +48,10 @@ exports.read = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const { addonName, price } = req.body
+        const { addonName, price, addonName_en, addonName_th } = req.body
         const addonId = Number(req.params.id)
 
-        if (!addonName || !price) {
+        if ((!addonName && !addonName_en && !addonName_th) || !price) {
             return res.status(400).json({ message: "ไม่มีค่าที่ส่งมา" })
         }
 
@@ -68,7 +70,9 @@ exports.update = async (req, res) => {
                 addonId: addonId
             },
             data: {
-                addonName: addonName,
+                addonName: addonName || addonName_th || addonName_en,
+                addonName_en: addonName_en || addonName,
+                addonName_th: addonName_th || addonName,
                 price: Number(price)
             }
         })
