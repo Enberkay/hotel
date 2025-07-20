@@ -1,9 +1,11 @@
-import react, { useEffect } from "react"
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import AppRoutes from "./routes/AppRoutes"
 import { ToastContainer } from 'react-toastify'
 import useAuthStore from "./store/auth-store";
 
 const App = () => {
+  const { t } = useTranslation();
 
   useEffect(() => {
     const checkTokenInterval = setInterval(() => {
@@ -13,10 +15,14 @@ const App = () => {
   }, []);
 
   return (
-    <>
+    <div>
+      <h1>{t('welcome')}</h1>
+      <p>{t('hello')}</p>
+      <button onClick={() => i18n.changeLanguage('th')}>ไทย</button>
+      <button onClick={() => i18n.changeLanguage('en')}>English</button>
       <ToastContainer />
       <AppRoutes />
-    </>
-  )
+    </div>
+  );
 }
 export default App
