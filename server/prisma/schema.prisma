@@ -290,6 +290,8 @@ model Room {
 model RoomType {
     roomTypeId   Int    @id @default(autoincrement())
     roomTypeName String
+    name_en      String
+    name_th      String
     price        Float  @default(0)
 
     Room    Room[]
