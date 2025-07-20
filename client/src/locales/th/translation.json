@@ -107,5 +107,21 @@
   "check_in": "เช็คอิน",
   "check_out": "เช็คเอาท์",
   "customer_name": "ชื่อลูกค้า",
-  "booking_time": "เวลาที่จอง"
+  "booking_time": "เวลาที่จอง",
+  "booking_detail": "รายละเอียดการจอง",
+  "room_type": "ประเภทห้อง",
+  "price": "ราคา",
+  "customer_name": "ชื่อลูกค้า",
+  "phone": "เบอร์โทรศัพท์",
+  "email": "อีเมล",
+  "license_plate": "ทะเบียนรถ",
+  "guest_count": "จำนวนผู้เข้าพัก",
+  "check_in": "เช็คอิน",
+  "check_out": "เช็คเอาท์",
+  "booking_time": "เวลาที่จอง",
+  "status": "สถานะ",
+  "confirm": "ยืนยัน",
+  "cancel": "ยกเลิก",
+  "error_required": "กรุณากรอกข้อมูลให้ครบถ้วน",
+  "no_data": "ไม่มีข้อมูล"
 } 

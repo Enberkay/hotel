@@ -8,6 +8,7 @@ import { Undo2, BedDouble, BedSingle, Bed, Star } from "lucide-react"
 import { useTranslation } from 'react-i18next';
 
 const BookingDetail = () => {
+    const { t } = useTranslation();
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -59,7 +60,7 @@ const BookingDetail = () => {
     //เลือกห้อง
     const handleConfirm = async () => {
         if (!selectedRoom || !selectedBookingId) {
-            toast.error("กรุณาเลือกห้องและการจองก่อนยืนยัน")
+            toast.error(t('select_room_and_booking_before_confirm'));
             return
         }
 
@@ -67,33 +68,33 @@ const BookingDetail = () => {
             const res = await confirmBooking(token, selectedBookingId, selectedRoom)
             console.log(res)
 
-            toast.success(`ยืนยันการจองห้องสำเร็จ!`)
+            toast.success(t('booking_confirmed_success'));
             setShowPopup(false)
             getRoom(token)
             navigate("/front")
         } catch (err) {
             console.error("Error confirming booking:", err)
-            toast.error("เกิดข้อผิดพลาดในการยืนยันการจอง")
+            toast.error(t('error_confirming_booking'));
         }
     }
 
     //CheckIn
     const handleCheckIn = async (bookingId) => {
-        if (window.confirm("คุณต้องการ CheckIn ให้ลูกค้าใช่หรอไม่?")) {
+        if (window.confirm(t('confirm_check_in'))) {
             try {
                 await checkIn(token, bookingId)
-                toast.success("CheckIn แล้ว")
+                toast.success(t('check_in_successful'));
                 navigate("/front")
             } catch (err) {
                 console.log(err)
-                toast.error("CheckIn ไม่สำเร็จ")
+                toast.error(t('check_in_failed'));
             }
         }
     }
 
     //CheckOut
     const handleCheckOut = async (bookingId) => {
-        if (window.confirm(`คุณต้องการ Check-Out ใช่หรือไม่?`)) {
+        if (window.confirm(t('confirm_check_out'))) {
             try {
                 const res = await checkOut(token, bookingId)
                 console.log(res)
@@ -106,10 +107,10 @@ const BookingDetail = () => {
                 // Navigate ไปหน้าทำความสะอาด พร้อมส่งข้อมูลห้องที่เพิ่ง Check-Out
                 navigate("/front/cleaning-request", { state: { roomId, roomNumber, floor } })
 
-                toast.success(`Check-Out แล้ว! ห้องหมายเลข ${roomNumber} ถูกเพิ่มไปยังรายการทำความสะอาด`)
+                toast.success(t('check_out_successful'));
             } catch (err) {
                 console.error("Check-Out ไม่สำเร็จ:", err)
-                toast.error("Check-Out ไม่สำเร็จ")
+                toast.error(t('check_out_failed'));
             }
         }
     }
@@ -117,47 +118,47 @@ const BookingDetail = () => {
 
     return (
         <div className="container mx-auto mt-10 p-4 bg-white shadow-md">
-            <div className="mb-4 text-center px-50 font-bold text-xl">เลือกห้องให้ลูกค้า</div>
+            <div className="mb-4 text-center px-50 font-bold text-xl">{t('select_room_for_customer')}</div>
             <ul className="space-y-4">
                 {form ? (
                     <li className="p-4 border border-gray-300 rounded-lg shadow-sm bg-gray-50">
-                        <p><strong>ใบที่:</strong> {form.bookingId || "-"}</p>
-                        <p><strong>ประเภทห้องที่ลูกค้าต้องการ:</strong> {form.roomType ? (i18n.language === 'th' ? form.roomType.name_th : form.roomType.name_en) : '-'}</p>
-                        <p><strong>ราคาห้อง:</strong> {form.roomType?.price || 0} บาท</p>
-                        <p><strong>ชื่อ-นามสกุล:</strong> {`${form.customer?.user?.prefix || ""} ${form.customer?.user?.userName || ""} ${form.customer?.user?.userSurName || ""}`.trim()}</p>
-                        <p><strong>เบอร์โทร:</strong> {form.customer?.user?.userNumPhone || "-"}</p>
-                        <p><strong>Email:</strong> {form.customer?.user?.userEmail || "-"}</p>
-                        <p><strong>ทะเบียนรถ:</strong> {form.customer?.user?.licensePlate || "-"}</p>
-                        <p><strong>จำนวนผู้เข้าพัก:</strong> {form.count || "-"} คน</p>
-                        <p><strong>เวลาเข้า (Check-In):</strong> {formatDate(form.checkInDate)}</p>
-                        <p><strong>เวลาออก (Check-Out):</strong> {formatDate(form.checkOutDate)}</p>
-                        <p><strong>เวลาที่ทำการจอง:</strong> {formatDateTime(form.createdAt)}</p>
+                        <p><strong>{t('booking_id')}:</strong> {form.bookingId || "-"}</p>
+                        <p><strong>{t('room_type')}:</strong> {form.roomType ? (i18n.language === 'th' ? form.roomType.name_th : form.roomType.name_en) : '-'}</p>
+                        <p><strong>{t('room_price')}:</strong> {form.roomType?.price || 0} {t('baht')}</p>
+                        <p><strong>{t('customer_name')}:</strong> {`${form.customer?.user?.prefix || ""} ${form.customer?.user?.userName || ""} ${form.customer?.user?.userSurName || ""}`.trim()}</p>
+                        <p><strong>{t('customer_phone')}:</strong> {form.customer?.user?.userNumPhone || "-"}</p>
+                        <p><strong>{t('customer_email')}:</strong> {form.customer?.user?.userEmail || "-"}</p>
+                        <p><strong>{t('license_plate')}:</strong> {form.customer?.user?.licensePlate || "-"}</p>
+                        <p><strong>{t('number_of_guests')}:</strong> {form.count || "-"} {t('people')}</p>
+                        <p><strong>{t('check_in_time')}:</strong> {formatDate(form.checkInDate)}</p>
+                        <p><strong>{t('check_out_time')}:</strong> {formatDate(form.checkOutDate)}</p>
+                        <p><strong>{t('booking_time')}:</strong> {formatDateTime(form.createdAt)}</p>
 
                         {/* แสดงรายการเสริม */}
-                        <p><strong>รายการเสริม:</strong></p>
+                        <p><strong>{t('additional_items')}:</strong></p>
                         {form.BookingAddonListRelation?.length > 0 ? (
                             form.BookingAddonListRelation.map((addonRel, index) => (
                                 <div key={addonRel.bookingAddonListId} className="ml-4 p-2 bg-gray-100 rounded-lg">
                                     {addonRel.bookingAddonList?.BookingAddon?.length > 0 ? (
                                         addonRel.bookingAddonList.BookingAddon.map((addonItem) => (
                                             <p key={addonItem.addonId}>
-                                                - {addonItem.addon?.addonName} ({addonItem.quantity} x {addonItem.addon?.price} บาท)
+                                                - {addonItem.addon?.addonName} ({addonItem.quantity} x {addonItem.addon?.price} {t('baht')})
                                             </p>
                                         ))
                                     ) : (
-                                        <p className="text-gray-500">ไม่มีรายการเสริม</p>
+                                        <p className="text-gray-500">{t('no_additional_items')}</p>
                                     )}
-                                    <p className="font-bold">รวม Addon: {addonRel.price} บาท</p>
+                                    <p className="font-bold">{t('total_addon_price')}: {addonRel.price} {t('baht')}</p>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-gray-500">ไม่มีรายการเสริม</p>
+                            <p className="text-gray-500">{t('no_additional_items')}</p>
                         )}
 
 
                         {/* เพิ่มราคาทั้งหมดและเฉพาะ Addons */}
-                        <p><strong>ราคารวม Addons (Total Addon):</strong> {form.totalAddon || 0} บาท</p>
-                        <p><strong>ราคารวม (Total):</strong> {form.total || 0} บาท</p>
+                        <p><strong>{t('total_addon_price')}:</strong> {form.totalAddon || 0} {t('baht')}</p>
+                        <p><strong>{t('total_price')}:</strong> {form.total || 0} {t('baht')}</p>
 
 
                         <div>
@@ -195,7 +196,7 @@ const BookingDetail = () => {
                                     }`}
                                 disabled={form.bookingStatus !== 'RESERVED'}
                             >
-                                เลือกห้อง
+                                {t('select_room')}
                             </button>
 
                             {/* ปุ่มเลือกห้อง จะกดได้เฉพาะ bookingStatusId = 2 เพราะ 2 คือ "อนุมัติแล้ว" รอทำการ checkIn ต่อ */}
@@ -209,7 +210,7 @@ const BookingDetail = () => {
                                     onClick={() => handleCheckIn(form.bookingId)}
                                     disabled={form.bookingStatus !== 'APPROVED'} // ปิดการใช้งานเมื่อไม่ใช่สถานะ 2
                                 >
-                                    Check-In
+                                    {t('check_in')}
                                 </button>
                             )}
 
@@ -224,7 +225,7 @@ const BookingDetail = () => {
                                     onClick={() => handleCheckOut(form.bookingId)}
                                     disabled={form.bookingStatus !== 'CHECKED_IN'}
                                 >
-                                    Check-Out
+                                    {t('check_out')}
                                 </button>
                             )}
 
@@ -253,7 +254,7 @@ const BookingDetail = () => {
                     </li>
                 ) : (
                     <li className="text-center w-full py-6 border border-gray-300">
-                        ไม่มีข้อมูลการจอง
+                        {t('no_booking_data')}
                     </li>
                 )}
 
@@ -264,10 +265,10 @@ const BookingDetail = () => {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-20 rounded-lg shadow-lg">
                         <h2 className="text-lg font-bold mb-4">
-                            เลือกห้อง
+                            {t('select_room')}
                             {selectedRoom && (
                                 <span className="text-blue-700 ml-2">
-                                    (คุณเลือกห้องหมายเลข {rooms.find(r => r.roomId === selectedRoom)?.roomNumber}
+                                    {t('selected_room_number')} {rooms.find(r => r.roomId === selectedRoom)?.roomNumber}
 
                                     {/* ตรวจสอบว่าห้องที่เลือกมีคู่หรือไม่ */}
                                     {rooms.find(r => r.roomId === selectedRoom)?.roomTypeId === 3 &&
@@ -276,7 +277,7 @@ const BookingDetail = () => {
                                             const pair = pairableRooms.find(pair => pair.includes(selectedRoomNumber));
                                             const pairedRoom = pair?.find(num => num !== selectedRoomNumber);
 
-                                            return pairedRoom ? ` และคู่ของมันคือ ${pairedRoom}` : "";
+                                            return pairedRoom ? ` ${t('and_its_pair')} ${pairedRoom}` : "";
                                         })()
                                     })
                                 </span>
@@ -323,7 +324,7 @@ const BookingDetail = () => {
                                         key={index}
                                         className={`flex flex-col items-center justify-center w-20 h-20 border rounded-lg shadow-md ${statusColor} hover:bg-opacity-80 transition duration-200 
                                                     ${room.roomStatus !== 'AVAILABLE' ? "opacity-50 cursor-not-allowed" : ""} 
-                                                    ${(isSelected || isPairSelected) ? "border-4 border-yellow-500 bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
+                                                    {(isSelected || isPairSelected) ? "border-4 border-yellow-500 bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}
                                         onClick={() => room.roomStatus === 'AVAILABLE' && setSelectedRoom(room.roomId)}
                                         disabled={room.roomStatus !== 'AVAILABLE'}
                                     >
@@ -342,32 +343,32 @@ const BookingDetail = () => {
                             {/*แจ้งสี */}
                             <div className="flex justify item-center gap-2">
                                 <p className="text-xs text-black mb-8 flex items-center gap-2">
-                                    <Star size={20} className="text-green-500 " /> ว่าง
+                                    <Star size={20} className="text-green-500 " /> {t('available')}
                                 </p>
                                 <p className="text-xs text-black mb-8 flex items-center gap-2">
-                                    <Star size={20} className="text-gray-500" /> มีคนเข้าพัก
+                                    <Star size={20} className="text-gray-500" /> {t('occupied')}
                                 </p>
                                 <p className="text-xs text-black mb-8 flex items-center gap-2">
-                                    <Star size={20} className="text-yellow-500" /> ติดจอง
+                                    <Star size={20} className="text-yellow-500" /> {t('reserved')}
                                 </p>
                                 <p className="text-xs text-black mb-8 flex items-center gap-2">
-                                    <Star size={20} className="text-blue-500" /> แจ้งทำความสะอาด
+                                    <Star size={20} className="text-blue-500" /> {t('cleaning_request')}
                                 </p>
                                 <p className="text-xs text-black mb-8 flex items-center gap-2">
-                                    <Star size={20} className="text-red-500" /> แจ้งซ่อม
+                                    <Star size={20} className="text-red-500" /> {t('repair_request')}
                                 </p>
                             </div>
 
                             {/* แจ้งไอคอนเตียง */}
                             <div className="flex justify item-center gap-2">
                                 <p className="text-xs text-black mb-8 flex items-center gap-2">
-                                    <BedSingle size={20} className="text-black" /> Standard(เดี่ยว)
+                                    <BedSingle size={20} className="text-black" /> {t('single_bed')}
                                 </p>
                                 <p className="text-xs text-black mb-8 flex items-center gap-2">
-                                    <BedDouble size={20} className="text-black" /> Standard(คู่)
+                                    <BedDouble size={20} className="text-black" /> {t('double_bed')}
                                 </p>
                                 <p className="text-xs text-black mb-8 flex items-center gap-2">
-                                    <Bed size={20} className="text-black" /> Signature
+                                    <Bed size={20} className="text-black" /> {t('signature_room')}
                                 </p>
                             </div>
 
@@ -379,13 +380,13 @@ const BookingDetail = () => {
                                 className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
                                 onClick={() => setShowPopup(false)}
                             >
-                                ปิด
+                                {t('close')}
                             </button>
 
                             <div className="flex space-x-2">
                                 {/* ปุ่มยืนยัน */}
                                 <button onClick={handleConfirm} className="px-4 py-2 bg-green-500 text-white rounded">
-                                    ยืนยัน
+                                    {t('confirm')}
                                 </button>
 
                                 {/* ปุ่มยกเลิกการเลือกห้อง */}
@@ -395,7 +396,7 @@ const BookingDetail = () => {
                                     onClick={() => setSelectedRoom(null)}
                                     disabled={!selectedRoom} // ปิดการใช้งานถ้ายังไม่ได้เลือกห้อง
                                 >
-                                    ยกเลิกการเลือกห้อง
+                                    {t('cancel_room_selection')}
                                 </button>
                             </div>
                         </div>
