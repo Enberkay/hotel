@@ -391,6 +391,8 @@ model BookingAddon {
 model Addon {
     addonId      Int            @id @default(autoincrement())
     addonName    String
+    addonName_en String
+    addonName_th String
     price        Int
     BookingAddon BookingAddon[]
 
