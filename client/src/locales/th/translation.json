@@ -100,5 +100,19 @@
   "admin_room_management": "จัดการห้อง (แอดมิน)",
   "edit_room": "แก้ไขห้อง",
   "delete_room": "ลบห้อง",
-  "edit_room_data": "แก้ไขข้อมูลห้อง"
+  "edit_room_data": "แก้ไขข้อมูลห้อง",
+  "my_bookings": "การจองของฉัน",
+  "booking_status": "สถานะการจอง",
+  "booking_id": "รหัสการจอง",
+  "room_type": "ประเภทห้อง",
+  "price": "ราคา",
+  "check_in": "เช็คอิน",
+  "check_out": "เช็คเอาท์",
+  "customer_name": "ชื่อลูกค้า",
+  "phone": "เบอร์โทรศัพท์",
+  "email": "อีเมล",
+  "license_plate": "ทะเบียนรถ",
+  "guest_count": "จำนวนผู้เข้าพัก",
+  "booking_time": "เวลาที่จอง",
+  "no_data": "ไม่มีข้อมูล"
 } 

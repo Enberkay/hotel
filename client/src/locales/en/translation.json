@@ -100,5 +100,19 @@
   "admin_room_management": "Admin Room Management",
   "edit_room": "Edit Room",
   "delete_room": "Delete Room",
-  "edit_room_data": "Edit Room Data"
+  "edit_room_data": "Edit Room Data",
+  "my_bookings": "My Bookings",
+  "booking_status": "Booking Status",
+  "booking_id": "Booking ID",
+  "room_type": "Room Type",
+  "price": "Price",
+  "check_in": "Check-in",
+  "check_out": "Check-out",
+  "customer_name": "Customer Name",
+  "phone": "Phone",
+  "email": "Email",
+  "license_plate": "License Plate",
+  "guest_count": "Number of Guests",
+  "booking_time": "Booking Time",
+  "no_data": "No data"
 } 

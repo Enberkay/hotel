@@ -17,7 +17,7 @@ const CustomerBookingList = () => {
   const getProfile = useHotelStore((state) => state.getProfile)
   const Profile = useHotelStore((state) => state.profile)
   const [isMenuOpen, setIsMenuOpen] = useState(false) //ทำResponsive
-  const { i18n } = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     getMyBookings(token)
@@ -40,11 +40,11 @@ const CustomerBookingList = () => {
     if (window.confirm("Are you sure?")) {
       try {
         await cancelledBooking(token, bookingId)
-        toast.success("ยกเลิกแล้ว")
+        toast.success(t('booking_cancelled_success'))
         getMyBookings(token)
       } catch (err) {
         console.log(err)
-        toast.error("ยกเลิกไม่สำเร็จ")
+        toast.error(t('booking_cancelled_failed'))
       }
     }
   }
@@ -65,11 +65,11 @@ const CustomerBookingList = () => {
                 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
           } md:relative md:translate-x-0 md:w-1/5`}
       >
-        <h2 className="text-xl font-bold mb-6 text-[#5a3e2b]">เมนู</h2>
+        <h2 className="text-xl font-bold mb-6 text-[#5a3e2b]">{t('menu')}</h2>
         <ul className="space-y-4">
           {[
-            { to: "/customer/customer-profile", label: "ข้อมูลส่วนตัว" },
-            { to: "/customer/my-bookings", label: "การจองของฉัน" },
+            { to: "/customer/customer-profile", label: t('customer_profile') },
+            { to: "/customer/my-bookings", label: t('my_bookings') },
           ].map(({ to, label }) => (
             <li key={to}>
               <NavLink
@@ -92,7 +92,7 @@ const CustomerBookingList = () => {
       <div className="flex-1 p-6">
         <div className="bg-white p-8 shadow-lg rounded-lg max-w-full md:mx-auto sm:mx-2">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-            การจองของฉัน
+            {t('my_bookings')}
           </h2>
 
           <ul className="space-y-4">
@@ -112,46 +112,46 @@ const CustomerBookingList = () => {
                       </span>
                     </p>
                     <p>
-                      <span className="font-semibold">สถานะการชำระเงิน:</span>{" "}
+                      <span className="font-semibold">{t('payment_status')}:</span>{" "}
                       {item.paymentStatus?.paymentStatusName}
                     </p>
                     <p>
-                      <span className="font-semibold">วิธีชำระเงิน:</span>{" "}
-                      {item.paymentMethod?.paymentMethodName ?? "ไม่ระบุ"}
+                      <span className="font-semibold">{t('payment_method')}:</span>{" "}
+                      {item.paymentMethod?.paymentMethodName ?? t('not_specified')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
                     <p>
-                      <span className="font-semibold">ประเภทห้อง:</span>{' '}
-                      {item.roomType ? (i18n.language === 'th' ? item.roomType.name_th : item.roomType.name_en) : 'ไม่ระบุ'}
+                      <span className="font-semibold">{t('room_type')}:</span>{' '}
+                      {item.roomType ? (i18n.language === 'th' ? item.roomType.name_th : item.roomType.name_en) : t('not_specified')}
                     </p>
                     <p>
-                      <span className="font-semibold">วันที่เช็คอิน:</span>{" "}
+                      <span className="font-semibold">{t('check_in_date')}:</span>{" "}
                       {formatDate(item.checkInDate)}
                     </p>
                     <p>
-                      <span className="font-semibold">วันที่เช็คเอาท์:</span>{" "}
+                      <span className="font-semibold">{t('check_out_date')}:</span>{" "}
                       {formatDate(item.checkOutDate)}
                     </p>
                     <p>
-                      <span className="font-semibold">สถานะการจอง:</span>{" "}
+                      <span className="font-semibold">{t('booking_status')}:</span>{" "}
                       {item.bookingStatus?.bookingStatusName}
                     </p>
                     <p>
-                      <span className="font-semibold">หมายเลขห้อง:</span>{" "}
-                      {item.room?.roomNumber ?? "-"}
+                      <span className="font-semibold">{t('room_number')}:</span>{" "}
+                      {item.room?.roomNumber ?? t('not_specified')}
                     </p>
                     <p>
-                      <span className="font-semibold">ชั้น:</span>{" "}
-                      {item.room?.floor ?? "-"}
+                      <span className="font-semibold">{t('floor')}:</span>{" "}
+                      {item.room?.floor ?? t('not_specified')}
                     </p>
                   </div>
                 </div>
 
                 <div className="bg-gray-100 px-6 py-4 md:flex sm:grid justify-between items-center ">
                   <p className="text-lg font-semibold text-[#5a3e2b]">
-                    ราคาทั้งหมด: {item.total} บาท
+                    {t('total_price')}: {item.total} {t('baht')}
                   </p>
 
                   <div >
@@ -161,7 +161,7 @@ const CustomerBookingList = () => {
                           className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
                           onClick={() => console.log("ไปหน้าชำระเงิน")}
                         >
-                          ชำระเงิน
+                          {t('pay_now')}
                         </button>
 
                       </div>
@@ -175,19 +175,19 @@ const CustomerBookingList = () => {
                         className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
                         onClick={() => handleCancel(item.bookingId)}
                       >
-                        ยกเลิก
+                        {t('cancel_booking')}
                       </button>
                     )}
                     {item.bookingStatus?.bookingStatusId === 5 && (
                       <p className="text-sm text-gray-500">
-                        <span className="font-semibold">วันที่ยกเลิก:</span>{" "}
+                        <span className="font-semibold">{t('cancellation_date')}:</span>{" "}
                         {formatDate(item.cancelledAt)}
                       </p>
                     )}
                     {item.confirmedAt && (
                       <div className="text-sm text-gray-500">
                         <p>
-                          <span className="font-semibold">วันที่อนุมัติ:</span>{" "}
+                          <span className="font-semibold">{t('approval_date')}:</span>{" "}
                           {formatDateTime(item.confirmedAt)}
                         </p>
                       </div>
