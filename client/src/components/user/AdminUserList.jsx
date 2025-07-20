@@ -4,6 +4,7 @@ import { createUser, deleteUser } from "../../api/admin"
 import { toast } from "react-toastify"
 import { Pencil, Trash } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 
 const initialState = {
   userEmail: "",
@@ -18,30 +19,18 @@ const initialState = {
 }
 
 const AdminUserList = () => {
+  const { t } = useTranslation();
   const token = useAuthStore((state) => state.token)
   const getUser = useAuthStore((state) => state.getUser)
   const users = useAuthStore((state) => state.users)
 
-  const [form, setForm] = useState({
-    userEmail: "",
-    userPassword: "",
-    userName: "",
-    userSurName: "",
-    userNumPhone: "",
-    confirmPassword: "",
-    customertypeId: "",
-    userRole: "",
-    assignedFloor: "",
-  })
+  const [form, setForm] = useState(initialState)
 
   useEffect(() => {
     getUser(token)
-    console.log(users)
   }, [])
 
   const handleOnChange = (e) => {
-    console.log(e.target.name, e.target.value)
-    // ...form คือ operator spread
     setForm({
       ...form,
       [e.target.name]: e.target.value,
@@ -49,56 +38,40 @@ const AdminUserList = () => {
   }
 
   const handleSubmit = async (e) => {
-    // e.preventDefault() ป้องกันการ refresh
     e.preventDefault()
-    // console.log(form)
-
-    //check data in form
     if (!form.userEmail || !form.userPassword || !form.confirmPassword) {
-      return toast.error("กรุณากรอกข้อมูลให้ครบถ้วน")
+      return toast.error(t('error_required'))
     }
-
-    //check matching password
     if (form.userPassword !== form.confirmPassword) {
-      return toast.error("Password is not match!!!")
+      return toast.error(t('error_password_not_match'))
     }
-
     if (form.userNumPhone[0] !== "0") {
-      return toast.error("หมายเลขเบอร์โทรศัพท์ต้องเริ่มต้นด้วย 0")
+      return toast.error(t('error_phone_start_0'))
     }
-
     if (!["6", "8", "9"].includes(form.userNumPhone[1])) {
-      return toast.error("ตัวเลขตัวที่สองต้องเป็น 6, 8 หรือ 9 เท่านั้น")
+      return toast.error(t('error_phone_second_digit'))
     }
-
     if (form.userNumPhone.length !== 10) {
-      return toast.error("หมายเลขไม่ถูกต้อง")
+      return toast.error(t('error_phone_length'))
     }
-
     try {
       const res = await createUser(token, form)
-      // console.log(initialState)
-      //console.log(res)
       setForm(initialState)
       getUser(token)
-      toast.success(`เพิ่มพนักสำเร็จ`)
+      toast.success(t('add_user_success'))
     } catch (err) {
-      console.log(err)
       const errMag = err.response?.data?.message
       toast.error(errMag)
     }
   }
 
   const handleDelete = async (userId) => {
-    if (window.confirm("Are you sure?")) {
-      // console.log("ลบ" + userId)
+    if (window.confirm(t('confirm_delete'))) {
       try {
         const res = await deleteUser(token, userId)
-        console.log(res)
-        toast.success(`ลบข้อมูลสำเร็จ`)
+        toast.success(t('delete_success'))
         getUser()
       } catch (err) {
-        console.log(err)
         const errMag = err.response?.data?.message
         toast.error(errMag)
       }
@@ -108,51 +81,43 @@ const AdminUserList = () => {
   return (
     <div className="container mx-auto p-4 bg-white shadow-md">
       <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg max-w-3xl">
-        <h1 className="text-xl font-bold mb-6 text-center">เพิ่มพนักงาน</h1>
-
+        <h1 className="text-xl font-bold mb-6 text-center">{t('add_user')}</h1>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-          {/* First Name */}
           <div className="flex flex-col">
-            <label className="font-medium">First Name</label>
+            <label className="font-medium">{t('firstName')}</label>
             <input
               className="border p-2 rounded-md focus:ring focus:ring-blue-300"
               onChange={handleOnChange}
               name="userName"
               type="text"
-              placeholder="Enter first name"
+              placeholder={t('enterFirstName')}
               value={form.userName}
             />
           </div>
-
-          {/* Last Name */}
           <div className="flex flex-col">
-            <label className="font-medium">Last Name</label>
+            <label className="font-medium">{t('lastName')}</label>
             <input
               className="border p-2 rounded-md focus:ring focus:ring-blue-300"
               onChange={handleOnChange}
               name="userSurName"
               type="text"
-              placeholder="Enter last name"
+              placeholder={t('enterLastName')}
               value={form.userSurName}
             />
           </div>
-
-          {/* Email */}
           <div className="flex flex-col">
-            <label className="font-medium">Email</label>
+            <label className="font-medium">{t('email')}</label>
             <input
               type="email"
               className="border p-2 rounded-md focus:ring focus:ring-blue-300"
               onChange={handleOnChange}
-              placeholder="Enter email"
+              placeholder={t('enter_email')}
               name="userEmail"
               value={form.userEmail}
             />
           </div>
-
-          {/* Phone Number */}
           <div className="flex flex-col">
-            <label className="font-medium">Phone Number</label>
+            <label className="font-medium">{t('phone')}</label>
             <input
               className="border p-2 rounded-md focus:ring focus:ring-blue-300"
               onChange={handleOnChange}
@@ -165,38 +130,34 @@ const AdminUserList = () => {
                 e.target.value = e.target.value.replace(/\D/g, "")
               }}
               value={form.userNumPhone}
+              placeholder={t('enterPhone')}
             />
           </div>
-
-          {/* Password */}
           <div className="flex flex-col">
-            <label className="font-medium">Password</label>
+            <label className="font-medium">{t('password')}</label>
             <input
               type="password"
               className="border p-2 rounded-md focus:ring focus:ring-blue-300"
               onChange={handleOnChange}
-              placeholder="Enter password"
+              placeholder={t('enter_password')}
               name="userPassword"
               value={form.userPassword}
             />
           </div>
-
-          {/* Confirm Password */}
           <div className="flex flex-col">
-            <label className="font-medium">Confirm Password</label>
+            <label className="font-medium">{t('confirmPassword')}</label>
             <input
               type="password"
               className="border p-2 rounded-md focus:ring focus:ring-blue-300"
               onChange={handleOnChange}
-              placeholder="Confirm password"
+              placeholder={t('enter_confirm_password')}
               name="confirmPassword"
               value={form.confirmPassword}
             />
           </div>
-
           {/* Role Selection (เต็มแถว) */}
           <div className="col-span-2 flex flex-col">
-            <label className="font-medium">Role</label>
+            <label className="font-medium">{t('role')}</label>
             <select
               className="border p-2 rounded-md focus:ring focus:ring-blue-300"
               name="userRole"
@@ -204,19 +165,17 @@ const AdminUserList = () => {
               required
               value={form.userRole}
             >
-              <option value="" disabled>
-                Select role
-              </option>
-              <option value="front">Front</option>
-              <option value="housekeeping">Housekeeping</option>
-              <option value="maintenance">Maintenance</option>
+              <option value="" disabled>{t('select_role')}</option>
+              <option value="front">{t('front')}</option>
+              <option value="housekeeping">{t('housekeeping')}</option>
+              <option value="maintenance">{t('maintenance')}</option>
             </select>
           </div>
 
           {/* เพิ่มช่องใส่ชั้นถ้าเลือกเป็น housekeeping  */}
           {form.userRole === "housekeeping" && (
             <div className="mt-2">
-              <label className="font-medium">Floor</label>
+              <label className="font-medium">{t('floor')}</label>
               <select
                 name="assignedFloor"
                 className="border p-2 rounded-md focus:ring focus:ring-blue-300 w-full"
@@ -224,13 +183,11 @@ const AdminUserList = () => {
                 onChange={handleOnChange}
                 required
               >
-                <option value="" disabled>
-                  Select floor
-                </option>
-                <option value="3">Floor 3</option>
-                <option value="4">Floor 4</option>
-                <option value="5">Floor 5</option>
-                <option value="6">Floor 6</option>
+                <option value="" disabled>{t('select_floor')}</option>
+                <option value="3">{t('floor_3')}</option>
+                <option value="4">{t('floor_4')}</option>
+                <option value="5">{t('floor_5')}</option>
+                <option value="6">{t('floor_6')}</option>
               </select>
             </div>
           )}
@@ -241,7 +198,7 @@ const AdminUserList = () => {
               type="submit"
               className="w-full bg-blue-500 text-white font-semibold p-2 rounded-md shadow-md hover:bg-blue-600 transition"
             >
-              เพิ่มพนักงาน
+              {t('add_user')}
             </button>
           </div>
         </form>
@@ -251,31 +208,31 @@ const AdminUserList = () => {
         <thead>
           <tr className="bg-gray-200 border border-gray-300">
             <th scope="col" className="border border-gray-300 px-4 py-2">
-              No
+              {t('no')}
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-2">
-              ชื่อ
+              {t('name')}
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-2">
-              นามสกุล
+              {t('surname')}
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-2">
-              เบอร์
+              {t('phone')}
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-2">
-              อีเมลล์
+              {t('email')}
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-2">
-              บทบาท
+              {t('role')}
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-2">
-              ชั้น
+              {t('floor')}
             </th>
             <th
               scope="col"
               className="border border-gray-300 w-[100px] text-center px-2 py-2"
             >
-              จัดการ
+              {t('manage')}
             </th>
           </tr>
         </thead>
@@ -331,7 +288,7 @@ const AdminUserList = () => {
                 colSpan="7"
                 className="text-center py-4 border border-gray-300"
               >
-                ไม่มีข้อมูล
+                {t('no_data')}
               </td>
             </tr>
           )}

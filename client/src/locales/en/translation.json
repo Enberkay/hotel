@@ -30,5 +30,11 @@
   "error_password_not_match": "Passwords do not match!!!",
   "error_phone_start_0": "Phone number must start with 0",
   "error_phone_second_digit": "The second digit must be 6, 8, or 9 only",
-  "error_phone_length": "Invalid phone number length"
+  "error_phone_length": "Invalid phone number length",
+  "add_user": "Add User",
+  "add_user_success": "User added successfully",
+  "confirm_delete": "Are you sure you want to delete?",
+  "delete_success": "Delete successful",
+  "edit": "Edit",
+  "delete": "Delete"
 } 

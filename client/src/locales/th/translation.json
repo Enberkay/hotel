@@ -30,5 +30,11 @@
   "error_password_not_match": "รหัสผ่านไม่ตรงกัน!!!",
   "error_phone_start_0": "หมายเลขเบอร์โทรศัพท์ต้องเริ่มต้นด้วย 0",
   "error_phone_second_digit": "ตัวเลขตัวที่สองต้องเป็น 6, 8 หรือ 9 เท่านั้น",
-  "error_phone_length": "หมายเลขไม่ถูกต้อง"
+  "error_phone_length": "หมายเลขไม่ถูกต้อง",
+  "add_user": "เพิ่มพนักงาน",
+  "add_user_success": "เพิ่มพนักงานสำเร็จ",
+  "confirm_delete": "คุณแน่ใจหรือไม่ว่าต้องการลบ?",
+  "delete_success": "ลบข้อมูลสำเร็จ",
+  "edit": "แก้ไข",
+  "delete": "ลบ"
 } 
