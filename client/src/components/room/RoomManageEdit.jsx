@@ -4,6 +4,7 @@ import { toast } from "react-toastify"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { readRoom, updateRoom } from "../../api/room"
 import { Undo2 } from "lucide-react"
+import { useTranslation } from 'react-i18next';
 
 
 const initalState = {
@@ -24,6 +25,7 @@ const RoomManageEdit = () => {
   const roomtypes = useRoomStore((state) => state.roomTypes)
   const getRoomStatus = useRoomStore((state) => state.getRoomStatus)
   const roomStatuses = useRoomStore((state) => state.roomStatuses)
+  const { i18n } = useTranslation();
 
   const [form, setForm] = useState(initalState)
 
@@ -158,7 +160,7 @@ const RoomManageEdit = () => {
           >
             <option value="" disabled>Please Select</option>
             {roomtypes.map((item, index) => (
-              <option key={index} value={item.roomTypeId}>{item.roomTypeName}</option>
+              <option key={index} value={item.roomTypeId}>{i18n.language === 'th' ? item.name_th : item.name_en}</option>
             ))}
           </select>
         </div>

@@ -5,11 +5,13 @@ import { Star, BedDouble, BedSingle, Bed, CircleX } from "lucide-react"
 import { changeRoomStatus, groupRoom, ungroupRoom } from "../../api/room"
 import { toast } from "react-toastify"
 import { Link } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 
 const RoomManage = () => {
   const token = useAuthStore((state) => state.token)
   const getRoom = useRoomStore((state) => state.getRoom)
   const rooms = useRoomStore((state) => state.rooms)
+  const { i18n } = useTranslation();
 
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [selectedPair, setSelectedPair] = useState(null)

@@ -5,6 +5,7 @@ import { useParams, useNavigate, Link } from "react-router-dom"
 import { readBooking, confirmBooking, checkIn, checkOut } from "../../api/booking"
 import { toast } from "react-toastify"
 import { Undo2, BedDouble, BedSingle, Bed, Star } from "lucide-react"
+import { useTranslation } from 'react-i18next';
 
 const BookingDetail = () => {
     const { id } = useParams()
@@ -20,6 +21,8 @@ const BookingDetail = () => {
     const [selectedBookingId, setSelectedBookingId] = useState(null)
 
     const [showPopup, setShowPopup] = useState(false)
+
+    const { i18n } = useTranslation();
 
     const fetchBooking = async () => {
         try {
@@ -119,7 +122,7 @@ const BookingDetail = () => {
                 {form ? (
                     <li className="p-4 border border-gray-300 rounded-lg shadow-sm bg-gray-50">
                         <p><strong>ใบที่:</strong> {form.bookingId || "-"}</p>
-                        <p><strong>ประเภทห้องที่ลูกค้าต้องการ:</strong> {form.roomType?.roomTypeName || "-"}</p>
+                        <p><strong>ประเภทห้องที่ลูกค้าต้องการ:</strong> {form.roomType ? (i18n.language === 'th' ? form.roomType.name_th : form.roomType.name_en) : '-'}</p>
                         <p><strong>ราคาห้อง:</strong> {form.roomType?.price || 0} บาท</p>
                         <p><strong>ชื่อ-นามสกุล:</strong> {`${form.customer?.user?.prefix || ""} ${form.customer?.user?.userName || ""} ${form.customer?.user?.userSurName || ""}`.trim()}</p>
                         <p><strong>เบอร์โทร:</strong> {form.customer?.user?.userNumPhone || "-"}</p>

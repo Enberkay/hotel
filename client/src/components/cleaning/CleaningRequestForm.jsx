@@ -5,6 +5,7 @@ import { Star, BedDouble, BedSingle, Bed, Trash2, Edit } from "lucide-react"
 import { toast } from "react-toastify"
 import { cleaningRequest } from "../../api/cleaning"
 import { useLocation } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 
 const CleaningRequestForm = () => {
   const location = useLocation()
@@ -12,6 +13,7 @@ const CleaningRequestForm = () => {
   const token = useAuthStore((state) => state.token);
   const getRoom = useRoomStore((state) => state.getRoom);
   const rooms = useRoomStore((state) => state.rooms);
+  const { i18n } = useTranslation();
 
   // State สำหรับเก็บห้องที่ถูกเลือก
   const [selectedRooms, setSelectedRooms] = useState([])

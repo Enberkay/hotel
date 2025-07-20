@@ -6,6 +6,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom"
 import { cancelledBooking } from "../../api/myBooking"
 import { toast } from "react-toastify"
 import { Menu, X } from "lucide-react" // ไอคอนสำหรับเมนู
+import { useTranslation } from 'react-i18next';
 
 const CustomerBookingList = () => {
 
@@ -16,6 +17,7 @@ const CustomerBookingList = () => {
   const getProfile = useHotelStore((state) => state.getProfile)
   const Profile = useHotelStore((state) => state.profile)
   const [isMenuOpen, setIsMenuOpen] = useState(false) //ทำResponsive
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     getMyBookings(token)
@@ -121,8 +123,8 @@ const CustomerBookingList = () => {
 
                   <div className="space-y-2">
                     <p>
-                      <span className="font-semibold">ประเภทห้อง:</span>{" "}
-                      {item.roomType?.roomTypeName ?? "ไม่ระบุ"}
+                      <span className="font-semibold">ประเภทห้อง:</span>{' '}
+                      {item.roomType ? (i18n.language === 'th' ? item.roomType.name_th : item.roomType.name_en) : 'ไม่ระบุ'}
                     </p>
                     <p>
                       <span className="font-semibold">วันที่เช็คอิน:</span>{" "}
