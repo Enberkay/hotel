@@ -5,17 +5,15 @@ import { toast } from "react-toastify"
 import useAuthStore from "../../store/auth-store";
 import { useNavigate } from "react-router-dom"
 import { listCustomerType } from "../../api/customerType"
+import { useTranslation } from 'react-i18next';
 const API_URL = import.meta.env.VITE_API_URL
 
-
 const Register = () => {
-
+  const { t } = useTranslation();
   const navigate = useNavigate()
   const token = useAuthStore((state) => state.token)
   const [customerTypes, setCustomerTypes] = useState([])
-
   const [form, setForm] = useState({
-    //object
     userEmail: "",
     userPassword: "",
     userName: "",
@@ -27,81 +25,51 @@ const Register = () => {
     licensePlate: "",
   })
 
-
   useEffect(() => {
     async function fetchCustomerTypes() {
       try {
         const res = await listCustomerType(token)
         setCustomerTypes(res.data)
       } catch (err) {
-        toast.error("ไม่สามารถโหลดประเภทลูกค้าได้")
+        toast.error(t('error_load_customer_type'))
       }
     }
     if (token) fetchCustomerTypes()
   }, [token])
 
   const handleOnChange = (e) => {
-    console.log(e.target.name, e.target.value)
     setForm({
-      // "..." is copy old data
       ...form,
-      // key:value
       [e.target.name]: e.target.value
-
     })
   }
 
   const handleSubmit = async (e) => {
-    // e.preventDefault() ป้องกันการ refresh
     e.preventDefault()
-    // console.log(form)
-
-    //check data in form 
     if (!form.userEmail || !form.userPassword || !form.confirmPassword) {
-      return toast.error("กรุณากรอกข้อมูลให้ครบถ้วน")
+      return toast.error(t('error_required'))
     }
-
-    //check matching password
     if (form.userPassword !== form.confirmPassword) {
-      return toast.error("รหัสผ่านไม่ตรงกัน!!!")
-
+      return toast.error(t('error_password_not_match'))
     }
-
     if (form.userNumPhone[0] !== "0") {
-      return toast.error("หมายเลขเบอร์โทรศัพท์ต้องเริ่มต้นด้วย 0")
+      return toast.error(t('error_phone_start_0'))
     }
-
     if (!["6", "8", "9"].includes(form.userNumPhone[1])) {
-      return toast.error("ตัวเลขตัวที่สองต้องเป็น 6, 8 หรือ 9 เท่านั้น")
+      return toast.error(t('error_phone_second_digit'))
     }
-
     if (form.userNumPhone.length !== 10) {
-      return toast.error("หมายเลขไม่ถูกต้อง")
+      return toast.error(t('error_phone_length'))
     }
-
-    // ตรวจสอบว่าหากเลือกประเภทลูกค้าเป็น Student (customertypeId === "2") ต้องอัปโหลดรูปภาพ
-    // ลบ import UploadFile, field images, และ logic ที่เกี่ยวข้องกับการอัปโหลดรูปทั้งหมด
-
-    //Send to Backend
     try {
-      // console.log(form)
       const res = await axios.post(`${API_URL}/register`, form)
-      console.log(res)
-      toast.success("สมัครเรียบร้อย")
+      toast.success(t('register_success'))
       navigate("/login")
-
     } catch (err) {
-
-      console.log(err.response?.data?.message)
-
-      // ? is optional chaining เปลี่ยนจาก error เป็น undifine
       const errMag = err.response?.data?.message
       toast.error(errMag)
-      console.log(err)
     }
-
   }
-
 
   return (
     <div
@@ -109,61 +77,59 @@ const Register = () => {
       style={{ backgroundImage: `url(${image})` }}
     >
       <div className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl p-6 md:p-10 bg-white bg-opacity-95 shadow-2xl rounded-xl">
-        <h2 className="text-center text-2xl font-bold mb-6">ลงทะเบียน</h2>
-
+        <h2 className="text-center text-2xl font-bold mb-6">{t('register')}</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <label className="block space-y-2">
-            <span className="text-gray-700">Email</span>
+            <span className="text-gray-700">{t('email')}</span>
             <input
               className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
               onChange={handleOnChange}
               name="userEmail"
               type="email"
               required
+              placeholder={t('enter_email')}
             />
           </label>
-
           <label className="block space-y-2">
-            <span className="text-gray-700">คำนำหน้า</span>
+            <span className="text-gray-700">{t('prefix')}</span>
             <select
               className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
               onChange={handleOnChange}
               name="prefix"
               required
             >
-              <option value="">ไม่ระบุ</option>
-              <option value="นาย">นาย</option>
-              <option value="นาง">นาง</option>
-              <option value="นางสาว">นางสาว</option>
+              <option value="">{t('not_specified')}</option>
+              <option value="นาย">{t('mr')}</option>
+              <option value="นาง">{t('mrs')}</option>
+              <option value="นางสาว">{t('ms')}</option>
             </select>
           </label>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="block space-y-2">
-              <span className="text-gray-700">ชื่อ</span>
+              <span className="text-gray-700">{t('firstName')}</span>
               <input
                 className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
                 onChange={handleOnChange}
                 name="userName"
                 type="text"
                 required
+                placeholder={t('enterFirstName')}
               />
             </label>
-
             <label className="block space-y-2">
-              <span className="text-gray-700">นามสกุล</span>
+              <span className="text-gray-700">{t('lastName')}</span>
               <input
                 className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
                 onChange={handleOnChange}
                 name="userSurName"
                 type="text"
                 required
+                placeholder={t('enterLastName')}
               />
             </label>
           </div>
-
           <label className="block space-y-2">
-            <span className="text-gray-700">หมายเลขโทรศัพท์</span>
+            <span className="text-gray-700">{t('phone')}</span>
             <input
               className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
               onChange={handleOnChange}
@@ -173,24 +139,13 @@ const Register = () => {
               required
               inputMode="numeric"
               onInput={(e) => {
-                e.target.value = e.target.value.replace(/\D/g, "");
+                e.target.value = e.target.value.replace(/\D/g, "")
               }}
+              placeholder={t('enterPhone')}
             />
           </label>
-
           <label className="block space-y-2">
-            <span className="text-gray-700">ทะเบียนรถ</span>
-            <span className="inline text-red-600 ml-2">* ถ้ามี</span>
-            <input
-              className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
-              onChange={handleOnChange}
-              name="licensePlate"
-              type="text"
-            />
-          </label>
-
-          <label className="block space-y-2">
-            <span className="text-gray-700">ประเภทลูกค้า</span>
+            <span className="text-gray-700">{t('customer_type')}</span>
             <select
               className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
               onChange={handleOnChange}
@@ -198,7 +153,7 @@ const Register = () => {
               required
               value={form.customertypeId}
             >
-              <option value="" disabled>กรุณาเลือก</option>
+              <option value="" disabled>{t('please_select')}</option>
               {customerTypes.map((item, index) => (
                 <option key={index} value={item.customerTypeId}>
                   {item.customerTypeName}
@@ -206,43 +161,38 @@ const Register = () => {
               ))}
             </select>
           </label>
-
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="block space-y-2">
-              <span className="text-gray-700">Password</span>
+              <span className="text-gray-700">{t('password')}</span>
               <input
                 className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
                 onChange={handleOnChange}
                 name="userPassword"
                 type="password"
                 required
+                placeholder={t('enter_password')}
               />
             </label>
-
             <label className="block space-y-2">
-              <span className="text-gray-700">Confirm Password</span>
+              <span className="text-gray-700">{t('confirmPassword')}</span>
               <input
                 className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-brown/50 focus:outline-none"
                 onChange={handleOnChange}
                 name="confirmPassword"
                 type="password"
                 required
+                placeholder={t('enter_confirm_password')}
               />
             </label>
           </div>
-
           <button
             className="flex justify-center mx-auto w-full py-3 bg-brown text-white rounded-lg hover:bg-brown/80 transition"
           >
-            Register
+            {t('register')}
           </button>
         </form>
       </div>
     </div>
-
   );
-
-
 }
 export default Register
