@@ -64,5 +64,16 @@
   "floor": "ชั้น",
   "normal": "ปกติ",
   "problem": "มีปัญหา",
-  "enter_problem_detail": "กรอกรายละเอียดปัญหา..."
+  "enter_problem_detail": "กรอกรายละเอียดปัญหา...",
+  "status_available": "ว่าง",
+  "status_occupied": "มีคนเข้าพัก",
+  "status_reserved": "ติดจอง",
+  "status_cleaning": "แจ้งทำความสะอาด",
+  "status_repair": "แจ้งซ่อม",
+  "bed_double": "Standard (เตียงคู่)",
+  "bed_single": "Standard (เตียงเดี่ยว)",
+  "bed_signature": "Signature",
+  "submit": "ส่งคำขอ",
+  "cleaning_request_success": "ส่งคำขอทำความสะอาดสำเร็จ",
+  "cleaning_request_error": "เกิดข้อผิดพลาดในการส่งคำขอทำความสะอาด"
 } 

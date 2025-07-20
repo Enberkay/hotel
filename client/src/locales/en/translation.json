@@ -64,5 +64,16 @@
   "floor": "Floor",
   "normal": "Normal",
   "problem": "Problem",
-  "enter_problem_detail": "Enter problem details..."
+  "enter_problem_detail": "Enter problem details...",
+  "status_available": "Available",
+  "status_occupied": "Occupied",
+  "status_reserved": "Reserved",
+  "status_cleaning": "Cleaning",
+  "status_repair": "Repair",
+  "bed_double": "Standard (Double Bed)",
+  "bed_single": "Standard (Single Bed)",
+  "bed_signature": "Signature",
+  "submit": "Submit",
+  "cleaning_request_success": "Cleaning request submitted successfully",
+  "cleaning_request_error": "Failed to submit cleaning request"
 } 
