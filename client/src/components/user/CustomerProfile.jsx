@@ -5,8 +5,10 @@ import { updateProfile } from "../../api/profile"
 import { toast } from "react-toastify"
 import { Menu, X } from "lucide-react"
 import { listCustomerType } from "../../api/customerType"
+import { useTranslation } from 'react-i18next';
 
 const CustomerProfile = () => {
+    const { t } = useTranslation();
     const user = useAuthStore((state) => state.user)
     const token = useAuthStore((state) => state.token)
     const profile = useAuthStore((state) => state.profile)
@@ -22,7 +24,7 @@ const CustomerProfile = () => {
                 const res = await listCustomerType(token)
                 setCustomerTypes(res.data)
             } catch (err) {
-                toast.error("ไม่สามารถโหลดประเภทลูกค้าได้")
+                toast.error(t("customer_type_load_error"))
             }
         }
         if (token) fetchCustomerTypes()
@@ -60,22 +62,22 @@ const CustomerProfile = () => {
         e.preventDefault()
 
         if (form.userNumPhone[0] !== "0") {
-            return toast.error("หมายเลขเบอร์โทรศัพท์ต้องเริ่มต้นด้วย 0")
+            return toast.error(t("phone_number_start_with_0"))
         }
 
         if (!["6", "8", "9"].includes(form.userNumPhone[1])) {
-            return toast.error("ตัวเลขตัวที่สองต้องเป็น 6, 8 หรือ 9 เท่านั้น")
+            return toast.error(t("phone_number_second_digit_6_8_9"))
         }
 
         if (form.userNumPhone.length !== 10) {
-            return toast.error("หมายเลขไม่ถูกต้อง")
+            return toast.error(t("phone_number_incorrect"))
         }
 
         try {
             await updateProfile(token, form)
-            toast.success("แก้ไขข้อมูลเรียบร้อย")
+            toast.success(t("profile_update_success"))
         } catch (err) {
-            const errMsg = err.response?.data?.message || "เกิดข้อผิดพลาด"
+            const errMsg = err.response?.data?.message || t("profile_update_error")
             toast.error(errMsg)
         }
     }
@@ -98,11 +100,11 @@ const CustomerProfile = () => {
             <aside className={`mt-20 lg:mt-0 md:mt-0 fixed inset-y-0 left-0 z-40 w-64 p-6 shadow-md bg-[#f7f3ef] transition-transform transform 
                 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0 md:w-1/5`}
             >
-                <h2 className="text-xl font-bold mb-6 text-[#5a3e2b]">เมนู</h2>
+                <h2 className="text-xl font-bold mb-6 text-[#5a3e2b]">{t("menu")}</h2>
                 <ul className="space-y-4">
                     {[
-                        { to: "/customer/customer-profile", label: "ข้อมูลส่วนตัว" },
-                        { to: "/customer/my-bookings", label: "การจองของฉัน" },
+                        { to: "/customer/customer-profile", label: t("customer_profile") },
+                        { to: "/customer/my-bookings", label: t("my_bookings") },
                     ].map(({ to, label }) => (
                         <li key={to}>
                             <NavLink
@@ -128,20 +130,20 @@ const CustomerProfile = () => {
                     className="bg-[#B29433] bg-opacity-30 p-8 shadow-lg rounded-lg w-full max-w-3xl mx-auto"
                 >
                     <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-                        ข้อมูลส่วนตัว
+                        {t("customer_profile")}
                     </h2>
 
                     <div className="space-y-4 text-gray-700">
                         {[
-                            { label: "คำนำหน้า", name: "prefix", type: "select", options: ["นาย", "นาง", "นางสาว"] },
-                            { label: "ชื่อ", name: "userName", type: "text" },
-                            { label: "นามสกุล", name: "userSurName", type: "text" },
-                            { label: "Email", name: "userEmail", type: "text", disabled: true },
-                            { label: "เบอร์โทรศัพท์", name: "userNumPhone", type: "text", maxLength: 10 },
-                            { label: "รหัสบัตรประชาชน", name: "idCard", type: "text", disabled: true },
-                            { label: "รหัสนักศึกษา", name: "stdId", type: "text", disabled: true },
+                            { label: t("prefix"), name: "prefix", type: "select", options: ["นาย", "นาง", "นางสาว"] },
+                            { label: t("first_name"), name: "userName", type: "text" },
+                            { label: t("last_name"), name: "userSurName", type: "text" },
+                            { label: t("email"), name: "userEmail", type: "text", disabled: true },
+                            { label: t("phone_number"), name: "userNumPhone", type: "text", maxLength: 10 },
+                            { label: t("id_card"), name: "idCard", type: "text", disabled: true },
+                            { label: t("student_id"), name: "stdId", type: "text", disabled: true },
                             {
-                                label: "ประเภทลูกค้า",
+                                label: t("customer_type"),
                                 name: "customerType",
                                 type: "select",
                                 options: customerTypes.map(({ customerTypeId, customerTypeName }) => ({
@@ -161,7 +163,7 @@ const CustomerProfile = () => {
                                         disabled={disabled}
                                         className="border p-2 w-full rounded-md"
                                     >
-                                        <option value="">-- เลือก --</option>
+                                        <option value="">-- {t("select_option")} --</option>
                                         {options.map((opt, i) => (
                                             <option key={i} value={typeof opt === "string" ? opt : opt.value}>
                                                 {typeof opt === "string" ? opt : opt.label}
@@ -191,13 +193,13 @@ const CustomerProfile = () => {
                             onClick={handleCancel}
                             className="px-6 py-3 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition"
                         >
-                            ยกเลิก
+                            {t("cancel")}
                         </button>
                         <button
                             type="submit"
                             className="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
                         >
-                            บันทึก
+                            {t("save")}
                         </button>
                     </div>
                 </form>
