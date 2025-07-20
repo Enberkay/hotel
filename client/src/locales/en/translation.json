@@ -108,21 +108,5 @@
   "check_out": "Check-out",
   "customer_name": "Customer Name",
   "booking_time": "Booking Time",
-  "booking_detail": "Booking Detail",
-  "booking_id": "Booking ID",
-  "room_type": "Room Type",
-  "price": "Price",
-  "customer_name": "Customer Name",
-  "phone": "Phone",
-  "email": "Email",
-  "license_plate": "License Plate",
-  "guest_count": "Number of Guests",
-  "check_in": "Check-in",
-  "check_out": "Check-out",
-  "booking_time": "Booking Time",
-  "status": "Status",
-  "confirm": "Confirm",
-  "cancel": "Cancel",
-  "error_required": "Please fill in all required fields",
-  "no_data": "No data"
+  "booking_detail": "Booking Detail"
 } 
