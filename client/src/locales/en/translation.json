@@ -98,15 +98,6 @@
   "redirecting": "Redirecting...",
   "please_wait": "Please wait",
   "admin_room_management": "Admin Room Management",
-  "room_number": "Room Number",
-  "floor": "Floor",
-  "room_type": "Room Type",
-  "status": "Status",
-  "add_room": "Add Room",
   "edit_room": "Edit Room",
-  "delete_room": "Delete Room",
-  "add_room_success": "Room added successfully",
-  "edit_room_success": "Room updated successfully",
-  "delete_room_success": "Room deleted successfully",
-  "error_required": "Please fill in all required fields"
+  "delete_room": "Delete Room"
 } 

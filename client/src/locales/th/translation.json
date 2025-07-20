@@ -98,15 +98,6 @@
   "redirecting": "กำลังเปลี่ยนเส้นทาง...",
   "please_wait": "กรุณารอสักครู่",
   "admin_room_management": "จัดการห้อง (แอดมิน)",
-  "room_number": "หมายเลขห้อง",
-  "floor": "ชั้น",
-  "room_type": "ประเภทห้อง",
-  "status": "สถานะ",
-  "add_room": "เพิ่มห้อง",
   "edit_room": "แก้ไขห้อง",
-  "delete_room": "ลบห้อง",
-  "add_room_success": "เพิ่มห้องสำเร็จ",
-  "edit_room_success": "แก้ไขห้องสำเร็จ",
-  "delete_room_success": "ลบห้องสำเร็จ",
-  "error_required": "กรุณากรอกข้อมูลให้ครบถ้วน"
+  "delete_room": "ลบห้อง"
 } 
