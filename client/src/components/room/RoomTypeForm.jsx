@@ -3,6 +3,7 @@ import useRoomStore from "../../store/room-store"
 import { createRoomType, readRoomType, updateRoomType } from "../../api/roomType"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
+import { useTranslation } from 'react-i18next';
 
 const initialState = { roomTypeName: "", price: 0 }
 
@@ -10,6 +11,7 @@ const RoomTypeForm = () => {
     const token = useRoomStore((state) => state.token)
     const getRoomType = useRoomStore((state) => state.getRoomType)
     const roomTypes = useRoomStore((state) => state.roomTypes)
+    const { i18n } = useTranslation();
 
     const [form, setForm] = useState(initialState)
     const [editForm, setEditForm] = useState(initialState)
@@ -64,7 +66,7 @@ const RoomTypeForm = () => {
             <h1 className="text-2xl font-bold mb-4">Room Type Management</h1>
             <form className="my-4" onSubmit={handleSubmit}>
                 <div className="flex flex-col space-y-4">
-                    <input type="text" name="roomTypeName" value={form.roomTypeName} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="ชื่อประเภทห้อง" required />
+                    <input type="text" name="roomTypeName" value={form.roomTypeName} onChange={handleOnChange} className="border p-2 rounded-md" placeholder={i18n.language === 'th' ? "ชื่อประเภทห้อง (TH)" : "Room Type Name (EN)"} required />
                     <input type="number" name="price" value={form.price} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="ราคา" required />
                     <button className="bg-blue-500 text-white p-2 rounded-md">Add Room Type</button>
                 </div>
@@ -74,7 +76,7 @@ const RoomTypeForm = () => {
                 {roomTypes.map((item) => (
                     <div key={item.roomTypeId} className="p-4 border rounded-md shadow-md flex justify-between items-center">
                         <div>
-                            <h2 className="font-bold">{item.roomTypeName}</h2>
+                            <h2 className="font-bold">{i18n.language === 'th' ? item.name_th : item.name_en}</h2>
                             <p>{item.price} บาท</p>
                         </div>
                         <button onClick={() => handleEditClick(item.roomTypeId)} className="text-blue-500">

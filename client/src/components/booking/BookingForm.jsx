@@ -10,6 +10,7 @@ import { createBooking } from "../../api/booking"
 import dayjs from "dayjs"
 import { useNavigate } from "react-router-dom"
 import Select from "react-select"
+import { useTranslation } from 'react-i18next';
 
 const initialState = {
   count: "1",
@@ -36,6 +37,7 @@ const BookingForm = () => {
   const [selectedAddons, setSelectedAddons] = useState(null)
   const [addonPrice, setAddonPrice] = useState([])
   const [selectedOption, setSelectedOption] = useState([])
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     getRoomType(token)
@@ -56,7 +58,7 @@ const BookingForm = () => {
   //เลือกประเภทห้อง
   const roomOptions = roomtypes.map((roomtype) => ({
     value: roomtype.roomTypeId,
-    label: `${roomtype.roomTypeName}`,
+    label: i18n.language === 'th' ? roomtype.name_th : roomtype.name_en,
     price: roomtype.price,
   }))
 
