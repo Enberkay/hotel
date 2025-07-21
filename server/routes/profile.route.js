@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { getProfile, updateProfile } = require("../controllers/profile")
+const { getProfile, updateProfile } = require("../controllers/profile.controller")
 
 const { authCheck } = require("../middlewares/authCheck")
 const { z } = require('zod');

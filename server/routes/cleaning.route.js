@@ -11,7 +11,7 @@ const {
     allListCleaningReport,
     noteReport,
     noteRequest
-} = require("../controllers/cleaning")
+} = require("../controllers/cleaning.controller")
 
 const { authCheck, frontCheck } = require("../middlewares/authCheck")
 const { z } = require('zod');

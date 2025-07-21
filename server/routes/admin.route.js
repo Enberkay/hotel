@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router()
 
 //import controller...
-const { addUser, listUser, readUser, updateUser, deleteUser } = require("../controllers/admin")
+const { addUser, listUser, readUser, updateUser, deleteUser } = require("../controllers/admin.controller")
 
 //middleware
 const { authCheck, adminCheck } = require("../middlewares/authCheck")

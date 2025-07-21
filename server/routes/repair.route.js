@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { repairRequest, listRepairRequest, readRepairRequest, noteRepairRequest, repairReport } = require("../controllers/repair")
+const { repairRequest, listRepairRequest, readRepairRequest, noteRepairRequest, repairReport } = require("../controllers/repair.controller")
 
 const { authCheck } = require("../middlewares/authCheck")
 const { z } = require('zod');

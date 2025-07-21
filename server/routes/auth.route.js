@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { register, login, currentUser } = require("../controllers/auth")
+const { register, login, currentUser } = require("../controllers/auth.controller")
 
 const { adminCheck, authCheck, customerCheck, frontCheck, housekeepingCheck, maintenanceCheck } = require("../middlewares/authCheck")
 const { z } = require('zod');

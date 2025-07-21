@@ -2,8 +2,8 @@ const express = require("express")
 const router = express.Router()
 
 //import controller...
-const { myBookings, bookingDetail } = require("../controllers/user")
-const { CancelledBooking } = require("../controllers/cancel")
+const { myBookings, bookingDetail } = require("../controllers/user.controller")
+const { CancelledBooking } = require("../controllers/cancel.controller")
 
 //import middleware...
 const { authCheck } = require("../middlewares/authCheck")

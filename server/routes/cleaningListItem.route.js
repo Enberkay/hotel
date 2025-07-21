@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { create, list, read, update, remove } = require("../controllers/cleaningListItem")
+const { create, list, read, update, remove } = require("../controllers/cleaningListItem.controller")
 
 const { authCheck } = require("../middlewares/authCheck")
 

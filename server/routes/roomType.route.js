@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { create, list, remove, update, read } = require("../controllers/roomType")
+const { create, list, remove, update, read } = require("../controllers/roomType.controller")
 
 const { authCheck } = require("../middlewares/authCheck")
 

@@ -2,8 +2,8 @@ const express = require("express")
 const router = express.Router()
 
 //import controller...
-const { create, read, list, update, remove, groupRoom, unGroupRoom } = require("../controllers/room")
-const { changeStatusRoom } = require("../controllers/changeStatusRoom")
+const { create, read, list, update, remove, groupRoom, unGroupRoom } = require("../controllers/room.controller")
+const { changeStatusRoom } = require("../controllers/changeStatusRoom.controller")
 
 const { authCheck } = require("../middlewares/authCheck")
 const { z } = require('zod');

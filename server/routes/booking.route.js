@@ -1,8 +1,8 @@
 const express = require("express")
 const router = express.Router()
 
-const { createBooking, listBookings, readBooking, confirmBooking } = require("../controllers/booking")
-const { checkIn, checkOut } = require("../controllers/checkInAndCheckOut")
+const { createBooking, listBookings, readBooking, confirmBooking } = require("../controllers/booking.controller")
+const { checkIn, checkOut } = require("../controllers/checkInAndCheckOut.controller")
 
 const { authCheck, frontCheck } = require("../middlewares/authCheck")
 const { z } = require('zod');

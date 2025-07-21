@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { create, list, remove, read, update } = require("../controllers/addon")
+const { create, list, remove, read, update } = require("../controllers/addon.controller")
 const { z } = require('zod');
 const validateWithZod = require('../middlewares/validateWithZod');
 
