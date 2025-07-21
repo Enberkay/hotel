@@ -4,8 +4,10 @@ import useAuthStore from "../../store/auth-store"
 import { useState, useEffect, useCallback } from "react"
 import { repairRequest } from "../../api/repair"
 import { toast } from "react-toastify"
+import { useTranslation } from 'react-i18next';
 
 const RepairRequestForm = () => {
+    const { t } = useTranslation();
     const token = useAuthStore((state) => state.token)
     const [cleaningReports, setCleaningReports] = useState([])
     const [selectedReport, setSelectedReport] = useState(null)
@@ -110,7 +112,7 @@ const RepairRequestForm = () => {
 
     const handleSubmitRepairRequest = async () => {
         if (selectedRooms.length === 0) {
-            toast.error("กรุณาเลือกห้องที่ต้องการแจ้งซ่อม")
+            toast.error(t('please_select_room'))
             return;
         }
 
@@ -140,13 +142,13 @@ const RepairRequestForm = () => {
         try {
             const response = await repairRequest(token, repairRequests.reportIds, repairRequests.rooms) // ส่ง reportIds และ rooms
             console.log("✅ ส่งแจ้งซ่อมสำเร็จ:", response.data)
-            toast.success("แจ้งซ่อมสำเร็จ!")
+            toast.success(t('repair_success'))
             setSelectedReport(null) // รีเซ็ตใบรายงาน
             setSelectedRooms([]) // ล้างค่าห้องที่เลือก
             fetchCleaningReports()
         } catch (error) {
             console.error("แจ้งซ่อมไม่สำเร็จ:", error)
-            toast.error("เกิดข้อผิดพลาดในการแจ้งซ่อม")
+            toast.error(t('repair_failed'))
         }
     }
 
@@ -160,41 +162,41 @@ const RepairRequestForm = () => {
             {/* Left: Repair Request Form */}
             {/* Left: Selected Rooms & Repair Form */}
             <div className="w-1/2 p-6 bg-gray-100 h-screen overflow-auto touch-pan-y">
-                <h2 className="text-xl font-semibold mb-4">แจ้งซ่อม</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('repair_request')}</h2>
 
                 {selectedRooms.length === 0 ? (
-                    <p className="text-gray-500">กรุณาเลือกห้องจากรายการทางขวา</p>
+                    <p className="text-gray-500">{t('please_select_room')}</p>
                 ) : (
                     <ul className="space-y-4">
                         {selectedRooms.map((room) => (
                             <li key={room.roomId} className="p-4 border rounded-lg bg-white shadow ">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="text-lg font-semibold">ห้อง: {room.roomNumber}</h3>
+                                    <h3 className="text-lg font-semibold">{t('room')}: {room.roomNumber}</h3>
                                     <button
                                         onClick={() => handleRemoveRoom(room.roomId)}
                                         className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition"
                                     >
-                                        ลบห้อง
+                                        {t('delete_room')}
                                     </button>
                                 </div>
 
                                 {room.cleaningResults.map((result, index) => (
                                     <div key={index} className="mt-2 p-3 border rounded-lg bg-gray-50 shadow">
                                         <div className="flex justify-between items-center">
-                                            <p><span className="font-semibold">รายการตรวจสอบ:</span> {result.cleaningList.itemName}</p>
+                                            <p><span className="font-semibold">{t('checklist_item')}:</span> {result.cleaningList.itemName}</p>
                                             <button
                                                 onClick={() => handleRemoveCleaningResult(room.roomId, index)}
                                                 className="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600 transition"
                                             >
-                                                ลบ
+                                                {t('delete_room')}
                                             </button>
                                         </div>
-                                        <p><span className="font-semibold">สถานะ:</span>
+                                        <p><span className="font-semibold">{t('status')}:</span>
                                             <span className="ml-2 px-2 py-1 rounded-lg bg-red-500 text-white">
                                                 {result.cleaningStatus.cleaningStatusName}
                                             </span>
                                         </p>
-                                        <p><span className="font-semibold">รายละเอียด:</span></p>
+                                        <p><span className="font-semibold">{t('detail')}:</span></p>
                                         <textarea
                                             className="w-full p-2 border rounded-lg"
                                             value={result.description || ""}
@@ -211,7 +213,7 @@ const RepairRequestForm = () => {
                         onClick={handleSubmitRepairRequest}
                         className="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
                     >
-                        แจ้งซ่อม
+                        {t('repair_request')}
                     </button>
                 )}
 
@@ -221,30 +223,30 @@ const RepairRequestForm = () => {
 
             {/* Right: Cleaning Reports */}
             <div className="w-1/2 p-6 bg-white shadow-lg overflow-auto touch-pan-y ">
-                <h2 className="text-xl font-semibold mb-4 text-center">ใบรายงานผลทำความสะอาด</h2>
+                <h2 className="text-xl font-semibold mb-4 text-center">{t('select_report')}</h2>
 
                 {!selectedReport && (
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition block mx-auto"
                     >
-                        เลือกใบรายงานผล
+                        {t('select_report')}
                     </button>
                 )}
 
                 {selectedReport && (
                     <div className="border p-4 rounded-lg bg-gray-100 mt-4">
-                        <p><span className="font-semibold">หมายเลขใบรายงาน:</span> {selectedReport.reportId}</p>
-                        <p><span className="font-semibold">รายงานเมื่อ:</span> {formatDateTime(selectedReport.reportAt)}</p>
+                        <p><span className="font-semibold">{t('report_number')}:</span> {selectedReport.reportId}</p>
+                        <p><span className="font-semibold">{t('reported_at')}:</span> {formatDateTime(selectedReport.reportAt)}</p>
 
                         {/* Loop CleaningResults with cleaningStatusId === 2 */}
-                        <h3 className="text-lg font-semibold mt-4">รายละเอียดการตรวจสอบ:</h3>
+                        <h3 className="text-lg font-semibold mt-4">{t('detail')}</h3>
 
                         {/* ปรับโค้ดในรายการ CleaningResults */}
                         <ul className="mt-2 space-y-2">
                             {selectedReport.CleaningResults.filter(result => result.cleaningStatusId === 2).reduce((acc, result) => {
                                 const roomInfo = selectedReport.CleaningReportRoom.find(room => room.roomId === result.roomId)
-                                const roomNumber = roomInfo ? roomInfo.room.roomNumber : "ไม่ทราบหมายเลขห้อง"
+                                const roomNumber = roomInfo ? roomInfo.room.roomNumber : t('unknown_status');
                                 const reportId = roomInfo ? roomInfo.reportId : undefined;  // ดึง reportId
 
                                 // ค้นหาว่าห้องนี้เคยถูกเพิ่มไปใน acc หรือยัง
@@ -262,16 +264,16 @@ const RepairRequestForm = () => {
                                 return (
                                     <li key={index} className="p-3 border rounded-lg bg-white shadow flex justify-between items-center">
                                         <div>
-                                            <p><span className="font-semibold">ห้อง:</span> {room.roomNumber}</p>
+                                            <p><span className="font-semibold">{t('room')}:</span> {room.roomNumber}</p>
                                             {room.cleaningResults.map((result, i) => (
                                                 <div key={i} className="mt-2">
-                                                    <p><span className="font-semibold">รายการตรวจสอบ:</span> {result.cleaningList.itemName}</p>
-                                                    <p><span className="font-semibold">สถานะ:</span>
+                                                    <p><span className="font-semibold">{t('checklist_item')}:</span> {result.cleaningList.itemName}</p>
+                                                    <p><span className="font-semibold">{t('status')}:</span>
                                                         <span className="ml-2 px-2 py-1 rounded-lg bg-red-500 text-white">
                                                             {result.cleaningStatus.cleaningStatusName}
                                                         </span>
                                                     </p>
-                                                    <p><span className="font-semibold">รายละเอียด:</span> {result.description || '-'}</p>
+                                                    <p><span className="font-semibold">{t('detail')}:</span> {result.description || t('no_detail')}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -293,7 +295,7 @@ const RepairRequestForm = () => {
                             onClick={() => setIsModalOpen(true)}
                             className="mt-4 bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition block mx-auto"
                         >
-                            เลือกใบใหม่
+                            {t('select_report')}
                         </button>
                     </div>
                 )}
@@ -304,10 +306,10 @@ const RepairRequestForm = () => {
                 {isModalOpen && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
                         <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full">
-                            <h2 className="text-xl font-semibold mb-4 text-center">เลือกใบรายงานผล</h2>
+                            <h2 className="text-xl font-semibold mb-4 text-center">{t('select_report')}</h2>
                             <ul className="border p-4 rounded-lg bg-gray-100 max-h-60 overflow-auto">
                                 {verifiedReports.length === 0 ? (
-                                    <p className="text-gray-500 text-center">ไม่มีใบรายงาน</p>
+                                    <p className="text-gray-500 text-center">{t('no_report')}</p>
                                 ) : (
                                     verifiedReports.map((report) => (
                                         <li
@@ -318,8 +320,8 @@ const RepairRequestForm = () => {
                                                 setIsModalOpen(false)
                                             }}
                                         >
-                                            <span className="font-semibold">หมายเลข:</span> {report.reportId} |
-                                            <span className="ml-2 font-semibold">แจ้งเมื่อ:</span> {formatDateTime(report.reportAt)}
+                                            <span className="font-semibold">{t('report_number')}:</span> {report.reportId} |
+                                            <span className="ml-2 font-semibold">{t('reported_at')}:</span> {formatDateTime(report.reportAt)}
                                         </li>
                                     ))
                                 )}
@@ -328,7 +330,7 @@ const RepairRequestForm = () => {
                                 onClick={() => setIsModalOpen(false)}
                                 className="mt-4 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition block mx-auto"
                             >
-                                ปิด
+                                {t('close')}
                             </button>
                         </div>
                     </div>
