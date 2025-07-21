@@ -108,5 +108,20 @@
   "check_out": "Check-out",
   "customer_name": "Customer Name",
   "booking_time": "Booking Time",
-  "booking_detail": "Booking Detail"
+  "booking_detail": "Booking Detail",
+  "new_cleaning_requests": "New cleaning requests: {{count}} items",
+  "phuphan_place": "PHUPHAN PLACE",
+  "select_start_date": "Select start date",
+  "select_end_date": "Select end date",
+  "all": "All",
+  "today": "Today",
+  "this_week": "This week",
+  "this_month": "This month",
+  "pending": "Pending",
+  "in_progress": "In progress",
+  "completed": "Completed",
+  "cleaning_request_id": "Cleaning request #{{id}}",
+  "requester": "Requester",
+  "request_time": "Request time",
+  "no_cleaning_requests": "No cleaning requests found"
 } 

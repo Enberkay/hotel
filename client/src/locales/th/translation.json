@@ -108,5 +108,20 @@
   "check_out": "เช็คเอาท์",
   "customer_name": "ชื่อลูกค้า",
   "booking_time": "เวลาที่จอง",
-  "booking_detail": "รายละเอียดการจอง"
+  "booking_detail": "รายละเอียดการจอง",
+  "new_cleaning_requests": "มีใบแจ้งทำความสะอาดใหม่ {{count}} รายการ",
+  "phuphan_place": "PHUPHAN PLACE",
+  "select_start_date": "เลือกวันเริ่มต้น",
+  "select_end_date": "เลือกวันสิ้นสุด",
+  "all": "ทั้งหมด",
+  "today": "วันนี้",
+  "this_week": "อาทิตย์นี้",
+  "this_month": "เดือนนี้",
+  "pending": "รอดำเนินการ",
+  "in_progress": "รับเรื่องแล้ว",
+  "completed": "เสร็จสิ้น",
+  "cleaning_request_id": "ใบแจ้งทำความสะอาดที่ {{id}}",
+  "requester": "ผู้แจ้งทำความสะอาด",
+  "request_time": "เวลาที่แจ้ง",
+  "no_cleaning_requests": "ไม่มีข้อมูลใบแจ้งทำความสะอาด"
 } 
