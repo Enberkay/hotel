@@ -6,16 +6,39 @@ import { toast } from "react-toastify"
 import { Menu, X } from "lucide-react"
 import { listCustomerType } from "../../api/customerType"
 import { useTranslation } from 'react-i18next';
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const CustomerProfile = () => {
     const { t } = useTranslation(['user', 'common']);
-    const user = useAuthStore((state) => state.user)
     const token = useAuthStore((state) => state.token)
     const profile = useAuthStore((state) => state.profile)
     const getProfile = useAuthStore((state) => state.getProfile)
     const [customerTypes, setCustomerTypes] = useState([])
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [form, setForm] = useState({})
+
+    // Zod schema
+    const schema = z.object({
+        userName: z.string().min(1, { message: t('common:error_required') }),
+        userSurName: z.string().min(1, { message: t('common:error_required') }),
+        userNumPhone: z.string()
+            .min(10, { message: t('user:phone_number_incorrect') })
+            .max(10, { message: t('user:phone_number_incorrect') })
+            .regex(/^0[689][0-9]{8}$/, { message: t('user:phone_number_start_with_0') }),
+        customerType: z.string().min(1, { message: t('common:error_required') }),
+    });
+
+    const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting }, reset } = useForm({
+        resolver: zodResolver(schema),
+        mode: 'onTouched',
+        defaultValues: {
+            userName: '',
+            userSurName: '',
+            userNumPhone: '',
+            customerType: '',
+        }
+    });
 
     useEffect(() => {
         getProfile(token)
@@ -28,63 +51,36 @@ const CustomerProfile = () => {
             }
         }
         if (token) fetchCustomerTypes()
-    }, [token, getProfile])
+    }, [token, getProfile, t])
 
     useEffect(() => {
         if (profile) {
-            setForm(profile)
+            reset({
+                userName: profile.userName || '',
+                userSurName: profile.userSurName || '',
+                userNumPhone: profile.userNumPhone || '',
+                customerType: profile.Customer?.customerType?.customerTypeId?.toString() || '',
+            })
         }
-    }, [profile])
+    }, [profile, reset])
 
-    const handleOnChange = (e) => {
-        const { name, value } = e.target
-
-        if (name === "customerType") {
-            const selectedType = customerTypes.find(type => type.customerTypeId.toString() === value)
-
-            setForm(prev => ({
-                ...prev,
-                Customer: {
-                    ...prev.Customer,
-                    customerType: selectedType
-                }
-            }))
-        } else {
-            setForm(prev => ({
-                ...prev,
-                [name]: value
-            }))
-        }
-    }
-
-
-    const handleOnSubmit = async (e) => {
-        e.preventDefault()
-
-        if (form.userNumPhone[0] !== "0") {
-            return toast.error(t("phone_number_start_with_0"))
-        }
-
-        if (!["6", "8", "9"].includes(form.userNumPhone[1])) {
-            return toast.error(t("phone_number_second_digit_6_8_9"))
-        }
-
-        if (form.userNumPhone.length !== 10) {
-            return toast.error(t("phone_number_incorrect"))
-        }
-
+    const onSubmit = async (data) => {
         try {
-            await updateProfile(token, form)
+            await updateProfile(token, {
+                ...profile,
+                userName: data.userName,
+                userSurName: data.userSurName,
+                userNumPhone: data.userNumPhone,
+                Customer: {
+                    ...profile.Customer,
+                    customerType: customerTypes.find(type => type.customerTypeId.toString() === data.customerType)
+                }
+            })
             getProfile(token)
             toast.success(t("common:update_success"))
         } catch (err) {
-            console.log(err)
             toast.error(t("common:error_update"))
         }
-    }
-
-    const handleCancel = () => {
-        setForm(profile || {}) // ป้องกัน undefined
     }
 
     return (
@@ -128,57 +124,59 @@ const CustomerProfile = () => {
             <main className="flex-1 flex justify-center p-6">
                 <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold mb-6 text-center">{t('edit_profile')}</h2>
-                    <form onSubmit={handleOnSubmit}>
+                    <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="mb-4">
                             <label className="block text-gray-700">{t('name')}</label>
                             <input
                                 type="text"
-                                name="userName"
-                                value={form.userName || ""}
+                                {...register('userName')}
                                 className="w-full p-2 border border-gray-300 rounded mt-1"
-                                onChange={handleOnChange}
                             />
+                            {errors.userName && <p className="text-red-500 text-xs mt-1">{errors.userName.message}</p>}
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">{t('lastName')}</label>
                             <input
                                 type="text"
-                                name="userSurName"
-                                value={form.userSurName || ""}
+                                {...register('userSurName')}
                                 className="w-full p-2 border border-gray-300 rounded mt-1"
-                                onChange={handleOnChange}
                             />
+                            {errors.userSurName && <p className="text-red-500 text-xs mt-1">{errors.userSurName.message}</p>}
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">{t('phone')}</label>
                             <input
                                 type="text"
-                                name="userNumPhone"
-                                value={form.userNumPhone || ""}
+                                {...register('userNumPhone')}
                                 className="w-full p-2 border border-gray-300 rounded mt-1"
-                                onChange={handleOnChange}
                             />
+                            {errors.userNumPhone && <p className="text-red-500 text-xs mt-1">{errors.userNumPhone.message}</p>}
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">{t('customer_type')}</label>
-                            <select
+                            <Controller
+                                control={control}
                                 name="customerType"
-                                value={form.Customer?.customerType?.customerTypeId || ""}
-                                onChange={handleOnChange}
-                                className="w-full p-2 border border-gray-300 rounded mt-1"
-                            >
-                                <option value="">{t('common:please_select')}</option>
-                                {customerTypes.map((type) => (
-                                    <option key={type.customerTypeId} value={type.customerTypeId}>
-                                        {type.customerTypeName}
-                                    </option>
-                                ))}
-                            </select>
+                                render={({ field }) => (
+                                    <select
+                                        {...field}
+                                        className="w-full p-2 border border-gray-300 rounded mt-1"
+                                    >
+                                        <option value="">{t('common:please_select')}</option>
+                                        {customerTypes.map((type) => (
+                                            <option key={type.customerTypeId} value={type.customerTypeId}>
+                                                {type.customerTypeName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                            />
+                            {errors.customerType && <p className="text-red-500 text-xs mt-1">{errors.customerType.message}</p>}
                         </div>
 
                         <div className="flex justify-end space-x-4">
-                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-                                {t('common:save')}
+                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded" disabled={isSubmitting}>
+                                {isSubmitting ? t('common:loading') : t('common:save')}
                             </button>
                             <NavLink to="/customer/my-bookings" className="bg-gray-300 px-4 py-2 rounded">
                                 {t('common:cancel')}
