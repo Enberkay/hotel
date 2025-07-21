@@ -19,5 +19,17 @@
   "error_update": "An error occurred while updating",
   "update_success": "Updated successfully",
   "status": "Status",
-  "detail": "Detail"
+  "detail": "Detail",
+  "confirm_delete": "Are you sure you want to delete?",
+  "delete_success": "Delete successful",
+  "select": "-- Select --",
+  "not_found_title": "Page Not Found",
+  "not_found_message": "Sorry, the page you are looking for does not exist.",
+  "back_to_home": "Back to Home",
+  "redirecting": "Redirecting...",
+  "please_wait": "Please wait",
+  "pending": "Pending",
+  "in_progress": "In progress",
+  "completed": "Completed",
+  "are_you_sure": "Are you sure?"
 } 

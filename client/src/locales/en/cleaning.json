@@ -1,0 +1,14 @@
+{
+  "normal": "Normal",
+  "problem": "Problem",
+  "enter_problem_detail": "Enter problem details...",
+  "submit": "Submit",
+  "cleaning_request_success": "Cleaning request submitted successfully",
+  "cleaning_request_error": "Failed to submit cleaning request",
+  "new_cleaning_requests": "New cleaning requests: {{count}} items",
+  "cleaning_request_id": "Cleaning request #{{id}}",
+  "requester": "Requester",
+  "request_time": "Request time",
+  "no_cleaning_requests": "No cleaning requests found",
+  "checklist_item": "Checklist Item"
+} 

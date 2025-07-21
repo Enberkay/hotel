@@ -1,0 +1,14 @@
+{
+  "normal": "ปกติ",
+  "problem": "มีปัญหา",
+  "enter_problem_detail": "กรอกรายละเอียดปัญหา...",
+  "submit": "ส่งคำขอ",
+  "cleaning_request_success": "ส่งคำขอทำความสะอาดสำเร็จ",
+  "cleaning_request_error": "เกิดข้อผิดพลาดในการส่งคำขอทำความสะอาด",
+  "new_cleaning_requests": "มีใบแจ้งทำความสะอาดใหม่ {{count}} รายการ",
+  "cleaning_request_id": "ใบแจ้งทำความสะอาดที่ {{id}}",
+  "requester": "ผู้แจ้งทำความสะอาด",
+  "request_time": "เวลาที่แจ้ง",
+  "no_cleaning_requests": "ไม่มีข้อมูลใบแจ้งทำความสะอาด",
+  "checklist_item": "รายการตรวจสอบ"
+} 

@@ -1,5 +1,13 @@
 {
   "name": "Name",
   "email": "Email",
-  "phone": "Phone"
+  "phone": "Phone",
+  "customer_type": "Customer Type",
+  "add_user": "Add User",
+  "add_user_success": "User added successfully",
+  "profile": "Profile",
+  "edit_profile": "Edit Profile",
+  "id_card": "ID Card",
+  "std_id": "Student ID",
+  "error_load_customer_type": "Cannot load customer type"
 } 
