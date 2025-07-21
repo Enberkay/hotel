@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { register, login, currentUser } = require("../controllers/auth.controller")
+const { register, login, currentUser, registerDefaultAdmin } = require("../controllers/auth.controller")
 
 const { adminCheck, authCheck, customerCheck, frontCheck, housekeepingCheck, maintenanceCheck } = require("../middlewares/authCheck")
 const { z } = require('zod');
@@ -22,6 +22,9 @@ const registerSchema = z.object({
 //@ENDPOINT http://localhost:8000/api/register
 router.post("/register", validateWithZod(registerSchema), register)
 router.post("/login", login)
+
+// Endpoint สำหรับสร้าง default admin จาก ENV หรือ fallback
+router.post("/register-default-admin", registerDefaultAdmin)
 
 // router.post("/current-user", authCheck, currentUser)
 router.post("/current-admin", authCheck, adminCheck, currentUser)
