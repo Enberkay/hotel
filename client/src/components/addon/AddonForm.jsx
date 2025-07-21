@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import useAddonStore from "../../store/addon-store";
 import useAuthStore from "../../store/auth-store";
 import { createAddon, readAddon, updateAddon } from "../../api/addon"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
 import { useTranslation } from 'react-i18next';
-
-const initialState = { addonName_en: "", addonName_th: "", price: 0 }
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const FormAddon = () => {
   const { i18n, t } = useTranslation(['addon', 'common']);
@@ -14,30 +15,38 @@ const FormAddon = () => {
   const getAddon = useAddonStore((state) => state.getAddon);
   const addons = useAddonStore((state) => state.addons);
 
-  const [form, setForm] = useState(initialState)
-  const [editForm, setEditForm] = useState(initialState)
+  // Zod schema
+  const schema = z.object({
+    addonName_en: z.string().min(1, { message: t('common:error_required') }),
+    addonName_th: z.string().min(1, { message: t('common:error_required') }),
+    price: z.preprocess((val) => Number(val), z.number().positive({ message: t('common:error_required') })),
+  });
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(schema),
+    mode: 'onTouched',
+    defaultValues: {
+      addonName_en: '',
+      addonName_th: '',
+      price: '',
+    }
+  });
+
+  const [editForm, setEditForm] = useState(null)
   const [isEditOpen, setIsEditOpen] = useState(false)
 
   useEffect(() => {
     getAddon(token)
   }, [])
 
-  const handleOnChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!form.addonName_en || !form.addonName_th || !form.price) {
-      return toast.error(t("common:error_required"))
-    }
+  const onSubmit = async (data) => {
     try {
-      const res = await createAddon(token, form)
-      setForm(initialState)
+      const res = await createAddon(token, data)
+      reset()
       getAddon(token)
       toast.success(t("add_addon_success", { addonName: i18n.language === 'th' ? res.data.addonName_th : res.data.addonName_en }))
     } catch (err) {
-      console.log(err)
+      toast.error(t("common:error_update"))
     }
   }
 
@@ -47,7 +56,7 @@ const FormAddon = () => {
       setEditForm(res.data)
       setIsEditOpen(true)
     } catch (err) {
-      console.log(err)
+      toast.error(t("common:error_update"))
     }
   }
 
@@ -57,13 +66,19 @@ const FormAddon = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault()
+    if (!editForm.addonName_en || !editForm.addonName_th || !editForm.price) {
+      return toast.error(t("common:error_required"))
+    }
+    if (isNaN(Number(editForm.price)) || Number(editForm.price) <= 0) {
+      return toast.error(t("common:error_required"))
+    }
     try {
-      await updateAddon(token, editForm)
+      await updateAddon(token, { ...editForm, price: Number(editForm.price) })
       getAddon(token)
       setIsEditOpen(false)
       toast.success(t("update_addon_success"))
     } catch (err) {
-      console.log(err)
+      toast.error(t("common:error_update"))
     }
   }
 
@@ -72,20 +87,23 @@ const FormAddon = () => {
       <h1 className="text-2xl font-bold mb-4">{t('addon_management')}</h1>
 
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div>
             <label className="block text-sm font-medium">{t('addon_name_en')}</label>
-            <input type="text" name="addonName_en" value={form.addonName_en} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+            <input type="text" {...register('addonName_en')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+            {errors.addonName_en && <p className="text-red-500 text-xs mt-1">{errors.addonName_en.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium">{t('addon_name_th')}</label>
-            <input type="text" name="addonName_th" value={form.addonName_th} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+            <input type="text" {...register('addonName_th')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+            {errors.addonName_th && <p className="text-red-500 text-xs mt-1">{errors.addonName_th.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium">{t('price')}</label>
-            <input type="number" name="price" value={form.price} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+            <input type="number" {...register('price')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+            {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
           </div>
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">{t('add_addon')}</button>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" disabled={isSubmitting}>{isSubmitting ? t('common:loading') : t('add_addon')}</button>
         </form>
       </div>
 
