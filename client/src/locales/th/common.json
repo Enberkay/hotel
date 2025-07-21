@@ -1,0 +1,23 @@
+{
+  "welcome": "ยินดีต้อนรับ",
+  "language": "ภาษา",
+  "hello": "สวัสดี",
+  "save": "บันทึก",
+  "cancel": "ยกเลิก",
+  "edit": "แก้ไข",
+  "delete": "ลบ",
+  "close": "ปิด",
+  "back": "ย้อนกลับ",
+  "please_select": "กรุณาเลือก",
+  "no_data": "ไม่มีข้อมูล",
+  "all": "ทั้งหมด",
+  "today": "วันนี้",
+  "this_week": "อาทิตย์นี้",
+  "this_month": "เดือนนี้",
+  "phuphan_place": "PHUPHAN PLACE",
+  "error_required": "กรุณากรอกข้อมูลให้ครบถ้วน",
+  "error_update": "เกิดข้อผิดพลาดในการแก้ไขข้อมูล",
+  "update_success": "แก้ไขข้อมูลเรียบร้อย",
+  "status": "สถานะ",
+  "detail": "รายละเอียด"
+} 

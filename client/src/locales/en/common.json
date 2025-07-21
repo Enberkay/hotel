@@ -1,0 +1,23 @@
+{
+  "welcome": "Welcome",
+  "language": "Language",
+  "hello": "Hello",
+  "save": "Save",
+  "cancel": "Cancel",
+  "edit": "Edit",
+  "delete": "Delete",
+  "close": "Close",
+  "back": "Back",
+  "please_select": "Please select",
+  "no_data": "No data",
+  "all": "All",
+  "today": "Today",
+  "this_week": "This week",
+  "this_month": "This month",
+  "phuphan_place": "PHUPHAN PLACE",
+  "error_required": "Please fill in all required fields",
+  "error_update": "An error occurred while updating",
+  "update_success": "Updated successfully",
+  "status": "Status",
+  "detail": "Detail"
+} 
