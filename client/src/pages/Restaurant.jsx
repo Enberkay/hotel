@@ -29,7 +29,7 @@ const Restaurant = () => {
       </div>
 
       {modalImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl w-full relative">
             <button onClick={() => setModalImage(null)} className="absolute top-2 right-2 text-gray-500 text-3xl">&times;</button>
             <img src={modalImage} alt="Preview" className="w-full max-h-[80vh] object-cover rounded-lg" />

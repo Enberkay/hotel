@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import MaintenanceSidebar from "../components/maintenance/MaintenanceSidebar"
+import MaintenanceSidebar from "../components/shared/MaintenanceSidebar"
 
 const LayoutMaintenance = () => {
   return (

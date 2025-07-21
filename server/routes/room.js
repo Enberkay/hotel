@@ -18,28 +18,28 @@ const roomCreateSchema = z.array(z.object({
 
 //@ENDPOINT http://localhost:8000/api
 
-// 🔹 เพิ่มห้อง (Create Room)
+//เพิ่มห้อง (Create Room)
 router.post("/rooms", validateWithZod(roomCreateSchema), create)
 
-// 🔹 ดูห้องทั้งหมด (List Rooms)
+//ดูห้องทั้งหมด (List Rooms)
 router.get("/rooms", authCheck, list)
 
-// 🔹 ดูรายละเอียดห้องตาม ID (Get Room by ID)
+//ดูรายละเอียดห้องตาม ID (Get Room by ID)
 router.get("/rooms/:id", authCheck, read)
 
-// 🔹 อัปเดตห้อง (Update Room)
+//อัปเดตห้อง (Update Room)
 router.put("/rooms/:id", authCheck, update)
 
-// 🔹 ลบห้อง (Delete Room)
+//ลบห้อง (Delete Room)
 router.delete("/rooms/:id", authCheck, remove)
 
-// 🔹 อัปเดตสถานะห้อง (Change Room Status)
+//อัปเดตสถานะห้อง (Change Room Status)
 router.post("/rooms-status", authCheck, changeStatusRoom)
 
-// 🔹 จัดกลุ่มห้อง (Group Rooms)
+//จัดกลุ่มห้อง (Group Rooms)
 router.post("/rooms/group", authCheck, groupRoom)
 
-// 🔹 ยกเลิกการจัดกลุ่มห้อง (Ungroup Rooms)
+//ยกเลิกการจัดกลุ่มห้อง (Ungroup Rooms)
 router.post("/rooms/ungroup", authCheck, unGroupRoom)
 
 module.exports = router

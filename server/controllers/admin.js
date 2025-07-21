@@ -1,26 +1,26 @@
 const prisma = require("../config/prisma")
 const bcrypt = require("bcryptjs")
 
-// ✅ เพิ่มผู้ใช้ใหม่
+//เพิ่มผู้ใช้ใหม่
 exports.addUser = async (req, res) => {
     try {
         const { userEmail, userPassword, userName, userSurName, userRole, userNumPhone, assignedFloor } = req.body
 
-        // ✅ ตรวจสอบค่าว่าง
+        //ตรวจสอบค่าว่าง
         if (!userEmail || !userPassword || !userName || !userSurName || !userRole) {
             return res.status(400).json({ message: 'All fields are required!' })
         }
 
-        // ✅ ตรวจสอบว่าอีเมลซ้ำหรือไม่
+        //ตรวจสอบว่าอีเมลซ้ำหรือไม่
         const existingUser = await prisma.user.findUnique({ where: { userEmail } })
         if (existingUser) {
             return res.status(400).json({ message: "Email already exists!" })
         }
 
-        // ✅ เข้ารหัสรหัสผ่าน
+        //เข้ารหัสรหัสผ่าน
         const hashPassword = await bcrypt.hash(userPassword, 10)
 
-        // ✅ เพิ่มผู้ใช้
+        //เพิ่มผู้ใช้
         const addUser = await prisma.user.create({
             data: {
                 userEmail,
@@ -42,7 +42,7 @@ exports.addUser = async (req, res) => {
     }
 }
 
-// ✅ ดึงข้อมูลผู้ใช้ทั้งหมด
+//ดึงข้อมูลผู้ใช้ทั้งหมด
 exports.listUser = async (req, res) => {
     try {
         const users = await prisma.user.findMany({
@@ -59,7 +59,7 @@ exports.listUser = async (req, res) => {
             }
         });
 
-        // ✅ จัดโครงสร้างข้อมูลใหม่
+        //จัดโครงสร้างข้อมูลใหม่
         const formattedUsers = users.map(user => ({
             ...user,
             assignedFloor: user.assignedFloor || null
@@ -72,7 +72,7 @@ exports.listUser = async (req, res) => {
     }
 };
 
-// ✅ ดึงข้อมูลผู้ใช้จาก ID
+//ดึงข้อมูลผู้ใช้จาก ID
 exports.readUser = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
@@ -103,7 +103,7 @@ exports.readUser = async (req, res) => {
     }
 };
 
-// ✅ อัปเดตข้อมูลผู้ใช้
+//อัปเดตข้อมูลผู้ใช้
 exports.updateUser = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
@@ -126,17 +126,17 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-// ✅ ลบผู้ใช้
+//ลบผู้ใช้
 exports.deleteUser = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
         if (isNaN(userId)) return res.status(400).json({ message: "Invalid user ID" });
 
-        // ✅ ตรวจสอบว่าผู้ใช้มีอยู่หรือไม่
+        //ตรวจสอบว่าผู้ใช้มีอยู่หรือไม่
         const existingUser = await prisma.user.findUnique({ where: { userId } });
         if (!existingUser) return res.status(404).json({ message: "User not found" });
 
-        // ✅ ลบผู้ใช้
+        //ลบผู้ใช้
         const deletedUser = await prisma.user.delete({ where: { userId } });
 
         res.json({ message: "User deleted successfully", deletedUser });
