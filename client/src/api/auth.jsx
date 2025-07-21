@@ -62,11 +62,3 @@ export const currentMaintenance = async (token) => {
     }
     )
 }
-
-export const removeFiles = async (token, filename) => {
-    return axios.post(`${API_URL}/removeimages`, { filename }, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-};

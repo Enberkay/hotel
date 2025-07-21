@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { myProfile } from "../api/profile";
 import { jwtDecode } from "jwt-decode";
+import { listUser } from "../api/admin";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,6 +11,7 @@ const authStore = (set) => ({
   user: null,
   token: null,
   profile: [],
+  users: [],
   hasCheckedToken: false,
 
   actionLogin: async (form) => {
@@ -78,6 +80,26 @@ const authStore = (set) => ({
     try {
       const res = await myProfile(token);
       set({ profile: res.data });
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  getAllUsers: async (token) => {
+    try {
+      const res = await listUser(token);
+      set({ users: res.data });
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  getCurrentUser: async (token) => {
+    try {
+      const res = await axios.post(`${API_URL}/current-user`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      set({ user: res.data.user });
     } catch (err) {
       console.error(err);
     }

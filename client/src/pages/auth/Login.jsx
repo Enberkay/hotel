@@ -91,7 +91,7 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-custom-brown text-white p-2 rounded hover:bg-opacity-90"
+            className="w-full bg-custom-brown text-black p-2 rounded hover:bg-opacity-90"
             disabled={isSubmitting}
           >
             {isSubmitting ? t('logging_in') : t('login')}

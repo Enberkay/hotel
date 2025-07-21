@@ -21,14 +21,14 @@ const initialState = {
 const AdminUserList = () => {
   const { t } = useTranslation();
   const token = useAuthStore((state) => state.token)
-  const getUser = useAuthStore((state) => state.getUser)
+  const getAllUsers = useAuthStore((state) => state.getAllUsers)
   const users = useAuthStore((state) => state.users)
 
   const [form, setForm] = useState(initialState)
 
   useEffect(() => {
-    getUser(token)
-  }, [])
+    getAllUsers(token)
+  }, [token])
 
   const handleOnChange = (e) => {
     setForm({
@@ -57,7 +57,7 @@ const AdminUserList = () => {
     try {
       const res = await createUser(token, form)
       setForm(initialState)
-      getUser(token)
+      getAllUsers(token)
       toast.success(t('add_user_success'))
     } catch (err) {
       const errMag = err.response?.data?.message
@@ -70,7 +70,7 @@ const AdminUserList = () => {
       try {
         const res = await deleteUser(token, userId)
         toast.success(t('delete_success'))
-        getUser()
+        getAllUsers(token)
       } catch (err) {
         const errMag = err.response?.data?.message
         toast.error(errMag)
