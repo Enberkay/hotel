@@ -33,7 +33,13 @@ const BookingForm = () => {
         message: t('check_out_after_check_in'),
       }),
     roomTypeId: z.string().min(1, { message: t('error_select_room_type') }),
-    count: z.string().refine(val => parseInt(val, 10) >= 1, { message: t('common:error_required') }),
+    count: z.string()
+      .refine(val => parseInt(val, 10) >= 1, { message: t('common:error_required') })
+      .refine((val, ctx) => {
+        // max guest: roomTypeId === 3 ? 4 : 2
+        const max = ctx.parent.roomTypeId === '3' ? 4 : 2;
+        return parseInt(val, 10) <= max;
+      }, { message: t('error_guest_count_max') }),
     licensePlate: z.string().optional(),
   });
 
@@ -148,10 +154,11 @@ const BookingForm = () => {
                     dateFormat="dd/MM/yyyy"
                     className="p-3 border rounded-md shadow-sm w-full bg-light-yellow"
                     popperPlacement="bottom-start"
+                    autoFocus
                   />
                 )}
               />
-              {errors.checkInDate && <p className="text-red-500 text-xs mt-1">{errors.checkInDate.message}</p>}
+              {errors.checkInDate && <p className="text-red-500 text-xs mt-1">{t(errors.checkInDate.message)}</p>}
             </div>
             <div className="flex flex-col">
               <label className="mb-2 text-gray-700 text-sm md:text-base">
@@ -172,7 +179,7 @@ const BookingForm = () => {
                   />
                 )}
               />
-              {errors.checkOutDate && <p className="text-red-500 text-xs mt-1">{errors.checkOutDate.message}</p>}
+              {errors.checkOutDate && <p className="text-red-500 text-xs mt-1">{t(errors.checkOutDate.message)}</p>}
             </div>
           </div>
 
@@ -197,7 +204,7 @@ const BookingForm = () => {
                 />
               )}
             />
-            {errors.roomTypeId && <p className="text-red-500 text-xs mt-1">{errors.roomTypeId.message}</p>}
+            {errors.roomTypeId && <p className="text-red-500 text-xs mt-1">{t(errors.roomTypeId.message)}</p>}
           </div>
 
           <div className="bg-white p-4 rounded-md border-2 border-black mt-4">
@@ -230,7 +237,7 @@ const BookingForm = () => {
               {...register('count')}
               className="w-400px p-3 border rounded-md shadow-sm"
             />
-            {errors.count && <p className="text-red-500 text-xs mt-1">{errors.count.message}</p>}
+            {errors.count && <p className="text-red-500 text-xs mt-1">{t(errors.count.message)}</p>}
           </div>
 
           {/* Addon Select (optional, logic เดิม) */}
