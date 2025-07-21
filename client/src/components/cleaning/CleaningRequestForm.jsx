@@ -13,7 +13,7 @@ const CleaningRequestForm = () => {
   const token = useAuthStore((state) => state.token);
   const getRoom = useRoomStore((state) => state.getRoom);
   const rooms = useRoomStore((state) => state.rooms);
-  const { t } = useTranslation();
+  const { t } = useTranslation(['cleaning', 'room', 'common']);
 
   // State สำหรับเก็บห้องที่ถูกเลือก
   const [selectedRooms, setSelectedRooms] = useState([])
@@ -132,32 +132,32 @@ const CleaningRequestForm = () => {
         {/* แจ้งสี */}
         <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-lg shadow-lg">
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-green-500" /> {t('status_available')}
+            <Star size={20} className="text-green-500" /> {t('cleaning:status_available')}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-gray-500" /> {t('status_occupied')}
+            <Star size={20} className="text-gray-500" /> {t('cleaning:status_occupied')}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-yellow-500" /> {t('status_reserved')}
+            <Star size={20} className="text-yellow-500" /> {t('cleaning:status_reserved')}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-blue-500" /> {t('status_cleaning')}
+            <Star size={20} className="text-blue-500" /> {t('cleaning:status_cleaning')}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Star size={20} className="text-red-500" /> {t('status_repair')}
+            <Star size={20} className="text-red-500" /> {t('cleaning:status_repair')}
           </p>
         </div>
 
         {/* แจ้งไอคอนเตียง */}
         <div className="flex flex-col gap-2 bg-gray-100 p-4 rounded-lg shadow-lg">
           <p className="text-xs text-black flex items-center gap-2">
-            <BedDouble size={20} className="text-black" /> {t('room_type_standard_double')}
+            <BedDouble size={20} className="text-black" /> {t('room:room_type_standard_double')}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <BedSingle size={20} className="text-black" /> {t('room_type_standard_single')}
+            <BedSingle size={20} className="text-black" /> {t('room:room_type_standard_single')}
           </p>
           <p className="text-xs text-black flex items-center gap-2">
-            <Bed size={20} className="text-black" /> {t('room_type_signature')}
+            <Bed size={20} className="text-black" /> {t('room:room_type_signature')}
           </p>
         </div>
       </div>
@@ -166,7 +166,7 @@ const CleaningRequestForm = () => {
       <div className="flex-1 p-5 grid grid-cols-2 gap-5">
         {Object.keys(groupedRooms).map((floor) => (
           <div key={floor} className="mb-6 text-center">
-            <h2 className="text-lg font-bold mb-3">{t('floor', { floor })}</h2>
+            <h2 className="text-lg font-bold mb-3">{t('cleaning:floor', { floor })}</h2>
             <div className="flex flex-wrap gap-3 justify-center">
               {groupedRooms[floor].map((room) => {
                 const roomTypeName = room.roomType?.roomTypeName || ""
@@ -211,7 +211,7 @@ const CleaningRequestForm = () => {
 
       <div className="flex mt-5">
         <div className="w-72 bg-gray-100 p-4 rounded-lg shadow-lg">
-          <h2 className="text-lg font-bold mb-3">{t('selected_rooms')}</h2>
+          <h2 className="text-lg font-bold mb-3">{t('cleaning:selected_rooms')}</h2>
           <div className="space-y-3">
             {selectedRooms.length > 0 ? (
               selectedRooms.map((room) => (
@@ -237,7 +237,7 @@ const CleaningRequestForm = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-sm">{t('no_rooms_selected')}</p>
+              <p className="text-gray-500 text-sm">{t('cleaning:no_rooms_selected')}</p>
             )}
           </div>
           <button
@@ -245,32 +245,32 @@ const CleaningRequestForm = () => {
             onClick={handleSubmit}
             disabled={selectedRooms.length === 0}
           >
-            {t('submit_cleaning_request')}
+            {t('cleaning:submit_cleaning_request')}
           </button>
           {editingRoom && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white p-4 rounded-lg shadow-lg w-96">
                 <h3 className="text-lg font-bold mb-3">
-                  {t('add_room_description', { roomNumber: editingRoom.roomNumber })}
+                  {t('cleaning:add_room_description', { roomNumber: editingRoom.roomNumber })}
                 </h3>
                 <textarea
                   className="w-full p-2 border rounded-lg"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder={t('add_description_placeholder')}
+                  placeholder={t('cleaning:add_description_placeholder')}
                 ></textarea>
                 <div className="mt-3 flex justify-end gap-3">
                   <button
                     onClick={() => setEditingRoom(null)}
                     className="px-3 py-1 bg-gray-300 rounded-lg"
                   >
-                    {t('cancel')}
+                    {t('common:cancel')}
                   </button>
                   <button
                     onClick={saveDescription}
                     className="px-3 py-1 bg-blue-500 text-white rounded-lg"
                   >
-                    {t('save')}
+                    {t('common:save')}
                   </button>
                 </div>
               </div>

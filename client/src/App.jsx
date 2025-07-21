@@ -16,8 +16,8 @@ const App = () => {
 
   return (
     <div>
-      <h1>{t('welcome')}</h1>
-      <p>{t('hello')}</p>
+      <h1>{t('common:welcome')}</h1>
+      <p>{t('common:hello')}</p>
       <button onClick={() => i18n.changeLanguage('th')}>ไทย</button>
       <button onClick={() => i18n.changeLanguage('en')}>English</button>
       <ToastContainer />

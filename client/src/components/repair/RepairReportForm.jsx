@@ -7,7 +7,7 @@ import { notedRepairRequest, repairReport } from "../../api/repair"
 import { useTranslation } from 'react-i18next';
 
 const FormRepairReport = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['repair', 'common']);
     const navigate = useNavigate()
     const token = useRepairStore((state) => state.token)
     const repairStatuses = useRepairStore((state) => state.repairStatuses)
@@ -33,7 +33,7 @@ const FormRepairReport = () => {
     )
 
     const handleSelectRequest = async (req) => {
-        if (window.confirm(t('are_you_sure'))) {
+        if (window.confirm(t('common:are_you_sure'))) {
             try {
                 await notedRepairRequest(token, req.requestId)
                 setSelectedRequest(req)
@@ -56,7 +56,7 @@ const FormRepairReport = () => {
         }))
     }
 
-    const handleSubmit = async (e) => {
+    const handleOnSubmit = async (e) => {
         e.preventDefault()
 
         if (!selectedRequest) {
@@ -65,117 +65,128 @@ const FormRepairReport = () => {
         }
 
         const repairData = {
-            requestId: selectedRequest.requestId,
-            rooms: selectedRequest.RepairRequestRoom.map((detail) => ({
-                roomId: detail.room.roomId,
-                description: repairDetails[detail.room.roomId]?.description || "",
-                repairStatusId: repairDetails[detail.room.roomId]?.repairStatusId || "",
-            })),
+            repairRequestId: selectedRequest.requestId,
+            ...repairDetails
         }
 
         try {
-            await repairReport(token, repairData.requestId, repairData.rooms)
+            await repairReport(token, repairData)
             toast.success(t('repair_report_success'))
-            navigate("/maintenance")
+            navigate('/maintenance/repair-request')
         } catch (error) {
-            console.error("Error:", error)
+            console.error(error)
             toast.error(t('repair_report_error'))
         }
     }
 
     return (
-        <div className="mt-14 md:max-w-4xl md:mx-auto p-6 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-semibold mb-4 text-center">
-                {t('repair_report_form')}
-            </h1>
+        <div className="p-6 bg-gray-100 min-h-screen">
+            <h1 className="text-2xl font-bold mb-6">{t('repair_report_form')}</h1>
 
-            {!selectedRequest && (
+            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h2 className="text-xl font-semibold mb-4">{t('select_repair_request')}</h2>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition block mx-auto"
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                 >
-                    {t('select_repair_request')}
+                    {t('select_request')}
                 </button>
-            )}
+
+                {selectedRequest && (
+                    <div className="mt-4 p-4 border rounded-md bg-gray-50">
+                        <p><strong>{t('request_number')}:</strong> {selectedRequest.requestId}</p>
+                        <p><strong>{t('request_at')}:</strong> {formatDateTime(selectedRequest.createdAt)}</p>
+                        <p><strong>{t('room:room_number')}:</strong> {selectedRequest.CleaningReport.Room.roomNumber}</p>
+                    </div>
+                )}
+            </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
-                    <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full">
-                        <h2 className="text-xl font-semibold mb-4 text-center">{t('select_repair_request')}</h2>
-                        <ul className="border p-4 rounded-lg bg-gray-100 max-h-60 overflow-auto">
-                            {pendingRequests.length === 0 ? (
-                                <p className="text-gray-500 text-center">{t('no_pending_requests')}</p>
-                            ) : (
-                                pendingRequests.map((req) => (
-                                    <li
-                                        key={req.requestId}
-                                        className={`p-3 border-b last:border-none cursor-pointer hover:bg-gray-200 ${req.repairRequestStatusId === 2 ? "bg-yellow-100" : ""}`}
-                                        onClick={() => handleSelectRequest(req)}
-                                    >
-                                        <span className="font-semibold">{t('request_number')}:</span> {req.requestId} |
-                                        <span className="ml-2 font-semibold">{t('request_at')}:</span> {formatDateTime(req.requestAt)}
-                                    </li>
-                                ))
-                            )}
-                        </ul>
-                        <button
-                            onClick={() => setIsModalOpen(false)}
-                            className="mt-4 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition block mx-auto"
-                        >
-                            {t('close')}
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
+                        <h3 className="text-xl font-bold mb-4">{t('pending_requests')}</h3>
+                        <div className="max-h-96 overflow-y-auto">
+                            <table className="min-w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="py-2 px-4">{t('request_number')}</th>
+                                        <th className="py-2 px-4">{t('request_at')}</th>
+                                        <th className="py-2 px-4">{t('room:room_number')}</th>
+                                        <th className="py-2 px-4">{t('common:action')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pendingRequests.length > 0 ? (
+                                        pendingRequests.map((req) => (
+                                            <tr key={req.requestId} className="border-b">
+                                                <td className="py-2 px-4">{req.requestId}</td>
+                                                <td className="py-2 px-4">{formatDateTime(req.createdAt)}</td>
+                                                <td className="py-2 px-4">{req.CleaningReport.Room.roomNumber}</td>
+                                                <td className="py-2 px-4">
+                                                    <button
+                                                        onClick={() => handleSelectRequest(req)}
+                                                        className="bg-green-500 text-white px-3 py-1 rounded"
+                                                    >
+                                                        {t('common:select')}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-center py-4">{t('no_pending_requests')}</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        <button onClick={() => setIsModalOpen(false)} className="mt-4 bg-gray-500 text-white px-4 py-2 rounded">
+                            {t('common:close')}
                         </button>
                     </div>
                 </div>
             )}
 
-            {selectedRequest && (
-                <form onSubmit={handleSubmit}>
-                    <div className="border p-4 rounded-lg bg-gray-100 mt-4">
-                        <p><span className="font-semibold">{t('request_number')}:</span> {selectedRequest.requestId}</p>
-                        <p><span className="font-semibold">{t('request_at')}:</span> {formatDateTime(selectedRequest.requestAt)}</p>
+            <form onSubmit={handleOnSubmit} className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">{t('room_details')}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium">{t('room:room_number')}</label>
+                        <p className="mt-1 p-2 border rounded-md bg-gray-100">{selectedRequest?.CleaningReport.Room.roomNumber || "-"}</p>
                     </div>
-
-                    <h2 className="text-lg font-semibold mt-4 mb-2">{t('room_details')}</h2>
-
-                    {selectedRequest.RepairRequestRoom.map((detail, index) => (
-                        <div key={index} className="mb-4">
-                            <p><span className="font-semibold">{t('room_number')}:</span> {detail.room.roomNumber}</p>
-                            <p><span className="font-semibold">{t('floor')}:</span> {detail.room.floor}</p>
-                            <p><span className="font-semibold">{t('detail')}:</span> {detail.description || t('no_detail')}</p>
-
-                            <select
-                                className="border"
-                                name="repairStatusId"
-                                required
-                                value={repairDetails[detail.room.roomId]?.repairStatusId || ""}
-                                onChange={(e) => handleOnChange(e, detail.room.roomId, "repairStatusId")}
-                            >
-                                <option value="" disabled>{t('please_select')}</option>
-                                {repairStatuses.map((item, index) => (
-                                    <option key={index} value={item.repairStatusId}>
-                                        {item.repairStatusName}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <label className="block mt-2 font-semibold">{t('write_details')}:</label>
-                            <input
-                                className="border w-full p-2 rounded-md"
-                                type="text"
-                                value={repairDetails[detail.room.roomId]?.description || ""}
-                                onChange={(e) => handleOnChange(e, detail.room.roomId, "description")}
-                            />
-                        </div>
-                    ))}
-
-                    <button
-                        type="submit"
-                        className="bg-green-600 text-white py-2 px-4 rounded-md mt-4 hover:bg-green-700 w-full"
+                    <div>
+                        <label className="block text-sm font-medium">{t('room:floor')}</label>
+                        <p className="mt-1 p-2 border rounded-md bg-gray-100">{selectedRequest?.CleaningReport.Room.floor || "-"}</p>
+                    </div>
+                </div>
+                <div className="mt-4">
+                    <label className="block text-sm font-medium">{t('write_details')}</label>
+                    <textarea
+                        name="repairedItem"
+                        onChange={(e) => setRepairDetails({ ...repairDetails, repairedItem: e.target.value })}
+                        className="mt-1 block w-full p-2 border rounded-md"
+                        rows="3"
+                    ></textarea>
+                </div>
+                <div className="mt-4">
+                    <label className="block text-sm font-medium">{t('common:status')}</label>
+                    <select
+                        name="repairStatusId"
+                        onChange={(e) => setRepairDetails({ ...repairDetails, repairStatusId: parseInt(e.target.value) })}
+                        className="mt-1 block w-full p-2 border rounded-md"
                     >
-                        {t('submit_repair_report')}
-                    </button>
-                </form>
-            )}
+                        <option value="">{t('common:please_select')}</option>
+                        {repairStatuses.map((status) => (
+                            <option key={status.repairStatusId} value={status.repairStatusId}>
+                                {status.repairStatusName}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <button type="submit" className="mt-6 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">
+                    {t('submit_repair_report')}
+                </button>
+            </form>
         </div>
     )
 }

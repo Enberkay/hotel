@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
 
 const NotFoundPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   return (
     <div>
         <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">

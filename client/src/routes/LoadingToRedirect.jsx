@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 const LoadingToRedirect = () => {
 
-    const { t } = useTranslation();
+    const { t } = useTranslation('common');
     const [count, setCount] = useState(3)
     const [redirect, setRedirect] = useState(false)
 

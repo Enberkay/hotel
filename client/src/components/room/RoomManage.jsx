@@ -11,7 +11,7 @@ const RoomManage = () => {
   const token = useAuthStore((state) => state.token)
   const getRoom = useRoomStore((state) => state.getRoom)
   const rooms = useRoomStore((state) => state.rooms)
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(['room', 'common']);
 
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [selectedPair, setSelectedPair] = useState(null)

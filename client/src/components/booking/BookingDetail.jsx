@@ -8,7 +8,7 @@ import { Undo2, BedDouble, BedSingle, Bed, Star } from "lucide-react"
 import { useTranslation } from 'react-i18next';
 
 const BookingDetail = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['booking', 'room', 'common']);
     const { id } = useParams()
     const navigate = useNavigate()
 
@@ -80,37 +80,29 @@ const BookingDetail = () => {
 
     //CheckIn
     const handleCheckIn = async (bookingId) => {
-        if (window.confirm(t('confirm_check_in'))) {
+        if (window.confirm(t('common:are_you_sure'))) {
             try {
                 await checkIn(token, bookingId)
-                toast.success(t('check_in_successful'));
-                navigate("/front")
+                toast.success(t("check_in_success"))
+                fetchBooking()
+                getRoom(token)
             } catch (err) {
-                console.log(err)
-                toast.error(t('check_in_failed'));
+                console.log("Error check-in", err)
+                toast.error(t("check_in_failed"))
             }
         }
     }
 
     //CheckOut
-    const handleCheckOut = async (bookingId) => {
-        if (window.confirm(t('confirm_check_out'))) {
+    const handleCheckOut = async (bookingId, roomId, roomNumber, floor) => {
+        if (window.confirm(t('common:are_you_sure'))) {
             try {
                 const res = await checkOut(token, bookingId)
-                console.log(res)
-
-                const roomId = res.data.checkedOutBooking.roomId
-                const roomNumber = res.data.checkedOutBooking.room.roomNumber
-                const floor = res.data.checkedOutBooking.room.floor
-                console.log(roomId, roomNumber, floor)
-
-                // Navigate ไปหน้าทำความสะอาด พร้อมส่งข้อมูลห้องที่เพิ่ง Check-Out
-                navigate("/front/cleaning-request", { state: { roomId, roomNumber, floor } })
-
-                toast.success(t('check_out_successful'));
+                toast.success(t("check_out_success"))
+                navigate("/front/cleaning-request", { state: { roomId, roomNumber, floor } }) // ส่งข้อมูลห้องไปหน้า cleaning
             } catch (err) {
-                console.error("Check-Out ไม่สำเร็จ:", err)
-                toast.error(t('check_out_failed'));
+                console.log("Error check-out", err)
+                toast.error(t("check_out_failed"))
             }
         }
     }
@@ -222,7 +214,7 @@ const BookingDetail = () => {
                                         ? "bg-blue-500 hover:scale-105 hover:-translate-y-1 text-white"
                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                     }`}
-                                    onClick={() => handleCheckOut(form.bookingId)}
+                                    onClick={() => handleCheckOut(form.bookingId, form.Room.roomId, form.Room.roomNumber, form.Room.floor)}
                                     disabled={form.bookingStatus !== 'CHECKED_IN'}
                                 >
                                     {t('check_out')}

@@ -5,9 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { User, KeyRound } from "lucide-react";
 import image from "../../assets/Images/test3.png";
 import { useTranslation } from 'react-i18next';
+import { Link } from "react-router-dom";
 
 const Login = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('auth');
   //JavaScript
   const navigate = useNavigate();
   const actionLogin = useAuthStore((state) => state.actionLogin);
@@ -63,41 +64,48 @@ const Login = () => {
       <div className="w-full sm:w-[400px] md:w-[400px] lg:w-[500px] xl:w-[500px] p-12 bg-white bg-opacity-95 shadow-lg rounded-lg">
           <h2 className="text-2xl font-bold mb-6 text-center">{t('login')}</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <label className="block space-y-2">
-              <span className="text-gray-700">{t('email')}</span>
-              <div className="flex items-center border p-3 rounded-md focus-within:ring-2 focus-within:ring-brown/50">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4 relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                 <User className="text-gray-500 mr-3" size={24} />
-                <input
-                  className="w-full focus:outline-none text-lg "
-                  onChange={handleOnChange}
-                  name="userEmail"
-                  type="email"
-                  required
-                  placeholder={t('enter_email')}
-                />
-              </div>
-            </label>
-
-            <label className="block space-y-2">
-              <span className="text-gray-700">{t('password')}</span>
-              <div className="flex items-center border p-3 rounded-md focus-within:ring-2 focus-within:ring-brown/50">
+              </span>
+              <input
+                id="userEmail"
+                type="text"
+                name="userEmail"
+                className="pl-10 w-full p-2 border border-gray-300 rounded"
+                placeholder={t('enter_email')}
+                onChange={handleOnChange}
+              />
+            </div>
+            <div className="mb-4 relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                 <KeyRound className="text-gray-500 mr-3" size={24} />
-                <input
-                  className="w-full focus:outline-none text-lg"
-                  onChange={handleOnChange}
-                  name="userPassword"
-                  type="password"
-                  required
-                  placeholder={t('enter_password')}
-                />
-              </div>
-            </label>
-
-            <button className="w-full py-3 px-6 bg-[var(--color-brown)] text-white text-lg rounded-md hover:bg-[var(--color-brown)]/80 transition shadow-md" style={{'--color-brown':'#6A503D'}}>
+              </span>
+              <input
+                id="userPassword"
+                type="password"
+                name="userPassword"
+                className="pl-10 w-full p-2 border border-gray-300 rounded"
+                placeholder={t('enter_password')}
+                onChange={handleOnChange}
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-custom-brown text-white p-2 rounded hover:bg-opacity-90"
+            >
               {t('login')}
             </button>
           </form>
+
+          <div className="flex justify-center mt-4">
+            <p className="text-sm">
+              <Link to="/register" className="text-custom-brown hover:underline">
+                {t('register')}
+              </Link>
+            </p>
+          </div>
       </div>
     </div>
   );

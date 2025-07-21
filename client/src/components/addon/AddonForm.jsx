@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 const initialState = { addonName_en: "", addonName_th: "", price: 0 }
 
 const FormAddon = () => {
-  const { i18n, t } = useTranslation();
+  const { i18n, t } = useTranslation(['addon', 'common']);
   const token = useAuthStore((state) => state.token);
   const getAddon = useAddonStore((state) => state.getAddon);
   const addons = useAddonStore((state) => state.addons);
@@ -29,13 +29,13 @@ const FormAddon = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.addonName_en || !form.addonName_th || !form.price) {
-      return toast.error("กรุณากรอกข้อมูลให้ครบถ้วน")
+      return toast.error(t("common:error_required"))
     }
     try {
       const res = await createAddon(token, form)
       setForm(initialState)
       getAddon(token)
-      toast.success(`เพิ่มรายการเสริม ${i18n.language === 'th' ? res.data.addonName_th : res.data.addonName_en} สำเร็จ`)
+      toast.success(t("add_addon_success", { addonName: i18n.language === 'th' ? res.data.addonName_th : res.data.addonName_en }))
     } catch (err) {
       console.log(err)
     }
@@ -55,60 +55,94 @@ const FormAddon = () => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value })
   }
 
-  const handleUpdate = async () => {
-    if (!editForm.addonName_en || !editForm.addonName_th || !editForm.price) {
-      return toast.error("กรุณากรอกข้อมูลให้ครบถ้วน")
-    }
+  const handleEditSubmit = async (e) => {
+    e.preventDefault()
     try {
-      await updateAddon(token, editForm.addonId, editForm)
-      setIsEditOpen(false)
+      await updateAddon(token, editForm)
       getAddon(token)
-      toast.success("แก้ไขข้อมูลสำเร็จ")
+      setIsEditOpen(false)
+      toast.success(t("update_addon_success"))
     } catch (err) {
       console.log(err)
     }
   }
 
   return (
-    <div className="container mx-auto p-4 bg-white shadow-md mt-20">
-      <h1 className="text-2xl font-bold mb-4">Addon Management</h1>
-      <form className="my-4" onSubmit={handleSubmit}>
-        <div className="flex flex-col space-y-4">
-          <input type="text" name="addonName_th" value={form.addonName_th} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="ชื่อรายการเสริม (TH)" required />
-          <input type="text" name="addonName_en" value={form.addonName_en} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="Addon Name (EN)" required />
-          <input type="number" name="price" value={form.price} onChange={handleOnChange} className="border p-2 rounded-md" placeholder="ราคา" required />
-          <button className="bg-blue-500 text-white p-2 rounded-md">Add Addon</button>
-        </div>
-      </form>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {addons.map((item) => (
-          <div key={item.addonId} className="p-4 border rounded-md shadow-md flex justify-between items-center">
-            <div>
-              <h2 className="font-bold">{i18n.language === 'th' ? item.addonName_th : item.addonName_en}</h2>
-              <p>{item.price} บาท</p>
-            </div>
-            <button onClick={() => handleEditClick(item.addonId)} className="text-blue-500">
-              <Pencil />
-            </button>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">{t('addon_management')}</h1>
+
+      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div>
+            <label className="block text-sm font-medium">{t('addon_name_en')}</label>
+            <input type="text" name="addonName_en" value={form.addonName_en} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
           </div>
-        ))}
+          <div>
+            <label className="block text-sm font-medium">{t('addon_name_th')}</label>
+            <input type="text" name="addonName_th" value={form.addonName_th} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">{t('price')}</label>
+            <input type="number" name="price" value={form.price} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+          </div>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">{t('add_addon')}</button>
+        </form>
       </div>
 
       {isEditOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-          <div className="bg-white p-6 rounded-md shadow-md w-96">
-            <h2 className="text-xl font-bold mb-4">แก้ไขรายการเสริม</h2>
-            <input type="text" name="addonName_th" value={editForm.addonName_th} onChange={handleEditChange} className="border p-2 w-full rounded-md mb-2" placeholder="ชื่อรายการเสริม (TH)" />
-            <input type="text" name="addonName_en" value={editForm.addonName_en} onChange={handleEditChange} className="border p-2 w-full rounded-md mb-2" placeholder="Addon Name (EN)" />
-            <input type="number" name="price" value={editForm.price} onChange={handleEditChange} className="border p-2 w-full rounded-md mb-4" placeholder="ราคา" />
-            <div className="flex justify-between">
-              <button onClick={() => setIsEditOpen(false)} className="bg-gray-500 text-white p-2 rounded-md">ยกเลิก</button>
-              <button onClick={handleUpdate} className="bg-green-500 text-white p-2 rounded-md">ยืนยัน</button>
-            </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">{t('edit_addon')}</h2>
+            <form onSubmit={handleEditSubmit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">{t('addon_name_en')}</label>
+                <input type="text" name="addonName_en" value={editForm.addonName_en} onChange={handleEditChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">{t('addon_name_th')}</label>
+                <input type="text" name="addonName_th" value={editForm.addonName_th} onChange={handleEditChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">{t('price')}</label>
+                <input type="number" name="price" value={editForm.price} onChange={handleEditChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button type="button" onClick={() => setIsEditOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded-md">{t('common:cancel')}</button>
+                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">{t('common:save')}</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
+
+      <div className="bg-white p-4 rounded-lg shadow-md">
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="py-2 px-4 text-left">{t('addon_name')}</th>
+                <th className="py-2 px-4 text-left">{t('price')}</th>
+                <th className="py-2 px-4 text-left">{t('common:actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {addons.map((addon) => (
+                <tr key={addon.addonId} className="border-b">
+                  <td className="py-2 px-4">{i18n.language === 'th' ? addon.addonName_th : addon.addonName_en}</td>
+                  <td className="py-2 px-4">{addon.price}</td>
+                  <td className="py-2 px-4">
+                    <button onClick={() => handleEditClick(addon.addonId)} className="text-blue-500 hover:underline">
+                      <Pencil size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
-export default FormAddon
+
+export default FormAddon;

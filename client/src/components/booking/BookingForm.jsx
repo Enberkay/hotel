@@ -21,7 +21,7 @@ const initialState = {
 }
 
 const BookingForm = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(['booking', 'room', 'user', 'common']);
   const navigate = useNavigate()
   const token = useAuthStore((state) => state.token)
   const profile = useAuthStore((state) => state.profile)
@@ -160,7 +160,7 @@ const BookingForm = () => {
     e.preventDefault()
 
     if (!form.roomTypeId || !form.checkInDate || !form.checkOutDate) {
-      return toast.error(t('error_required'))
+      return toast.error(t('common:error_required'))
     }
 
     if (dayjs(form.checkOutDate).isBefore(dayjs(form.checkInDate))) {

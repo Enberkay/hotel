@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 
 const CleaningChecklist = (props) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['cleaning', 'common']);
     const location = useLocation()
     const navigate = useNavigate()
     const token = useCleaningStore((state) => state.token)
@@ -60,57 +60,62 @@ const CleaningChecklist = (props) => {
     }
 
     return (
-        <div className=" max-w-3xl mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
-            <h1 className="text-2xl font-semibold mb-4">{t('cleaning_checklist_title')}</h1>
-            <p>{t('request_id')}: {requestId}</p>
-            <p>{t('room_id')}: {roomId}</p>
+        <>
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white">
+                    <thead>
+                        <tr>
+                            <th className="py-2 px-4 border-b">{t('checklist_item')}</th>
+                            <th className="py-2 px-4 border-b">{t('common:status')}</th>
+                            <th className="py-2 px-4 border-b">{t('common:detail')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {checklist.map((item, index) => (
+                            <tr key={item.cleaningListItemId}>
+                                <td className="py-2 px-4 border-b">{item.cleaningListItemName}</td>
+                                <td className="py-2 px-4 border-b">
+                                    <select
+                                        value={item.cleaningStatusId}
+                                        onChange={(e) => updateChecklist(index, parseInt(e.target.value))}
+                                        className="p-2 border rounded"
+                                    >
+                                        <option value={1}>{t('status_normal')}</option>
+                                        <option value={2}>{t('status_problem')}</option>
+                                    </select>
+                                </td>
+                                <td className="py-2 px-4 border-b">
+                                    {item.cleaningStatusId === 2 && (
+                                        <input
+                                            type="text"
+                                            value={item.description}
+                                            onChange={(e) => updateDescription(index, e.target.value)}
+                                            className="p-2 border rounded w-full"
+                                            placeholder={t('enter_problem_detail')}
+                                        />
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-            <ul className="mt-4 border rounded-lg p-4 bg-gray-50">
-                {checklist.map((item, index) => (
-                    <li
-                        key={item.itemId}
-                        className="flex flex-col border-b last:border-none py-2 px-3"
-                    >
-                        <span className="text-gray-800 font-medium">{item.itemName}</span>
-                        <div className="flex space-x-4 mt-2">
-                            <label className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    checked={item.cleaningStatusId === 1}
-                                    onChange={() => updateChecklist(index, 1)}
-                                    className="w-5 h-5 accent-green-500"
-                                />
-                                <span>{t('normal')}</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    checked={item.cleaningStatusId === 2}
-                                    onChange={() => updateChecklist(index, 2)}
-                                    className="w-5 h-5 accent-red-500"
-                                />
-                                <span>{t('problem')}</span>
-                            </label>
-                        </div>
-                        {item.cleaningStatusId === 2 && (
-                            <textarea
-                                className="w-full mt-2 p-2 border rounded-md"
-                                placeholder={t('enter_problem_detail')}
-                                value={item.description || ""}
-                                onChange={(e) => updateDescription(index, e.target.value)}
-                            />
-                        )}
-                    </li>
-                ))}
-            </ul>
-
-            <button
-                onClick={handleSaveAndGoBack}
-                className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 block mx-auto"
-            >
-                {t('save')}
-            </button>
-        </div>
+            <div className="flex justify-between mt-4">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded"
+                >
+                    {t('common:back')}
+                </button>
+                <button
+                    onClick={() => props.onSubmit(checklist)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                    {t('common:submit')}
+                </button>
+            </div>
+        </>
     )
 }
 

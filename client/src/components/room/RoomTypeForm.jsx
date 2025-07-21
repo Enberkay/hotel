@@ -11,7 +11,7 @@ const RoomTypeForm = () => {
     const token = useRoomStore((state) => state.token)
     const getRoomType = useRoomStore((state) => state.getRoomType)
     const roomTypes = useRoomStore((state) => state.roomTypes)
-    const { i18n, t } = useTranslation();
+    const { i18n, t } = useTranslation(['room', 'common']);
 
     const [form, setForm] = useState(initialState)
     const [editForm, setEditForm] = useState(initialState)
@@ -28,7 +28,7 @@ const RoomTypeForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!form.roomTypeName || !form.price) {
-            return toast.error(t("please_fill_in_all_fields"))
+            return toast.error(t("common:error_required"))
         }
         try {
             const res = await createRoomType(token, form)
@@ -50,56 +50,90 @@ const RoomTypeForm = () => {
         }
     }
 
-    const handleUpdate = async () => {
+    const handleEditChange = (e) => {
+        setEditForm({ ...editForm, [e.target.name]: e.target.value })
+    }
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault()
         try {
-            await updateRoomType(token, editForm.roomTypeId, editForm)
-            setIsEditOpen(false)
+            await updateRoomType(token, editForm)
             getRoomType(token)
-            toast.success(t("edit_data_success"))
+            setIsEditOpen(false)
+            toast.success(t("edit_room_type_success"))
         } catch (err) {
             console.log(err)
         }
     }
 
     return (
-        <div className="container mx-auto p-4 bg-white shadow-md">
+        <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">{t('room_type_management')}</h1>
-            <form className="my-4" onSubmit={handleSubmit}>
-                <div className="flex flex-col space-y-4">
-                    <input type="text" name="roomTypeName" value={form.roomTypeName} onChange={handleOnChange} className="border p-2 rounded-md" placeholder={t('room_type_name_th')} required />
-                    <input type="number" name="price" value={form.price} onChange={handleOnChange} className="border p-2 rounded-md" placeholder={t('price')} required />
-                    <button className="bg-blue-500 text-white p-2 rounded-md">{t('add_room_type')}</button>
-                </div>
-            </form>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {roomTypes.map((item) => (
-                    <div key={item.roomTypeId} className="p-4 border rounded-md shadow-md flex justify-between items-center">
-                        <div>
-                            <h2 className="font-bold">{i18n.language === 'th' ? item.name_th : item.name_en}</h2>
-                            <p>{item.price} บาท</p>
-                        </div>
-                        <button onClick={() => handleEditClick(item.roomTypeId)} className="text-blue-500">
-                            <Pencil />
-                        </button>
+            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label className="block text-sm font-medium">{t('room_type_name_en')}</label>
+                        <input type="text" name="roomTypeName" value={form.roomTypeName} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
                     </div>
-                ))}
+                    <div>
+                        <label className="block text-sm font-medium">{t('price')}</label>
+                        <input type="number" name="price" value={form.price} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                    </div>
+                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">{t('add_room_type')}</button>
+                </form>
             </div>
 
             {isEditOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-                    <div className="bg-white p-6 rounded-md shadow-md w-96">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
                         <h2 className="text-xl font-bold mb-4">{t('edit_room_type')}</h2>
-                        <input type="text" name="roomTypeName" value={editForm.roomTypeName} onChange={(e) => setEditForm({ ...editForm, roomTypeName: e.target.value })} className="border p-2 w-full rounded-md mb-2" />
-                        <input type="number" name="price" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} className="border p-2 w-full rounded-md mb-4" />
-                        <div className="flex justify-between">
-                            <button onClick={() => setIsEditOpen(false)} className="bg-gray-500 text-white p-2 rounded-md">{t('cancel')}</button>
-                            <button onClick={handleUpdate} className="bg-green-500 text-white p-2 rounded-md">{t('confirm')}</button>
-                        </div>
+                        <form onSubmit={handleEditSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium">{t('room_type_name_en')}</label>
+                                <input type="text" name="roomTypeName" value={editForm.roomTypeName} onChange={handleEditChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium">{t('price')}</label>
+                                <input type="number" name="price" value={editForm.price} onChange={handleEditChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                            </div>
+                            <div className="flex justify-end space-x-2">
+                                <button type="button" onClick={() => setIsEditOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded-md">{t('common:cancel')}</button>
+                                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">{t('common:save')}</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
+
+            <div className="bg-white p-4 rounded-lg shadow-md">
+                <div className="overflow-x-auto">
+                    <table className="min-w-full">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="py-2 px-4 text-left">{t('room_type_name_en')}</th>
+                                <th className="py-2 px-4 text-left">{t('price')}</th>
+                                <th className="py-2 px-4 text-left">{t('common:actions')}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {roomTypes.map((type) => (
+                                <tr key={type.roomTypeId} className="border-b">
+                                    <td className="py-2 px-4">{i18n.language === 'th' ? type.roomTypeName_th : type.roomTypeName_en}</td>
+                                    <td className="py-2 px-4">{type.price}</td>
+                                    <td className="py-2 px-4">
+                                        <button onClick={() => handleEditClick(type.roomTypeId)} className="text-blue-500 hover:underline">
+                                            <Pencil size={18} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    )
+    );
 }
-export default RoomTypeForm
+
+export default RoomTypeForm;
