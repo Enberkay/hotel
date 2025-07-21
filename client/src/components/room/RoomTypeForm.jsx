@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import useRoomStore from "../../store/room-store"
 import { createRoomType, readRoomType, updateRoomType } from "../../api/roomType"
 import { toast } from "react-toastify"
 import { Pencil } from "lucide-react"
 import { useTranslation } from 'react-i18next';
-
-const initialState = { roomTypeName: "", price: 0 }
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const RoomTypeForm = () => {
     const token = useRoomStore((state) => state.token)
@@ -13,30 +14,36 @@ const RoomTypeForm = () => {
     const roomTypes = useRoomStore((state) => state.roomTypes)
     const { i18n, t } = useTranslation(['room', 'common']);
 
-    const [form, setForm] = useState(initialState)
-    const [editForm, setEditForm] = useState(initialState)
+    // Zod schema
+    const schema = z.object({
+        roomTypeName: z.string().min(1, { message: t('common:error_required') }),
+        price: z.preprocess((val) => Number(val), z.number().positive({ message: t('common:error_required') })),
+    });
+
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+        resolver: zodResolver(schema),
+        mode: 'onTouched',
+        defaultValues: {
+            roomTypeName: '',
+            price: '',
+        }
+    });
+
+    const [editForm, setEditForm] = useState(null)
     const [isEditOpen, setIsEditOpen] = useState(false)
 
     useEffect(() => {
         getRoomType(token)
     }, [])
 
-    const handleOnChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value })
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        if (!form.roomTypeName || !form.price) {
-            return toast.error(t("common:error_required"))
-        }
+    const onSubmit = async (data) => {
         try {
-            const res = await createRoomType(token, form)
-            setForm(initialState)
+            const res = await createRoomType(token, data)
+            reset()
             getRoomType(token)
             toast.success(t("add_room_type_success", { roomTypeName: res.data.roomTypeName }))
         } catch (err) {
-            console.log(err)
+            toast.error(t("common:error_update"))
         }
     }
 
@@ -46,7 +53,7 @@ const RoomTypeForm = () => {
             setEditForm(res.data)
             setIsEditOpen(true)
         } catch (err) {
-            console.log(err)
+            toast.error(t("common:error_update"))
         }
     }
 
@@ -56,13 +63,19 @@ const RoomTypeForm = () => {
 
     const handleEditSubmit = async (e) => {
         e.preventDefault()
+        if (!editForm.roomTypeName || !editForm.price) {
+            return toast.error(t("common:error_required"))
+        }
+        if (isNaN(Number(editForm.price)) || Number(editForm.price) <= 0) {
+            return toast.error(t("common:error_required"))
+        }
         try {
-            await updateRoomType(token, editForm)
+            await updateRoomType(token, { ...editForm, price: Number(editForm.price) })
             getRoomType(token)
             setIsEditOpen(false)
             toast.success(t("edit_room_type_success"))
         } catch (err) {
-            console.log(err)
+            toast.error(t("common:error_update"))
         }
     }
 
@@ -71,16 +84,18 @@ const RoomTypeForm = () => {
             <h1 className="text-2xl font-bold mb-4">{t('room_type_management')}</h1>
 
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                     <div>
                         <label className="block text-sm font-medium">{t('room_type_name_en')}</label>
-                        <input type="text" name="roomTypeName" value={form.roomTypeName} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                        <input type="text" {...register('roomTypeName')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                        {errors.roomTypeName && <p className="text-red-500 text-xs mt-1">{errors.roomTypeName.message}</p>}
                     </div>
                     <div>
                         <label className="block text-sm font-medium">{t('price')}</label>
-                        <input type="number" name="price" value={form.price} onChange={handleOnChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                        <input type="number" {...register('price')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md" />
+                        {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
                     </div>
-                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">{t('add_room_type')}</button>
+                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" disabled={isSubmitting}>{isSubmitting ? t('common:loading') : t('add_room_type')}</button>
                 </form>
             </div>
 
