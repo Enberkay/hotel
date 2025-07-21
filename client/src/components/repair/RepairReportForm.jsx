@@ -4,8 +4,10 @@ import { toast } from "react-toastify"
 import dayjs from "dayjs"
 import useRepairStore from "../../store/repair-store"
 import { notedRepairRequest, repairReport } from "../../api/repair"
+import { useTranslation } from 'react-i18next';
 
 const FormRepairReport = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate()
     const token = useRepairStore((state) => state.token)
     const repairStatuses = useRepairStore((state) => state.repairStatuses)
@@ -31,15 +33,15 @@ const FormRepairReport = () => {
     )
 
     const handleSelectRequest = async (req) => {
-        if (window.confirm("Are you sure?")) {
+        if (window.confirm(t('are_you_sure'))) {
             try {
                 await notedRepairRequest(token, req.requestId)
                 setSelectedRequest(req)
                 setIsModalOpen(false)
-                toast.success("เลือกใบแจ้งซ่อมแล้ว!")
+                toast.success(t('select_repair_success'))
             } catch (error) {
-                console.error("เกิดข้อผิดพลาด:", error)
-                toast.error("ไม่สามารถเลือกใบแจ้งซ่อมได้")
+                console.error("Error:", error)
+                toast.error(t('select_repair_error'))
             }
         }
     }
@@ -58,7 +60,7 @@ const FormRepairReport = () => {
         e.preventDefault()
 
         if (!selectedRequest) {
-            toast.error("กรุณาเลือกใบแจ้งซ่อมก่อน")
+            toast.error(t('please_select_repair'))
             return
         }
 
@@ -73,18 +75,18 @@ const FormRepairReport = () => {
 
         try {
             await repairReport(token, repairData.requestId, repairData.rooms)
-            toast.success("บันทึกใบรายงานสำเร็จ!")
+            toast.success(t('repair_report_success'))
             navigate("/maintenance")
         } catch (error) {
             console.error("Error:", error)
-            toast.error("เกิดข้อผิดพลาดในการส่งข้อมูล")
+            toast.error(t('repair_report_error'))
         }
     }
 
     return (
         <div className="mt-14 md:max-w-4xl md:mx-auto p-6 bg-white shadow-lg rounded-lg">
             <h1 className="text-2xl font-semibold mb-4 text-center">
-                ทำใบรายงานการซ่อม
+                {t('repair_report_form')}
             </h1>
 
             {!selectedRequest && (
@@ -92,27 +94,26 @@ const FormRepairReport = () => {
                     onClick={() => setIsModalOpen(true)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition block mx-auto"
                 >
-                    เลือกใบแจ้งซ่อม
+                    {t('select_repair_request')}
                 </button>
             )}
 
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
                     <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full">
-                        <h2 className="text-xl font-semibold mb-4 text-center">เลือกใบแจ้งซ่อม</h2>
+                        <h2 className="text-xl font-semibold mb-4 text-center">{t('select_repair_request')}</h2>
                         <ul className="border p-4 rounded-lg bg-gray-100 max-h-60 overflow-auto">
                             {pendingRequests.length === 0 ? (
-                                <p className="text-gray-500 text-center">ไม่มีใบแจ้งที่รออยู่</p>
+                                <p className="text-gray-500 text-center">{t('no_pending_requests')}</p>
                             ) : (
                                 pendingRequests.map((req) => (
                                     <li
                                         key={req.requestId}
-                                        className={`p-3 border-b last:border-none cursor-pointer hover:bg-gray-200 ${req.repairRequestStatusId === 2 ? "bg-yellow-100" : ""
-                                            }`}
+                                        className={`p-3 border-b last:border-none cursor-pointer hover:bg-gray-200 ${req.repairRequestStatusId === 2 ? "bg-yellow-100" : ""}`}
                                         onClick={() => handleSelectRequest(req)}
                                     >
-                                        <span className="font-semibold">หมายเลข:</span> {req.requestId} |
-                                        <span className="ml-2 font-semibold">แจ้งเมื่อ:</span> {formatDateTime(req.requestAt)}
+                                        <span className="font-semibold">{t('request_number')}:</span> {req.requestId} |
+                                        <span className="ml-2 font-semibold">{t('request_at')}:</span> {formatDateTime(req.requestAt)}
                                     </li>
                                 ))
                             )}
@@ -121,7 +122,7 @@ const FormRepairReport = () => {
                             onClick={() => setIsModalOpen(false)}
                             className="mt-4 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition block mx-auto"
                         >
-                            ปิด
+                            {t('close')}
                         </button>
                     </div>
                 </div>
@@ -130,17 +131,17 @@ const FormRepairReport = () => {
             {selectedRequest && (
                 <form onSubmit={handleSubmit}>
                     <div className="border p-4 rounded-lg bg-gray-100 mt-4">
-                        <p><span className="font-semibold">หมายเลขใบแจ้ง:</span> {selectedRequest.requestId}</p>
-                        <p><span className="font-semibold">เวลาที่แจ้ง:</span> {formatDateTime(selectedRequest.requestAt)}</p>
+                        <p><span className="font-semibold">{t('request_number')}:</span> {selectedRequest.requestId}</p>
+                        <p><span className="font-semibold">{t('request_at')}:</span> {formatDateTime(selectedRequest.requestAt)}</p>
                     </div>
 
-                    <h2 className="text-lg font-semibold mt-4 mb-2">รายละเอียดห้อง</h2>
+                    <h2 className="text-lg font-semibold mt-4 mb-2">{t('room_details')}</h2>
 
                     {selectedRequest.RepairRequestRoom.map((detail, index) => (
                         <div key={index} className="mb-4">
-                            <p><span className="font-semibold">ห้องหมายเลข:</span> {detail.room.roomNumber}</p>
-                            <p><span className="font-semibold">ชั้น:</span> {detail.room.floor}</p>
-                            <p><span className="font-semibold">รายละเอียด:</span> {detail.description || "ไม่มีรายละเอียด"}</p>
+                            <p><span className="font-semibold">{t('room_number')}:</span> {detail.room.roomNumber}</p>
+                            <p><span className="font-semibold">{t('floor')}:</span> {detail.room.floor}</p>
+                            <p><span className="font-semibold">{t('detail')}:</span> {detail.description || t('no_detail')}</p>
 
                             <select
                                 className="border"
@@ -149,7 +150,7 @@ const FormRepairReport = () => {
                                 value={repairDetails[detail.room.roomId]?.repairStatusId || ""}
                                 onChange={(e) => handleOnChange(e, detail.room.roomId, "repairStatusId")}
                             >
-                                <option value="" disabled>โปรดเลือก</option>
+                                <option value="" disabled>{t('please_select')}</option>
                                 {repairStatuses.map((item, index) => (
                                     <option key={index} value={item.repairStatusId}>
                                         {item.repairStatusName}
@@ -157,7 +158,7 @@ const FormRepairReport = () => {
                                 ))}
                             </select>
 
-                            <label className="block mt-2 font-semibold">เขียนรายละเอียด:</label>
+                            <label className="block mt-2 font-semibold">{t('write_details')}:</label>
                             <input
                                 className="border w-full p-2 rounded-md"
                                 type="text"
@@ -171,7 +172,7 @@ const FormRepairReport = () => {
                         type="submit"
                         className="bg-green-600 text-white py-2 px-4 rounded-md mt-4 hover:bg-green-700 w-full"
                     >
-                        ส่งใบรายงาน
+                        {t('submit_repair_report')}
                     </button>
                 </form>
             )}

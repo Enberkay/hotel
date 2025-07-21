@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { readRepairRequest, notedRepairRequest } from "../../api/repair"
 import useRepairStore from "../../store/repair-store"
-import { useNavigate } from "react-router-dom"
 import dayjs from "dayjs"
-
+import { useTranslation } from 'react-i18next';
 
 const ListRepairRequestDetail = () => {
-
-    const { id } = useParams()
+    const { t } = useTranslation();
     const navigate = useNavigate()
     const token = useRepairStore((state) => state.token)
     const [requestDetail, setRequestDetail] = useState(null)
@@ -55,52 +53,49 @@ const ListRepairRequestDetail = () => {
             <div className="lg:hidden md:hidden bg-white shadow-md rounded-lg py-5 px-4 mt-14">
                 <header className="grid justify-items-center gap-2 py-2">
                     <div className="text-lg font-semibold text-brown">
-                        <h1>รายละเอียดใบแจ้งทำความสะอาด</h1>
+                        <h1>{t('repair_request_details')}</h1>
                     </div>
                 </header>
                 <main>
                     <div className="border p-4 rounded-lg bg-gray-100 mb-4">
-                        <p><span >หมายเลขใบแจ้ง:</span> {requestDetail.requestId}</p>
-                        <p><span >สถานะ:</span>
-                            <span className={`px-3 py-1 text-sm rounded-full 
-                        ${requestDetail.repairRequestStatus.repairRequestStatusId === 1 ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}>
+                        <p><span>{t('request_number')}:</span> {requestDetail.requestId}</p>
+                        <p><span>{t('request_status')}:</span>
+                            <span className={`px-3 py-1 text-sm rounded-full ${requestDetail.repairRequestStatus.repairRequestStatusId === 1 ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}>
                                 {requestDetail.repairRequestStatus.repairRequestStatusName}
                             </span>
                         </p>
-                        <p><span >เวลาที่แจ้ง:</span> {formatDateTime(requestDetail.requestAt)}</p>
+                        <p><span>{t('request_at')}:</span> {formatDateTime(requestDetail.requestAt)}</p>
                     </div>
 
-                    <div className="grid gap-2 py-2">
-                        <h2 className="text-lg font-semibold text-brown">รายละเอียดห้อง</h2>
+                    <h2 className="text-lg font-semibold mt-4 mb-2">{t('room_details')}</h2>
+                    <div className="space-y-4">
                         {requestDetail.RepairRequestRoom.map((detail, index) => (
-                            <div key={index} className="border p-4 rounded-lg bg-gray-50 mb-2">
-                                <p><span>ห้องหมายเลข:</span> {detail.room.roomNumber}</p>
-                                <p><span>ชั้น:</span> {detail.room.floor}</p>
-                                <p><span>รายละเอียด:</span> {detail.description || "ไม่มีรายละเอียด"}</p>
+                            <div key={index} className="border p-4 rounded-lg bg-gray-50">
+                                <p><span className="font-semibold">{t('room_number')}:</span> {detail.room.roomNumber}</p>
+                                <p><span className="font-semibold">{t('floor')}:</span> {detail.room.floor}</p>
+                                <p><span className="font-semibold">{t('detail')}:</span> {detail.description || t('no_detail')}</p>
                             </div>
                         ))}
                     </div>
 
-                    <div>
-                        <h2 className="text-lg mt-4 mb-2">ข้อมูลผู้แจ้ง</h2>
-                        <div className="border p-4 rounded-lg bg-gray-50">
-                            <p><span >ชื่อ:</span> {requestDetail.front.user.userName} {requestDetail.front.user.userSurName}</p>
-                            <p><span >เบอร์โทร:</span> {requestDetail.front.user.userNumPhone}</p>
-                        </div>
+                    <h2 className="text-lg font-semibold mt-4 mb-2">{t('reporter_info')}</h2>
+                    <div className="border p-4 rounded-lg bg-gray-50">
+                        <p><span className="font-semibold">{t('name')}:</span> {requestDetail.front.user.userName} {requestDetail.front.user.userSurName}</p>
+                        <p><span className="font-semibold">{t('phone')}:</span> {requestDetail.front.user.userNumPhone}</p>
                     </div>
 
-                    <div className="grid h-30 content-end">
+                    <div className="grid h-50 content-end">
                         <button
                             onClick={() => navigate(-1)}
                             className="text-center bg-neutral-400 text-white py-2 px-4 rounded-md mt-4 w-full"
                         >
-                            ย้อนกลับ
+                            {t('back')}
                         </button>
                         <button
                             onClick={() => handleCreateRepairReport(requestDetail.requestId)}
                             className="text-center bg-blue-600 text-white py-2 px-4 rounded-md mt-4 w-full"
                         >
-                            ทำใบรายงานการซ่อม
+                            {t('create_repair_report')}
                         </button>
                     </div>
                 </main>
