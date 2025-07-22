@@ -1,93 +1,37 @@
 const prisma = require("../config/prisma")
 const logger = require('../utils/logger');
 
-// exports.create = async (req, res) => {
-//     try {
-
-//         const { roomNumber, roomTypeId, roomStatusId, floor } = req.body
-
-//         const roomNum = await prisma.room.findFirst({
-//             where: {
-//                 roomNumber: roomNumber
-//             }
-//         })
-
-//         if (roomNum) {
-//             console.log("Room already exits")
-//             return res.status(400).json({ message: "Room already exists!!" })
-//         }
-
-//         const room = await prisma.room.create({
-//             data: {
-//                 roomNumber: roomNumber,
-//                 floor: floor,
-//                 roomType: {
-//                     connect: {
-//                         roomTypeId: Number(roomTypeId) // ✅ ใช้ connect เชื่อมกับ RoomType
-//                     }
-//                 },
-//                 roomStatus: {
-//                     connect: {
-//                         roomStatusId: Number(roomStatusId)
-//                     }
-//                 }
-//             }
-//         })
-
-//         res.json(room)
-//         // res.json("room")
-//     } catch (err) {
-//         console.log(err)
-//         res.status(500).json({ message: "Server error" })
-//     }
-// }
-
-//สำหรับเพิ่มห้องทั้งหมดใน postman
 exports.create = async (req, res) => {
     try {
-        const roomsData = req.validated;
+        const { roomNumber, roomType, roomStatus, floor, pairRoomNumber } = req.body
 
-        if (!Array.isArray(roomsData) || roomsData.length === 0) {
-            return res.status(400).json({ message: "Invalid payload format! Expected an array of rooms." });
-        }
-
-        let createdRooms = [];
-
-        for (const { roomNumber, roomType, roomStatus, floor } of roomsData) {
-            const roomNumberStr = roomNumber.toString();
-
-            const existingRoom = await prisma.room.findFirst({
-                where: { roomNumber: roomNumberStr }
-            });
-
-            if (existingRoom) {
-                createdRooms.push({ roomNumber, status: "Room already exists" });
-                continue;
+        const roomNum = await prisma.room.findUnique({
+            where: {
+                roomNumber: roomNumber
             }
+        })
 
-            const newRoom = await prisma.room.create({
-                data: {
-                    roomNumber: roomNumberStr,
-                    floor,
-                    roomType, // enum: 'SINGLE' | 'DOUBLE' | 'SIGNATURE'
-                    roomStatus // ต้องเป็นค่าจาก enum RoomStatus
-                }
-            });
-
-            createdRooms.push(newRoom);
+        if (roomNum) {
+            console.log("Room already exists")
+            return res.status(400).json({ message: "Room already exists!!" })
         }
 
-        res.json({ message: "Rooms processed", data: createdRooms });
-        logger.info('Create room: %o', createdRooms.map(r => r.roomNumber || r.roomNumberStr));
+        const room = await prisma.room.create({
+            data: {
+                roomNumber,
+                floor,
+                roomType,
+                roomStatus,
+                pairRoomNumber: pairRoomNumber || null
+            }
+        })
 
+        res.json(room)
     } catch (err) {
-        logger.error('Create room error: %s', err.stack || err.message);
-        res.status(500).json({ message: "Server error" });
+        console.log(err)
+        res.status(500).json({ message: "Server error" })
     }
-};
-
-
-
+}
 
 exports.list = async (req, res) => {
     try {
@@ -98,6 +42,7 @@ exports.list = async (req, res) => {
                 floor: true,
                 roomType: true, // enum
                 roomStatus: true,
+                pairRoomNumber: true,
                 createdAt: true
             }
         });
@@ -110,18 +55,16 @@ exports.list = async (req, res) => {
 
 exports.read = async (req, res) => {
     try {
-
-        const { id } = req.params
-        const room = await prisma.room.findFirst({
+        const { roomNumber } = req.params
+        const room = await prisma.room.findUnique({
             where: {
-                roomId: Number(id)
-            },
-            include: {
-                roomType: true
+                roomNumber: roomNumber
             }
         })
-
-        res.send(room)
+        if (!room) {
+            return res.status(404).json({ message: "Room not found" })
+        }
+        res.json(room)
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: "Server error" })
@@ -130,32 +73,29 @@ exports.read = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const { roomNumber, roomStatus, roomType, floor } = req.body;
-        const roomId = Number(req.params.id);
+        const { roomType, roomStatus, floor, pairRoomNumber } = req.body;
+        const { roomNumber } = req.params;
 
         // ค้นหาห้องที่มีเลขห้องเดียวกัน แต่ต้องไม่ใช่ห้องที่กำลังอัปเดต
         const existingRoom = await prisma.room.findFirst({
             where: {
                 roomNumber: roomNumber,
-                NOT: {
-                    roomId: roomId // ยกเว้นห้องปัจจุบัน
-                }
             }
         });
 
-        if (existingRoom) {
-            return res.status(400).json({ message: "เลขห้องซ้ำกับห้องอื่น" });
+        if (!existingRoom) {
+            return res.status(404).json({ message: "Room not found" });
         }
 
         const room = await prisma.room.update({
             where: {
-                roomId: roomId
+                roomNumber: roomNumber
             },
             data: {
-                roomNumber: roomNumber,
-                roomStatus: roomStatus,
-                roomType: roomType, // enum
-                floor: floor
+                roomType,
+                roomStatus,
+                floor,
+                pairRoomNumber: pairRoomNumber || null
             }
         });
 
@@ -166,28 +106,26 @@ exports.update = async (req, res) => {
     }
 };
 
-
 exports.remove = async (req, res) => {
     try {
-        const { id } = req.params
-
-        const room = await prisma.room.findFirst({
+        const { roomNumber } = req.params
+        const room = await prisma.room.findUnique({
             where: {
-                roomId: Number(id)
+                roomNumber: roomNumber
             },
         })
         if (!room) {
-            return res.status(400).json({ message: 'room not found!!' })
+            return res.status(404).json({ message: 'Room not found!!' })
         }
 
         await prisma.room.delete({
             where: {
-                roomId: Number(id)
+                roomNumber: roomNumber
             }
         })
 
         res.send("remove room")
-        logger.info('Remove room: roomId=%s', id);
+        logger.info('Remove room: roomNumber=%s', roomNumber);
 
     } catch (err) {
         logger.error('Remove room error: %s', err.stack || err.message);
@@ -195,18 +133,15 @@ exports.remove = async (req, res) => {
     }
 }
 
-
-
-
 // ฟังก์ชันรวม 2 ห้องเป็น Signature Room
 exports.groupRoom = async (req, res) => {
     try {
         const { roomNumber1, roomNumber2 } = req.body;
 
-        // ดึงข้อมูลห้องจาก roomId
+        // ดึงข้อมูลห้องจาก roomNumber
         const rooms = await prisma.room.findMany({
-            where: { roomId: { in: [roomNumber1, roomNumber2] } },
-            select: { roomId: true, roomNumber: true, roomStatus: true, roomType: true }
+            where: { roomNumber: { in: [roomNumber1, roomNumber2] } },
+            select: { roomNumber: true, roomStatus: true, roomType: true, pairRoomNumber: true }
         });
 
         if (rooms.length !== 2) {
@@ -239,20 +174,20 @@ exports.groupRoom = async (req, res) => {
             return res.status(400).json({ message: "ห้องไม่ว่าง ไม่สามารถรวมได้" });
         }
 
-        // อัปเดตสถานะของห้องให้เป็น "Signature"
+        // อัปเดตสถานะของห้องให้เป็น "Signature" และเชื่อม pairRoomNumber
         await prisma.room.update({
-            where: { roomId: room1.roomId },
+            where: { roomNumber: room1.roomNumber },
             data: {
                 roomType: 'SIGNATURE',
-                pairRoomId: room2.roomId
+                pairRoomNumber: room2.roomNumber
             }
         });
 
         await prisma.room.update({
-            where: { roomId: room2.roomId },
+            where: { roomNumber: room2.roomNumber },
             data: {
                 roomType: 'SIGNATURE',
-                pairRoomId: room1.roomId
+                pairRoomNumber: room1.roomNumber
             }
         });
 
@@ -267,10 +202,10 @@ exports.unGroupRoom = async (req, res) => {
     try {
         const { roomNumber1, roomNumber2 } = req.body;
 
-        // ดึงข้อมูลห้องจาก roomId
+        // ดึงข้อมูลห้องจาก roomNumber
         const rooms = await prisma.room.findMany({
-            where: { roomId: { in: [roomNumber1, roomNumber2] } },
-            select: { roomId: true, roomNumber: true, roomStatus: true, roomType: true, pairRoomId: true }
+            where: { roomNumber: { in: [roomNumber1, roomNumber2] } },
+            select: { roomNumber: true, roomStatus: true, roomType: true, pairRoomNumber: true }
         });
 
         if (rooms.length !== 2) {
@@ -284,12 +219,12 @@ exports.unGroupRoom = async (req, res) => {
             return res.status(400).json({ message: "ห้องนี้ไม่ได้อยู่ในประเภท Signature ไม่สามารถแยกได้" });
         }
 
-        // เปลี่ยนสถานะของห้องกลับเป็นห้องเดี่ยว (roomType = 'SINGLE')
+        // เปลี่ยนสถานะของห้องกลับเป็นห้องเดี่ยว (roomType = 'SINGLE') และ pairRoomNumber = null
         await prisma.room.updateMany({
-            where: { roomId: { in: [roomNumber1, roomNumber2] } },
+            where: { roomNumber: { in: [roomNumber1, roomNumber2] } },
             data: {
                 roomType: 'SINGLE',
-                pairRoomId: null
+                pairRoomNumber: null
             }
         });
 
