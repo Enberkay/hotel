@@ -110,7 +110,7 @@ exports.confirmBooking = async (req, res) => {
   try {
     const { roomNumber } = req.body; // รับ roomNumber จาก Client
     const { id } = req.params; // รับ bookingId จาก URL param
-    const { userEmail } = req.user; // ดึง userEmail จาก JWT (พนักงานที่ล็อกอินอยู่)
+    const { email } = req.user; // ดึง email จาก JWT (พนักงานที่ล็อกอินอยู่)
 
     // ตรวจสอบค่าที่ส่งมา
     if (!roomNumber || !id) {
@@ -140,7 +140,7 @@ exports.confirmBooking = async (req, res) => {
     // ค้นหา frontId ของพนักงานที่ล็อกอินอยู่
     const frontUser = await prisma.user.findFirst({
       where: {
-        userEmail,
+        email,
         role: "front",
       },
       select: { id: true },
@@ -202,10 +202,10 @@ exports.confirmBooking = async (req, res) => {
 
     res.status(200).json({ message, booking: updatedBooking });
     logger.info(
-      "Confirm booking: bookingId=%s, roomNumber=%s, userEmail=%s",
+      "Confirm booking: bookingId=%s, roomNumber=%s, email=%s",
       id,
       roomNumber,
-      userEmail
+      email
     );
   } catch (err) {
     logger.error("Confirm booking error: %s", err.stack || err.message);
