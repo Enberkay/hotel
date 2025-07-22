@@ -3,41 +3,40 @@ const prisma = require("../config/prisma")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
+// Login
 exports.login = async (req, res) => {
     try {
+        const { email, password } = req.body
 
-        const { userEmail, userPassword } = req.body
-
-        // Step 1 Check Email
-        const user = await prisma.user.findFirst({
-            where: {
-                userEmail: userEmail
-            }
+        // Step 1: Check Email
+        const user = await prisma.user.findUnique({
+            where: { email }
         })
         if (!user) {
             return res.status(400).json({ message: "ไม่พบบัญชีนี้" })
         }
 
-        // Step 2 Check password
-        const isMatch = await bcrypt.compare(userPassword, user.userPassword)
-        if (!isMatch) {
-            return res.status(400).json({ message: "อีเมลล์ และ รหัสผ่านไม่ถูกต้อง" })
+        // Step 2: Check password (ถ้ามี field password ใน schema)
+        if (user.password) {
+            const isMatch = await bcrypt.compare(password, user.password)
+            if (!isMatch) {
+                return res.status(400).json({ message: "อีเมลล์ และ รหัสผ่านไม่ถูกต้อง" })
+            }
         }
 
-        // Step 3 create Payload
+        // Step 3: create Payload
         const payload = {
-            userId: user.userId,
-            userEmail: user.userEmail,
-            userRole: user.userRole
+            id: user.id,
+            email: user.email,
+            role: user.role
         }
 
-        // Step 4 Generate Token
+        // Step 4: Generate Token
         jwt.sign(payload, process.env.SECRET, { expiresIn: '1d' }, (err, token) => {
             if (err) {
                 return res.status(500).json({ message: "Server Error" })
             }
             res.json({ payload, token })
-
         })
     } catch (error) {
         console.log(error)
@@ -45,16 +44,17 @@ exports.login = async (req, res) => {
     }
 }
 
+// Get current user
 exports.currentUser = async (req, res) => {
     try {
-        //code
-        const user = await prisma.user.findFirst({
-            where: { userId: req.user.userId },
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
             select: {
-                userId: true,
-                userName: true,
-                userPhone: true,
-                userRole: true,
+                id: true,
+                name: true,
+                phone: true,
+                email: true,
+                role: true,
                 licensePlate: true
             }
         })
@@ -65,7 +65,6 @@ exports.currentUser = async (req, res) => {
 
         res.json({ user })
     } catch (err) {
-        //errs
         console.log(err)
         return res.status(500).json({ message: "Server Error" })
     }
@@ -74,12 +73,11 @@ exports.currentUser = async (req, res) => {
 // Register default admin from ENV or fallback
 exports.registerDefaultAdmin = async (req, res) => {
     try {
-        const userEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@admin.com';
-        const userPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin1234';
-        const userName = 'Admin';
-        const userSurName = 'System';
-        const userNumPhone = '0000000000';
-        const prefix = 'Mr.';
+        const email = process.env.DEFAULT_ADMIN_EMAIL || 'admin@admin.com';
+        const password = process.env.DEFAULT_ADMIN_PASSWORD || 'admin1234';
+        const name = 'Admin';
+        const phone = '0000000000';
+        const role = 'admin';
         const licensePlate = '';
 
         const { secret } = req.body;
@@ -88,25 +86,20 @@ exports.registerDefaultAdmin = async (req, res) => {
         }
 
         // Check if admin already exists
-        const user = await prisma.user.findFirst({ where: { userEmail } });
+        const user = await prisma.user.findUnique({ where: { email } });
         if (user) {
             return res.status(400).json({ message: 'Default admin already exists.' });
         }
 
-        const hashPassword = await bcrypt.hash(userPassword, 10);
-        const newUser = await prisma.user.create({
-            data: {
-                userEmail,
-                userPassword: hashPassword,
-                userRole: 'admin',
-                userName,
-                userSurName,
-                userNumPhone,
-                prefix,
-                licensePlate
-            }
-        });
-        res.json({ message: 'Default admin created successfully.', userEmail, password: userPassword });
+        // ถ้ามี field password ใน schema
+        let userData = { name, phone, email, role, licensePlate };
+        if (prisma.user.fields && prisma.user.fields.password) {
+            const hashPassword = await bcrypt.hash(password, 10);
+            userData.password = hashPassword;
+        }
+
+        const newUser = await prisma.user.create({ data: userData });
+        res.json({ message: 'Default admin created successfully.', email, password });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'registerDefaultAdmin error' });
