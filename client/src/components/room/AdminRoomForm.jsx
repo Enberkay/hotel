@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import useRoomStore from "../../store/room-store";
+import useAuthStore from "../../store/auth-store";
 import { createRoom, deleteRoom } from "../../api/room";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
@@ -39,13 +40,11 @@ const roomFormSchema = z
 
 const AdminRoomForm = () => {
   const { t } = useTranslation();
-  const token = useRoomStore((state) => state.token);
+  const token = useAuthStore((state) => state.token);
   const getRoomType = useRoomStore((state) => state.getRoomType);
   const roomtypes = useRoomStore((state) => state.roomTypes);
   const getRoom = useRoomStore((state) => state.getRoom);
   const rooms = useRoomStore((state) => state.rooms);
-  const getRoomStatus = useRoomStore((state) => state.getRoomStatus);
-  const roomStatuses = useRoomStore((state) => state.roomStatuses);
 
   const {
     register,
@@ -65,7 +64,6 @@ const AdminRoomForm = () => {
 
   useEffect(() => {
     getRoomType(token);
-    getRoomStatus(token);
     getRoom(token);
     setFocus("roomNumber");
   }, []);
@@ -163,11 +161,11 @@ const AdminRoomForm = () => {
             <option value="" disabled>
               {t("select_status")}
             </option>
-            {Array.isArray(roomStatuses) && roomStatuses.map((item, index) => (
-              <option key={index} value={item.roomStatusId}>
-                {item.roomStatusName}
-              </option>
-            ))}
+            <option value="AVAILABLE">{t('available')}</option>
+            <option value="OCCUPIED">{t('occupied')}</option>
+            <option value="RESERVED">{t('reserved')}</option>
+            <option value="CLEANING">{t('cleaning')}</option>
+            <option value="REPAIR">{t('repair')}</option>
           </select>
           {errors.roomStatusId && (
             <p className="text-red-500 text-xs mt-1">

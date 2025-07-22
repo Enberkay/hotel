@@ -77,6 +77,7 @@ const AppRoutes = () => {
           <Route path="rooms" element={<AdminRoomForm />} />
           <Route path="rooms/:id" element={<AdminRoomEditForm />} />
           <Route path="users/:id" element={<AdminUserEdit />} />
+          <Route path="room-types" element={<RoomTypeForm />} />
         </Route>
 
         {/* Customer */}

@@ -1,12 +1,14 @@
 import { Outlet } from "react-router-dom"
 import SidebarHousekeeping from "../components/shared/HousekeepingSidebar"
+import LanguageSwitcher from "../components/shared/LanguageSwitcher";
 
 const LayoutHousekeeping = () => {
   return (
-    <div className="lg:flex lg:h-screen md:h-screen" >
-      <SidebarHousekeeping />
-      <div className="lg:flex-1 flex flex-col " >
-        <main className="lg:flex-1 p-6 bg-gray-100 overflow-y-auto h-screen" >
+    <div className="flex flex-col h-screen">
+      <LanguageSwitcher />
+      <div className="flex flex-1">
+        <SidebarHousekeeping />
+        <main className="flex-1 overflow-auto">
           <Outlet />
         </main>
       </div>
