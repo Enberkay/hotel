@@ -3,9 +3,7 @@ const prisma = require("../config/prisma")
 // ดึงประวัติการจองของตัวเอง
 exports.myBookings = async (req, res) => {
     try {
-        const userId = req.user.userId // ดึง userId จาก JWT Token (Middleware)
-
-        // ดึงข้อมูลการจองของลูกค้าโดยใช้ userId
+        const userId = req.user.userId;
         const bookings = await prisma.booking.findMany({
             where: { customerId: userId },
             include: {
@@ -14,7 +12,7 @@ exports.myBookings = async (req, res) => {
                     select: {
                         roomNumber: true,
                         floor: true,
-                        roomType: { select: { roomTypeName: true } }
+                        roomType: true // enum
                     }
                 },
                 pairRoom: {
@@ -22,22 +20,19 @@ exports.myBookings = async (req, res) => {
                         roomNumber: true,
                         floor: true
                     }
-                },
-                roomType: { select: { roomTypeName: true, price: true } }
+                }
             },
             orderBy: { createdAt: "desc" }
-        })
-
+        });
         if (!bookings || bookings.length === 0) {
-            return res.status(404).json({ message: "ไม่พบข้อมูลการจองของคุณ" })
+            return res.status(404).json({ message: "ไม่พบข้อมูลการจองของคุณ" });
         }
-
-        return res.json(bookings)
+        return res.json(bookings);
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ message: "Server Error" })
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
     }
-}
+};
 
 
 

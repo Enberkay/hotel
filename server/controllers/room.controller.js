@@ -53,7 +53,7 @@ exports.create = async (req, res) => {
 
         let createdRooms = [];
 
-        for (const { roomNumber, roomTypeId, roomStatusId, floor } of roomsData) {
+        for (const { roomNumber, roomType, roomStatus, floor } of roomsData) {
             const roomNumberStr = roomNumber.toString();
 
             const existingRoom = await prisma.room.findFirst({
@@ -69,8 +69,8 @@ exports.create = async (req, res) => {
                 data: {
                     roomNumber: roomNumberStr,
                     floor,
-                    roomType: { connect: { roomTypeId: Number(roomTypeId) } },
-                    roomStatus: { connect: { roomStatusId: Number(roomStatusId) } }
+                    roomType, // enum: 'SINGLE' | 'DOUBLE' | 'SIGNATURE'
+                    roomStatus // ต้องเป็นค่าจาก enum RoomStatus
                 }
             });
 
@@ -92,18 +92,22 @@ exports.create = async (req, res) => {
 exports.list = async (req, res) => {
     try {
         const rooms = await prisma.room.findMany({
-            orderBy: { createdAt: "asc" }, // เรียงข้อมูล
-            include: {
-                roomType: true,
-                roomStatus: true
+            orderBy: { createdAt: "asc" },
+            select: {
+                roomId: true,
+                roomNumber: true,
+                floor: true,
+                roomType: true, // enum
+                roomStatus: true,
+                createdAt: true
             }
-        })
-        res.json(rooms)
+        });
+        res.json(rooms);
     } catch (err) {
-        console.log(err)
-        res.status(500).json({ message: "Server error" })
+        logger.error('List room error: %s', err.stack || err.message);
+        res.status(500).json({ message: "Server error" });
     }
-}
+};
 
 exports.read = async (req, res) => {
     try {
@@ -127,8 +131,8 @@ exports.read = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const { roomNumber, roomStatusId, roomTypeId, floor } = req.body
-        const roomId = Number(req.params.id)
+        const { roomNumber, roomStatus, roomType, floor } = req.body;
+        const roomId = Number(req.params.id);
 
         // ค้นหาห้องที่มีเลขห้องเดียวกัน แต่ต้องไม่ใช่ห้องที่กำลังอัปเดต
         const existingRoom = await prisma.room.findFirst({
@@ -138,10 +142,10 @@ exports.update = async (req, res) => {
                     roomId: roomId // ยกเว้นห้องปัจจุบัน
                 }
             }
-        })
+        });
 
         if (existingRoom) {
-            return res.status(400).json({ message: "เลขห้องซ้ำกับห้องอื่น" })
+            return res.status(400).json({ message: "เลขห้องซ้ำกับห้องอื่น" });
         }
 
         const room = await prisma.room.update({
@@ -150,16 +154,16 @@ exports.update = async (req, res) => {
             },
             data: {
                 roomNumber: roomNumber,
-                roomStatus: roomStatusId,
-                roomTypeId: Number(roomTypeId),
+                roomStatus: roomStatus,
+                roomType: roomType, // enum
                 floor: floor
             }
-        })
+        });
 
-        res.json(room)
+        res.json(room);
     } catch (err) {
-        console.error(err)
-        res.status(500).json({ message: "Server error" })
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -203,7 +207,7 @@ exports.groupRoom = async (req, res) => {
         // ดึงข้อมูลห้องจาก roomId
         const rooms = await prisma.room.findMany({
             where: { roomId: { in: [roomId1, roomId2] } },
-            select: { roomId: true, roomNumber: true, roomStatusId: true, roomTypeId: true }
+            select: { roomId: true, roomNumber: true, roomStatus: true, roomType: true }
         });
 
         if (rooms.length !== 2) {
@@ -231,26 +235,25 @@ exports.groupRoom = async (req, res) => {
             return res.status(400).json({ message: "ห้องนี้ไม่สามารถรวมได้" });
         }
 
-        // ตรวจสอบว่าสถานะห้องเป็น "ว่าง" (roomStatusId = 1)
-        if (room1.roomStatusId !== 1 || room2.roomStatusId !== 1) {
+        // ตรวจสอบว่าสถานะห้องเป็น "ว่าง" (roomStatus === 'AVAILABLE')
+        if (room1.roomStatus !== 'AVAILABLE' || room2.roomStatus !== 'AVAILABLE') {
             return res.status(400).json({ message: "ห้องไม่ว่าง ไม่สามารถรวมได้" });
         }
 
-        // อัปเดตสถานะของห้องให้เป็น "Signature" (roomTypeId = 3)
-        // ✅ แก้ไขโค้ดเพื่ออัปเดต pairRoomId ให้ถูกต้อง
+        // อัปเดตสถานะของห้องให้เป็น "Signature"
         await prisma.room.update({
             where: { roomId: room1.roomId },
             data: {
-                roomTypeId: 3,  // ตั้งค่าเป็น Signature
-                pairRoomId: room2.roomId // ห้องนี้จับคู่กับ room2
+                roomType: 'SIGNATURE',
+                pairRoomId: room2.roomId
             }
         });
 
         await prisma.room.update({
             where: { roomId: room2.roomId },
             data: {
-                roomTypeId: 3,  // ตั้งค่าเป็น Signature
-                pairRoomId: room1.roomId // ห้องนี้จับคู่กับ room1
+                roomType: 'SIGNATURE',
+                pairRoomId: room1.roomId
             }
         });
 
@@ -268,7 +271,7 @@ exports.unGroupRoom = async (req, res) => {
         // ดึงข้อมูลห้องจาก roomId
         const rooms = await prisma.room.findMany({
             where: { roomId: { in: [roomId1, roomId2] } },
-            select: { roomId: true, roomNumber: true, roomStatusId: true, roomTypeId: true, pairRoomId: true }
+            select: { roomId: true, roomNumber: true, roomStatus: true, roomType: true, pairRoomId: true }
         });
 
         if (rooms.length !== 2) {
@@ -277,21 +280,17 @@ exports.unGroupRoom = async (req, res) => {
 
         const [room1, room2] = rooms;
 
-        // ตรวจสอบว่าห้องนี้เป็นห้องที่ถูกรวมอยู่หรือไม่
-        if (room1.roomTypeId !== 3 || room2.roomTypeId !== 3) {
+        // ตรวจสอบว่าห้องนี้เป็นห้องที่ถูกรวมอยู่หรือไม่ (roomType === 'SIGNATURE')
+        if (room1.roomType !== 'SIGNATURE' || room2.roomType !== 'SIGNATURE') {
             return res.status(400).json({ message: "ห้องนี้ไม่ได้อยู่ในประเภท Signature ไม่สามารถแยกได้" });
         }
 
-        // if (room1.roomStatusId !== 1 || room2.roomStatusId !== 1) {
-        //     return res.status(400).json({ message: "ห้องไม่ว่าง ไม่สามารถแยกได้" })
-        // }
-
-        // เปลี่ยนสถานะของห้องกลับเป็นห้องเดี่ยว (roomTypeId ปกติ)
+        // เปลี่ยนสถานะของห้องกลับเป็นห้องเดี่ยว (roomType = 'SINGLE')
         await prisma.room.updateMany({
             where: { roomId: { in: [roomId1, roomId2] } },
             data: {
-                roomTypeId: 1, // เปลี่ยนกลับเป็นห้องปกติ
-                pairRoomId: null // เอาค่าการจับคู่ห้องออก
+                roomType: 'SINGLE',
+                pairRoomId: null
             }
         });
 

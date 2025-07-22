@@ -27,14 +27,11 @@ model User {
     licensePlate String? // สำหรับ customer
     stdId        String? // สำหรับ customer
     idCard       String? // สำหรับ customer
-    assignedFloor String? // สำหรับ housekeeping
     userEnable   Boolean  @default(true)
     createdAt    DateTime @default(now())
     // Relations
     bookingsAsCustomer Booking[] @relation("CustomerBooking")
     bookingsAsFront Booking[] @relation("FrontBooking")
-    receiptsAsCustomer Receipt[] @relation("CustomerReceipt")
-    receiptsAsFront Receipt[] @relation("FrontReceipt")
     cleaningRequestsAsHousekeeping CleaningRequest[] @relation("HousekeepingCleaningRequest")
     cleaningRequestsAsFront CleaningRequest[] @relation("FrontCleaningRequest")
     cleaningReportsAsHousekeeping CleaningReport[] @relation("HousekeepingCleaningReport")
@@ -251,53 +248,12 @@ enum RepairStatus {
     UNFIXABLE
 }
 
-model Room {
-    roomId     Int    @id @default(autoincrement())
-    roomNumber String @unique
-    floor      String @default("3")
+// ลบ model RoomType และเปลี่ยนเป็น enum
 
-    roomTypeId Int      @default(0)
-    roomType   RoomType @relation(fields: [roomTypeId], references: [roomTypeId])
-
-    roomStatus RoomStatus @default(AVAILABLE)
-
-    pairRoomId Int?
-    pairRoom   Room? @relation("RoomPairing", fields: [pairRoomId], references: [roomId])
-
-    //เพิ่มฟิลด์ตรงข้าม (back-reference) 
-    pairedWith Room[] @relation("RoomPairing")
-
-    createdAt DateTime @default(now())
-
-    Bookings     Booking[] @relation("MainRoom") // ความสัมพันธ์หลัก
-    PairBookings Booking[] @relation("PairRoom") // ความสัมพันธ์ห้องคู่
-
-    CleaningRequestRoom CleaningRequestRoom[]
-    RepairRequestRoom   RepairRequestRoom[]
-
-    Receipt Receipt[]
-
-    // ความสัมพันธ์ M:N กับ CleaningReport ผ่าน CleaningReportRoom
-    CleaningReportRoom CleaningReportRoom[]
-
-    // ความสัมพันธ์ M:N กับ RepairReport ผ่าน RepairReportRoom
-    RepairReportRoom RepairReportRoom[]
-
-    @@index([roomNumber])
-    @@index([roomId])
-}
-
-model RoomType {
-    roomTypeId   Int    @id @default(autoincrement())
-    roomTypeName String
-    name_en      String
-    name_th      String
-    price        Float  @default(0)
-
-    Room    Room[]
-    Booking Booking[]
-
-    @@index([roomTypeId])
+enum RoomTypeEnum {
+    SINGLE
+    DOUBLE
+    SIGNATURE
 }
 
 enum RoomStatus {
@@ -306,6 +262,29 @@ enum RoomStatus {
     RESERVED
     CLEANING
     MAINTENANCE
+}
+
+model Room {
+    roomId     Int    @id @default(autoincrement())
+    roomNumber String @unique
+    floor      String @default("3")
+
+    roomType   RoomTypeEnum @default(SINGLE)
+
+    roomStatus RoomStatus @default(AVAILABLE)
+
+    pairRoomId Int?
+    pairRoom   Room? @relation("RoomPairing", fields: [pairRoomId], references: [roomId])
+    pairedWith Room[] @relation("RoomPairing")
+    createdAt DateTime @default(now())
+    Bookings     Booking[] @relation("MainRoom")
+    PairBookings Booking[] @relation("PairRoom")
+    CleaningRequestRoom CleaningRequestRoom[]
+    RepairRequestRoom   RepairRequestRoom[]
+    CleaningReportRoom CleaningReportRoom[]
+    RepairReportRoom RepairReportRoom[]
+    @@index([roomNumber])
+    @@index([roomId])
 }
 
 // เพิ่ม enum BookingStatus, PaymentStatus, PaymentMethod ก่อน model Booking
@@ -332,8 +311,7 @@ model Booking {
     pairRoomId Int? // ห้องที่ถูกจับคู่ (ถ้ามี)
     pairRoom   Room? @relation("PairRoom", fields: [pairRoomId], references: [roomId]) // ตั้งชื่อ relation "PairRoom"
 
-    roomTypeId Int?
-    roomType   RoomType? @relation(fields: [roomTypeId], references: [roomTypeId])
+    roomType   RoomTypeEnum? // เปลี่ยนจาก roomTypeId เป็น enum
 
     frontId Int?
     front   User? @relation("FrontBooking", fields: [frontId], references: [userId])
@@ -349,13 +327,11 @@ model Booking {
 
     bookingStatus BookingStatus @default(PENDING)
     BookingAddonListRelation BookingAddonListRelation[]
-    Receipt Receipt?
 
     @@index([bookingId])
     @@index([customerId])
     @@index([roomId])
     @@index([frontId])
-    @@index([roomTypeId])
 }
 
 model BookingAddonListRelation {
@@ -399,25 +375,3 @@ model Addon {
     @@index([addonId])
 }
 
-model Receipt {
-    receiptId Int @id @default(autoincrement())
-
-    createdAt DateTime @default(now())
-
-    customerId Int
-    customer   User @relation("CustomerReceipt", fields: [customerId], references: [userId])
-
-    roomId Int
-    room   Room @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
-
-    frontId Int
-    front   User @relation("FrontReceipt", fields: [frontId], references: [userId])
-
-    bookingId Int     @unique
-    booking   Booking @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
-
-    @@index([customerId])
-    @@index([roomId])
-    @@index([frontId])
-    @@index([bookingId])
-}

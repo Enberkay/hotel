@@ -2,10 +2,17 @@ const prisma = require("../config/prisma")
 const { calculateBookingTotal, processAddons } = require('../services/bookingService');
 const logger = require('../utils/logger');
 
+// กำหนดราคาห้องแต่ละประเภท (config)
+const ROOM_TYPE_PRICES = {
+    SINGLE: 500,      // เตียงเดี่ยว
+    DOUBLE: 500,     // เตียงคู่
+    SIGNATURE: 1500  // signature
+};
+
 // ฟังก์ชันสำหรับสร้างการจองใหม่
 exports.createBooking = async (req, res) => {
     try {
-        const { count, roomTypeId, checkInDate, checkOutDate, addon } = req.validated;
+        const { count, roomType, checkInDate, checkOutDate, addon } = req.validated;
         const { userEmail } = req.user;
 
         // ดึงข้อมูล user ที่เป็น customer จาก userEmail
@@ -32,25 +39,21 @@ exports.createBooking = async (req, res) => {
             return res.status(400).json({ message: "Check-in date must be before check-out date" });
         }
 
-        // ดึงราคา roomType
-        const roomType = await prisma.roomType.findUnique({
-            where: { roomTypeId: Number(roomTypeId) },
-            select: { price: true }
-        });
-        if (!roomType) {
+        // ใช้ราคาจาก config
+        const price = ROOM_TYPE_PRICES[roomType];
+        if (!price) {
             return res.status(400).json({ message: "Invalid room type" });
         }
 
-        // ใช้ service สำหรับคำนวณราคาและ addon
         const daysBooked = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
         const { totalAddon, addonListData } = await processAddons(addon);
-        const lastTotal = calculateBookingTotal(roomType.price, daysBooked, totalAddon, customerDiscount);
+        const lastTotal = calculateBookingTotal(price, daysBooked, totalAddon, customerDiscount);
 
         // สร้าง Booking
         const newBooking = await prisma.booking.create({
             data: {
                 customer: { connect: { userId: customerId } },
-                roomType: { connect: { roomTypeId: Number(roomTypeId) } },
+                roomType, // enum
                 count: Number(count),
                 checkInDate: checkIn,
                 checkOutDate: checkOut,
@@ -60,7 +63,7 @@ exports.createBooking = async (req, res) => {
             }
         });
 
-        // ถ้ามี Addon ให้สร้าง BookingAddonList และ BookingAddon
+        // Addon
         if (addonListData.length > 0) {
             const newBookingAddonList = await prisma.bookingAddonList.create({ data: {} });
             await prisma.bookingAddon.createMany({

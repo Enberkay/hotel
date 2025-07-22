@@ -11,8 +11,8 @@ const validateWithZod = require('../middlewares/validateWithZod');
 
 const roomCreateSchema = z.array(z.object({
   roomNumber: z.string().min(1),
-  roomTypeId: z.number(),
-  roomStatusId: z.number(),
+  roomType: z.enum(['SINGLE', 'DOUBLE', 'SIGNATURE']),
+  roomStatus: z.string().min(1),
   floor: z.number()
 }));
 

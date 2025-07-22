@@ -10,7 +10,7 @@ const validateWithZod = require('../middlewares/validateWithZod');
 
 const bookingCreateSchema = z.object({
   count: z.preprocess(val => Number(val), z.number().min(1)),
-  roomTypeId: z.string().or(z.number()),
+  roomType: z.enum(['SINGLE', 'DOUBLE', 'SIGNATURE']),
   checkInDate: z.string().min(1),
   checkOutDate: z.string().min(1),
   addon: z.array(z.object({
