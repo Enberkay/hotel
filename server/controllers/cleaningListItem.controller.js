@@ -29,13 +29,15 @@ exports.list = async (req, res) => {
 
 exports.read = async (req, res) => {
     try {
-
         const { id } = req.params
-        const item = await prisma.cleaningList.findFirst({
+        const item = await prisma.cleaningList.findUnique({
             where: {
                 itemId: Number(id)
             }
         })
+        if (!item) {
+            return res.status(404).json({ message: "ไม่พบข้อมูล" })
+        }
         res.json(item)
     } catch (err) {
         console.log(err)
@@ -52,14 +54,14 @@ exports.update = async (req, res) => {
             return res.status(400).json({ message: "ไม่มีค่าที่ส่งมา" })
         }
 
-        const existingItem = await prisma.cleaningList.findFirst({
+        const existingItem = await prisma.cleaningList.findUnique({
             where: {
                 itemId: itemId
             }
         })
 
         if (!existingItem) {
-            return res.status.json({ message: "ไม่มีค่าที่จะแก้ไข" })
+            return res.status(404).json({ message: "ไม่มีค่าที่จะแก้ไข" })
         }
 
         const itemUpdated = await prisma.cleaningList.update({
@@ -70,7 +72,7 @@ exports.update = async (req, res) => {
                 itemName: itemName
             }
         })
-
+        res.json(itemUpdated)
     } catch (err) {
         console.log(err)
         return res.status(500).json({ message: "Server error" })
