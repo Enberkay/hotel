@@ -126,6 +126,12 @@ const CleaningRequestForm = () => {
     REPAIR: "bg-red-500",
   }
 
+  const ROOM_TYPE_LABEL = {
+    SINGLE: 'เตียงเดี่ยว',
+    DOUBLE: 'เตียงคู่',
+    SIGNATURE: 'Signature',
+  };
+
   return (
     <div className="flex mx-5 mt-5">
       <div className="flex flex-col items-start gap-4">
@@ -169,7 +175,7 @@ const CleaningRequestForm = () => {
             <h2 className="text-lg font-bold mb-3">{t('cleaning:floor', { floor })}</h2>
             <div className="flex flex-wrap gap-3 justify-center">
               {groupedRooms[floor].map((room) => {
-                const roomTypeName = room.roomType?.roomTypeName || ""
+                const roomTypeName = ROOM_TYPE_LABEL[room.roomType] || "";
                 const roomIcon = roomTypeName.includes("เตียงเดี่ยว")
                   ? BedSingle
                   : roomTypeName.includes("เตียงคู่")

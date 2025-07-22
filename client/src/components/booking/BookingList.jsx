@@ -88,6 +88,12 @@ const BookingList = () => {
         CANCELLED: "bg-gray-400 text-gray-600",
     }
 
+    const ROOM_TYPE_LABEL = {
+      SINGLE: 'เตียงเดี่ยว',
+      DOUBLE: 'เตียงคู่',
+      SIGNATURE: 'Signature',
+    };
+
     return (
         <div className="w-10/12 mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
             <div className="flex justify-between items-center mb-6">
@@ -162,7 +168,7 @@ const BookingList = () => {
                                 </span>
                             </div>
                             <p className="text-gray-700 mt-2">คุณ {item.customer.user.userName} {item.customer.user.userSurName}</p>
-                            <p className="text-gray-600 text-sm">ประเภทห้อง: {item.roomType.roomTypeName}</p>
+                            <p className="text-gray-600 text-sm">ประเภทห้อง: {ROOM_TYPE_LABEL[item.roomType]}</p>
                             <p className="text-gray-500 text-sm">เข้าพัก: {formatDateTime(item.checkInDate)}</p>
                             <p className="text-gray-500 text-sm">ออก: {formatDateTime(item.checkOutDate)}</p>
                         </Link>

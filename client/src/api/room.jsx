@@ -4,6 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL
 
 //เพิ่มห้อง (Create Room)
 export const createRoom = async (token, form) => {
+    // form ต้องมี roomType เป็น string enum ('SINGLE', 'DOUBLE', 'SIGNATURE')
     return axios.post(`${API_URL}/rooms`, form, {
         headers: { Authorization: `Bearer ${token}` }
     })
@@ -32,6 +33,7 @@ export const deleteRoom = async (token, id) => {
 
 //อัปเดตห้อง (Update Room)
 export const updateRoom = async (token, id, form) => {
+    // form ต้องมี roomType เป็น string enum ('SINGLE', 'DOUBLE', 'SIGNATURE')
     return axios.put(`${API_URL}/rooms/${id}`, form, {
         headers: { Authorization: `Bearer ${token}` }
     })

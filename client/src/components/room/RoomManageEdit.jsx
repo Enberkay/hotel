@@ -9,6 +9,12 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
+const ROOM_TYPE_ENUM = [
+  { value: 'SINGLE', label: 'เตียงเดี่ยว' },
+  { value: 'DOUBLE', label: 'เตียงคู่' },
+  { value: 'SIGNATURE', label: 'Signature' },
+];
+
 const roomFormSchema = z.object({
   roomNumber: z.string()
     .min(3, { message: "room_number_too_short" })
@@ -16,7 +22,7 @@ const roomFormSchema = z.object({
     .regex(/^\d{3}$/, { message: "room_number_invalid_format" }),
   floor: z.string().min(1, { message: "select_floor" }),
   roomStatus: z.string().min(1, { message: "select_status" }),
-  roomTypeId: z.string().min(1, { message: "select_type" })
+  roomType: z.enum(['SINGLE', 'DOUBLE', 'SIGNATURE'])
 }).refine((data) => data.roomNumber[0] === data.floor, {
   message: "room_floor_number_mismatch",
   path: ["roomNumber"]
@@ -47,7 +53,7 @@ const RoomManageEdit = () => {
     defaultValues: {
       roomNumber: "",
       roomStatus: "",
-      roomTypeId: "",
+      roomType: "",
       floor: ""
     }
   })
@@ -61,7 +67,7 @@ const RoomManageEdit = () => {
         const data = res.data
         setValue("roomNumber", data.roomNumber)
         setValue("roomStatus", data.roomStatus)
-        setValue("roomTypeId", data.roomTypeId)
+        setValue("roomType", data.roomType)
         setValue("floor", data.floor)
         setFocus("roomNumber")
       } catch (err) {
@@ -140,19 +146,17 @@ const RoomManageEdit = () => {
         </div>
 
         <div>
-          <label htmlFor="roomTypeId" className="block text-sm font-semibold mb-1">{t('room_type')}</label>
-          <select
-            className={`border rounded-md p-2 w-full ${errors.roomTypeId ? 'border-red-500' : ''}`}
-            id="roomTypeId"
-            {...register("roomTypeId")}
+          <label htmlFor="roomType" className="block text-sm font-semibold">ประเภทห้อง</label>
+          <select id="roomType" {...register("roomType")}
+            className={`border rounded-md p-2 w-full ${errors.roomType ? 'border-red-500' : ''}`}
           >
-            <option value="" disabled>{t('please_select')}</option>
-            {roomtypes.map((item, index) => (
-              <option key={index} value={item.roomTypeId}>{t(`${item.name_th}`)}</option>
+            <option value="">เลือกประเภทห้อง</option>
+            {ROOM_TYPE_ENUM.map((item) => (
+              <option key={item.value} value={item.value}>{item.label}</option>
             ))}
           </select>
-          {errors.roomTypeId && (
-            <p className="text-red-500 text-xs mt-1">{t(errors.roomTypeId.message)}</p>
+          {errors.roomType && (
+            <p className="text-red-500 text-xs mt-1">{t(errors.roomType.message)}</p>
           )}
         </div>
 

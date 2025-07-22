@@ -32,12 +32,12 @@ const BookingForm = () => {
       .refine((val, ctx) => val && ctx.parent.checkInDate && dayjs(val).isAfter(dayjs(ctx.parent.checkInDate)), {
         message: t('check_out_after_check_in'),
       }),
-    roomTypeId: z.string().min(1, { message: t('error_select_room_type') }),
+    roomType: z.enum(['SINGLE', 'DOUBLE', 'SIGNATURE'], { required_error: t('error_select_room_type') }),
     count: z.string()
       .refine(val => parseInt(val, 10) >= 1, { message: t('common:error_required') })
       .refine((val, ctx) => {
         // max guest: roomTypeId === 3 ? 4 : 2
-        const max = ctx.parent.roomTypeId === '3' ? 4 : 2;
+        const max = ctx.parent.roomType === 'SIGNATURE' ? 4 : 2;
         return parseInt(val, 10) <= max;
       }, { message: t('error_guest_count_max') }),
     licensePlate: z.string().optional(),
@@ -49,7 +49,7 @@ const BookingForm = () => {
     defaultValues: {
       checkInDate: null,
       checkOutDate: null,
-      roomTypeId: '',
+      roomType: '',
       count: '1',
       licensePlate: '',
     }
@@ -82,7 +82,7 @@ const BookingForm = () => {
   // Handle RoomType select
   const handleOnChangeRoomType = (selected) => {
     setSelectedOption(selected)
-    setValue('roomTypeId', selected.value)
+    setValue('roomType', selected.value)
     setAddonPrice([])
     setSelectedAddons(null)
   }
@@ -128,6 +128,12 @@ const BookingForm = () => {
       toast.error(err.response?.data?.message)
     }
   }
+
+  const ROOM_TYPE_ENUM = [
+    { value: 'SINGLE', label: 'เตียงเดี่ยว' },
+    { value: 'DOUBLE', label: 'เตียงคู่' },
+    { value: 'SIGNATURE', label: 'Signature' },
+  ];
 
   return (
     <div className="flex justify-center">
@@ -184,27 +190,18 @@ const BookingForm = () => {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              {t('room_type')}
-            </label>
-            <Controller
-              control={control}
-              name="roomTypeId"
-              render={({ field }) => (
-                <Select
-                  options={roomOptions}
-                  value={roomOptions.find(opt => opt.value === field.value) || null}
-                  onChange={opt => {
-                    field.onChange(opt.value)
-                    handleOnChangeRoomType(opt)
-                  }}
-                  placeholder={t('select_room_type')}
-                  className="mb-2 w-[200px]"
-                  classNamePrefix="select"
-                />
-              )}
-            />
-            {errors.roomTypeId && <p className="text-red-500 text-xs mt-1">{t(errors.roomTypeId.message)}</p>}
+            <label htmlFor="roomType" className="block text-sm font-semibold">ประเภทห้อง</label>
+            <select id="roomType" {...register("roomType")}
+              className={`border rounded-md p-2 w-full ${errors.roomType ? 'border-red-500' : ''}`}
+            >
+              <option value="">เลือกประเภทห้อง</option>
+              {ROOM_TYPE_ENUM.map((item) => (
+                <option key={item.value} value={item.value}>{item.label}</option>
+              ))}
+            </select>
+            {errors.roomType && (
+              <p className="text-red-500 text-xs mt-1">{t(errors.roomType.message)}</p>
+            )}
           </div>
 
           <div className="bg-white p-4 rounded-md border-2 border-black mt-4">

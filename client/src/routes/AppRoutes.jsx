@@ -22,7 +22,6 @@ import CustomerTypeForm from "../components/user/CustomerTypeForm";
 // Customer
 import LayoutCustomer from "../layouts/LayoutCustomer";
 import ProtectRouteCustomer from "../routes/ProtectRouteCustomer";
-import CustomerBookingList from "../components/booking/CustomerBookingList";
 import CustomerProfile from "../components/user/CustomerProfile";
 import BookingForm from "../components/booking/BookingForm";
 // Front
@@ -34,7 +33,6 @@ import CleaningRequestForm from "../components/cleaning/CleaningRequestForm";
 import AddonForm from "../components/addon/AddonForm";
 import BookingList from "../components/booking/BookingList";
 import RoomManage from "../components/room/RoomManage";
-import RoomTypeForm from "../components/room/RoomTypeForm";
 import CleaningListItemForm from "../components/cleaning/CleaningListItemForm";
 import CleaningReportList from "../components/cleaning/CleaningReportList";
 import CleaningReportDetailList from "../components/cleaning/CleaningReportDetailList";
@@ -77,14 +75,10 @@ const AppRoutes = () => {
           <Route path="rooms" element={<AdminRoomForm />} />
           <Route path="rooms/:id" element={<AdminRoomEditForm />} />
           <Route path="users/:id" element={<AdminUserEdit />} />
-          <Route path="room-types" element={<RoomTypeForm />} />
         </Route>
 
         {/* Customer */}
         <Route path="customer" element={<ProtectRouteCustomer element={<LayoutCustomer />} />}>
-          <Route index element={<CustomerBookingList />} />
-          <Route path="book-room" element={<BookingForm />} />
-          <Route path="my-bookings" element={<CustomerBookingList />} />
           <Route path="customer-profile" element={<CustomerProfile />} />
         </Route>
 
@@ -97,7 +91,6 @@ const AppRoutes = () => {
           <Route path="cleaning-request" element={<CleaningRequestForm />} />
           <Route path="add-on" element={<AddonForm />} />
           <Route path="customer-type" element={<CustomerTypeForm />} />
-          <Route path="room-type" element={<RoomTypeForm />} />
           <Route path="cleaning-list-item" element={<CleaningListItemForm />} />
           <Route path="list-cleaning-report" element={<CleaningReportList />} />
           <Route path="list-cleaning-report/:id" element={<CleaningReportDetailList />} />

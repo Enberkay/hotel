@@ -19,7 +19,7 @@ const roomFormSchema = z
       .regex(/^\d{3}$/, { message: "room_number_invalid_format" }),
     floor: z.string().min(1, { message: "select_floor" }),
     roomStatusId: z.string().min(1, { message: "select_status" }),
-    roomTypeId: z.string().min(1, { message: "select_type" }),
+    roomType: z.enum(['SINGLE', 'DOUBLE', 'SIGNATURE'], { message: "select_type" }),
   })
   .refine((data) => data.roomNumber[0] === data.floor, {
     message: "floor_and_room_number_mismatch",
@@ -37,6 +37,18 @@ const roomFormSchema = z
       path: ["roomNumber"],
     }
   );
+
+const ROOM_TYPE_ENUM = [
+  { value: 'SINGLE', label: 'เตียงเดี่ยว' },
+  { value: 'DOUBLE', label: 'เตียงคู่' },
+  { value: 'SIGNATURE', label: 'Signature' },
+];
+
+const ROOM_TYPE_LABEL = {
+  SINGLE: 'เตียงเดี่ยว',
+  DOUBLE: 'เตียงคู่',
+  SIGNATURE: 'Signature',
+};
 
 const AdminRoomForm = () => {
   const { t } = useTranslation();
@@ -57,7 +69,7 @@ const AdminRoomForm = () => {
     defaultValues: {
       roomNumber: "",
       roomStatusId: "",
-      roomTypeId: "",
+      roomType: "",
       floor: "",
     },
   });
@@ -175,29 +187,17 @@ const AdminRoomForm = () => {
         </div>
 
         <div>
-          <label htmlFor="roomTypeId" className="block text-sm font-semibold">
-            {t("room_type")}
-          </label>
-          <select
-            className={`border rounded-md p-2 w-full mt-1 ${
-              errors.roomTypeId ? "border-red-500" : ""
-            }`}
-            id="roomTypeId"
-            {...register("roomTypeId")}
+          <label htmlFor="roomType" className="block text-sm font-semibold">ประเภทห้อง</label>
+          <select id="roomType" {...register("roomType")}
+            className={`border rounded-md p-2 w-full ${errors.roomType ? 'border-red-500' : ''}`}
           >
-            <option value="" disabled>
-              {t("select_type")}
-            </option>
-            {Array.isArray(roomtypes) && roomtypes.map((item, index) => (
-              <option key={index} value={item.roomTypeId}>
-                {item.roomTypeName}
-              </option>
+            <option value="">เลือกประเภทห้อง</option>
+            {ROOM_TYPE_ENUM.map((item) => (
+              <option key={item.value} value={item.value}>{item.label}</option>
             ))}
           </select>
-          {errors.roomTypeId && (
-            <p className="text-red-500 text-xs mt-1">
-              {t(errors.roomTypeId.message)}
-            </p>
+          {errors.roomType && (
+            <p className="text-red-500 text-xs mt-1">{t(errors.roomType.message)}</p>
           )}
         </div>
 
@@ -251,7 +251,7 @@ const AdminRoomForm = () => {
                   {item.roomStatus.roomStatusName}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {item.roomType.roomTypeName}
+                  {ROOM_TYPE_LABEL[item.roomType]}
                 </td>
                 <td className="px-4 py-2 flex justify-center gap-2">
                   <Link

@@ -88,7 +88,7 @@ const RoomManage = () => {
     // ตรวจสอบว่าห้องนี้เป็นห้องที่ถูก Group หรือไม่ (โดยเช็ค roomTypeId ด้วย)
     let roomIdsToUpdate = [roomId] // เริ่มต้นด้วยห้องที่เลือก
 
-    if (room.roomTypeId === 3) {
+    if (room.roomType === 'SIGNATURE') {
       const pairedRoom = pairableRooms.find(
         ([room1, room2]) => room.roomNumber === room1 || room.roomNumber === room2
       )
@@ -96,7 +96,7 @@ const RoomManage = () => {
       if (pairedRoom) {
         const otherRoomNumber = pairedRoom.find((r) => r !== room.roomNumber)
         const otherRoom = rooms.find((r) => r.roomNumber === otherRoomNumber)
-        if (otherRoom && otherRoom.roomTypeId === 3) {
+        if (otherRoom && otherRoom.roomType === 'SIGNATURE') {
           roomIdsToUpdate.push(otherRoom.roomId)
         }
       }
@@ -137,6 +137,12 @@ const RoomManage = () => {
     )
   }
 
+  // ตัวอย่างการเช็คห้อง Signature
+  const isSignatureRoom = (room) => room.roomType === 'SIGNATURE';
+  // ตัวอย่างการเช็คห้องเดี่ยว
+  const isSingleRoom = (room) => room.roomType === 'SINGLE';
+  // ตัวอย่างการเช็คห้องคู่
+  const isDoubleRoom = (room) => room.roomType === 'DOUBLE';
 
 
   return (
@@ -190,11 +196,9 @@ const RoomManage = () => {
                   REPAIR: "bg-red-500",
                 }
                 const statusColor = statusColors[room.roomStatus] || "bg-black"
-                const roomIcon = room.roomType?.roomTypeName.includes(
-                  "เตียงเดี่ยว"
-                )
+                const roomIcon = isSingleRoom(room)
                   ? BedSingle
-                  : room.roomType?.roomTypeName.includes("เตียงคู่")
+                  : isDoubleRoom(room)
                     ? BedDouble
                     : Bed
 
@@ -227,7 +231,7 @@ const RoomManage = () => {
             {pairableRooms.map(([room1, room2]) => {
               const room1Data = rooms.find((r) => r.roomNumber === room1)
               const room2Data = rooms.find((r) => r.roomNumber === room2)
-              const isGrouped = room1Data?.roomTypeId === 3 && room2Data?.roomTypeId === 3
+              const isGrouped = isSignatureRoom(room1Data) && isSignatureRoom(room2Data)
 
               return (
                 <div key={`${room1}-${room2}`} className="relative">

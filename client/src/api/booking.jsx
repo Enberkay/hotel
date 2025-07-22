@@ -3,6 +3,7 @@ import axios from "axios"
 const API_URL = import.meta.env.VITE_API_URL // ดึงค่าจาก .env
 
 export const createBooking = async (token, form) => {
+    // form ต้องมี roomType เป็น string enum ('SINGLE', 'DOUBLE', 'SIGNATURE')
     return axios.post(`${API_URL}/bookings`, form, {
         headers: {
             Authorization: `Bearer ${token}`

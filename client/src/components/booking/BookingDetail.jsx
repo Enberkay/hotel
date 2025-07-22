@@ -302,7 +302,12 @@ const BookingDetail = () => {
                                         statusColor = "bg-black";
                                 }
 
-                                const roomTypeName = room.roomType?.roomTypeName || "Unknown";
+                                const ROOM_TYPE_LABEL = {
+                                  SINGLE: 'เตียงเดี่ยว',
+                                  DOUBLE: 'เตียงคู่',
+                                  SIGNATURE: 'Signature',
+                                };
+                                const roomTypeName = ROOM_TYPE_LABEL[room.roomType] || "Unknown";
                                 const isSelected = selectedRoom === room.roomId;
                                 const roomNumber = room.roomNumber || "No Number";
 
@@ -320,9 +325,9 @@ const BookingDetail = () => {
                                         onClick={() => room.roomStatus === 'AVAILABLE' && setSelectedRoom(room.roomId)}
                                         disabled={room.roomStatus !== 'AVAILABLE'}
                                     >
-                                        {roomTypeName === "Standard(เตียงเดี่ยว)" ? (
+                                        {roomTypeName === "เตียงเดี่ยว" ? (
                                             <BedSingle size={32} className="text-white" />
-                                        ) : roomTypeName === "Standard(เตียงคู่)" ? (
+                                        ) : roomTypeName === "เตียงคู่" ? (
                                             <BedDouble size={32} className="text-white" />
                                         ) : (
                                             <Bed size={32} className="text-white" />

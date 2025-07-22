@@ -15,7 +15,7 @@ const roomFormSchema = z.object({
     .regex(/^\d{3}$/, { message: "room_number_invalid_format" }),
   floor: z.string().min(1, { message: "select_floor" }),
   roomStatusId: z.string().min(1, { message: "select_status" }),
-  roomTypeId: z.string().min(1, { message: "select_type" })
+  roomType: z.enum(['SINGLE', 'DOUBLE', 'SIGNATURE'])
 }).refine((data) => data.roomNumber[0] === data.floor, {
   message: "floor_and_room_number_mismatch",
   path: ["roomNumber"]
@@ -23,6 +23,12 @@ const roomFormSchema = z.object({
   message: "room_number_cannot_end_with_zero",
   path: ["roomNumber"]
 })
+
+const ROOM_TYPE_ENUM = [
+  { value: 'SINGLE', label: 'เตียงเดี่ยว' },
+  { value: 'DOUBLE', label: 'เตียงคู่' },
+  { value: 'SIGNATURE', label: 'Signature' },
+];
 
 const AdminRoomEditForm = () => {
   const { t } = useTranslation();
@@ -46,7 +52,7 @@ const AdminRoomEditForm = () => {
     defaultValues: {
       roomNumber: "",
       roomStatusId: "",
-      roomTypeId: "",
+      roomType: "",
       floor: ""
     }
   })
@@ -61,7 +67,7 @@ const AdminRoomEditForm = () => {
         const data = res.data
         setValue("roomNumber", data.roomNumber)
         setValue("roomStatusId", data.roomStatusId)
-        setValue("roomTypeId", data.roomTypeId)
+        setValue("roomType", data.roomType)
         setValue("floor", data.floor)
         setFocus("roomNumber")
       } catch (err) {
@@ -124,18 +130,17 @@ const AdminRoomEditForm = () => {
         {errors.roomStatusId && (
           <p className="text-red-500 text-xs mt-1">{t(errors.roomStatusId.message)}</p>
         )}
-        <select
-          className={`border ${errors.roomTypeId ? 'border-red-500' : ''}`}
-          id="roomTypeId"
-          {...register("roomTypeId")}
+        <label htmlFor="roomType" className="block text-sm font-semibold">ประเภทห้อง</label>
+        <select id="roomType" {...register("roomType")}
+          className={`border rounded-md p-2 w-full ${errors.roomType ? 'border-red-500' : ''}`}
         >
-          <option value="" disabled>{t('select_type')}</option>
-          {roomtypes.map((item, index) =>
-            <option key={index} value={item.roomTypeId}>{item.roomTypeName}</option>
-          )}
+          <option value="">เลือกประเภทห้อง</option>
+          {ROOM_TYPE_ENUM.map((item) => (
+            <option key={item.value} value={item.value}>{item.label}</option>
+          ))}
         </select>
-        {errors.roomTypeId && (
-          <p className="text-red-500 text-xs mt-1">{t(errors.roomTypeId.message)}</p>
+        {errors.roomType && (
+          <p className="text-red-500 text-xs mt-1">{t(errors.roomType.message)}</p>
         )}
         <div className="flex gap-2 mt-4">
           <Link
