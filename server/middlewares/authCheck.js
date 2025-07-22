@@ -13,13 +13,14 @@ exports.authCheck = async (req, res, next) => {
         const decode = jwt.verify(token, process.env.SECRET);
         req.user = decode;
 
+        // ตรวจสอบ user จาก phone (primary login field)
         const user = await prisma.user.findFirst({
             where: {
-                userEmail: req.user.userEmail
+                phone: req.user.phone
             }
         });
 
-        if (!user || !user.userEnable) {
+        if (!user) {
             return res.status(403).json({ message: "This account cannot access." });
         }
 
@@ -35,55 +36,21 @@ exports.authCheck = async (req, res, next) => {
     }
 };
 
-
-// Middleware สำหรับตรวจสอบ customer
-exports.customerCheck = async (req, res, next) => {
-    try {
-        const { userEmail, userRole } = req.user
-        // console.log(userEmail, userRole)
-
-        const customerUser = await prisma.user.findFirst({
-            where: {
-                userEmail: userEmail
-            }
-        })
-
-        // อนุญาตให้ admin ผ่าน
-        if (userRole === "admin") {
-            return next()
-        }
-
-        if (!customerUser || customerUser.userRole !== "customer") {
-            return res.status(403).json({ message: "Access Denied: Customer only." })
-        }
-
-        next()
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: "Error, Customer access denied." })
-    }
-}
-
 // Middleware สำหรับตรวจสอบ front (พนักงานหน้าฟร้อน)
 exports.frontCheck = async (req, res, next) => {
     try {
-        const { userEmail, userRole } = req.user
-
+        const { phone, role } = req.user
         const frontUser = await prisma.user.findFirst({
             where: {
-                userEmail: userEmail
+                phone: phone
             }
         })
-
-        // อนุญาตให้ admin ผ่าน
-        if (userRole === "admin") {
+        if (role === "admin") {
             return next()
         }
-
-        if (!frontUser || frontUser.userRole !== "front") {
+        if (!frontUser || frontUser.role !== "front") {
             return res.status(403).json({ message: "Access Denied: Front only." })
         }
-
         next()
     } catch (error) {
         console.log(error)
@@ -94,23 +61,18 @@ exports.frontCheck = async (req, res, next) => {
 // Middleware สำหรับตรวจสอบ housekeeping
 exports.housekeepingCheck = async (req, res, next) => {
     try {
-        const { userEmail, userRole } = req.user
-
+        const { phone, role } = req.user
         const housekeepingUser = await prisma.user.findFirst({
             where: {
-                userEmail: userEmail
+                phone: phone
             }
         })
-
-        // อนุญาตให้ admin ผ่าน
-        if (userRole === "admin") {
+        if (role === "admin") {
             return next();
         }
-
-        if (!housekeepingUser || housekeepingUser.userRole !== "housekeeping") {
+        if (!housekeepingUser || housekeepingUser.role !== "housekeeping") {
             return res.status(403).json({ message: "Access Denied: Housekeeping only." })
         }
-
         next()
     } catch (error) {
         console.log(error)
@@ -118,46 +80,18 @@ exports.housekeepingCheck = async (req, res, next) => {
     }
 }
 
-// Middleware สำหรับตรวจสอบ maintenance
-exports.maintenanceCheck = async (req, res, next) => {
-    try {
-        const { userEmail, userRole } = req.user
-
-        const maintenanceUser = await prisma.user.findFirst({
-            where: {
-                userEmail: userEmail
-            }
-        })
-
-        // อนุญาตให้ admin ผ่าน
-        if (userRole === "admin") {
-            return next()
-        }
-
-        if (!maintenanceUser || maintenanceUser.userRole !== "maintenance") {
-            return res.status(403).json({ message: "Access Denied: Maintenance only." })
-        }
-
-        next()
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ message: "Error, Maintenance access denied." })
-    }
-}
-
+// Middleware สำหรับตรวจสอบ admin
 exports.adminCheck = async (req, res, next) => {
     try {
-        const { userEmail } = req.user
+        const { phone } = req.user
         const adminUser = await prisma.user.findFirst({
             where: {
-                userEmail: userEmail
+                phone: phone
             }
         })
-        if (!adminUser || adminUser.userRole !== "admin") {
+        if (!adminUser || adminUser.role !== "admin") {
             return res.status(403).json({ message: "Access Denied: Admin only." })
         }
-
-
         next()
     } catch (error) {
         console.log(error)

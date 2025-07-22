@@ -10,9 +10,6 @@ const logger = createLogger({
   ),
   transports: [
     new transports.Console(),
-    // สามารถเพิ่ม file transport ได้ถ้าต้องการ
-    // new transports.File({ filename: 'logs/error.log', level: 'error' }),
-    // new transports.File({ filename: 'logs/combined.log' })
   ],
 });
 

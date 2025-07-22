@@ -1,6 +1,6 @@
 const prisma = require("../config/prisma")
 
-//อยู่ที่ user.js (routes)
+//สำหรับ front กดยกเลิกการจอง
 exports.CancelledBooking = async (req, res) => {
     try {
         const { bookingId } = req.body  // รับจาก body ตามที่ส่งมา

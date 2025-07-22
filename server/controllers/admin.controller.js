@@ -4,10 +4,10 @@ const bcrypt = require("bcryptjs")
 //เพิ่มผู้ใช้ใหม่
 exports.addUser = async (req, res) => {
     try {
-        const { userEmail, userPassword, userName, userSurName, userRole, userNumPhone, assignedFloor } = req.body
+        const { name, phone, role, licensePlate } = req.body
 
         //ตรวจสอบค่าว่าง
-        if (!userEmail || !userPassword || !userName || !userSurName || !userRole) {
+        if (!name || !phone || !role || !licensePlate) {
             return res.status(400).json({ message: 'All fields are required!' })
         }
 

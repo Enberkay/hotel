@@ -36,7 +36,7 @@ exports.cleaningRequest = async (req, res) => {
                     cleaningRequestStatus: 'PENDING',
                     CleaningRequestRoom: {
                         create: rooms.map(({ roomId, description }) => ({
-                            roomId,
+                            roomNumber: roomId,
                             description: description || null,
                         })),
                     },
@@ -47,7 +47,7 @@ exports.cleaningRequest = async (req, res) => {
             // อัปเดตสถานะของห้องที่ส่งคำขอให้เป็น 'CLEANING'
             await prisma.room.updateMany({
                 where: {
-                    roomId: { in: rooms.map(({ roomId }) => roomId) },
+                    roomNumber: { in: rooms.map(({ roomId }) => roomId) },
                 },
                 data: {
                     roomStatus: 'CLEANING',
@@ -110,7 +110,7 @@ exports.listCleaningRequest = async (req, res) => {
                     }
                 },
                 cleaningRequestStatus: true, // ถ้าเป็น enum หรือ object เดียว ให้ select เฉพาะ field ที่ใช้
-                user: { select: { userName: true, userSurName: true, prefix: true, userNumPhone: true } },
+                user: { select: { name: true, phone: true, role: true, licensePlate: true } },
             }
         })
         return res.json(cleaningRequests)
@@ -137,7 +137,7 @@ exports.readCleaningRequest = async (req, res) => {
                     }
                 },
                 cleaningRequestStatus: true,
-                user: { select: { userName: true, userSurName: true, prefix: true, userNumPhone: true } },
+                user: { select: { name: true, phone: true, role: true, licensePlate: true } },
             }
         })
         if (!cleaningRequest) {
@@ -189,25 +189,25 @@ exports.cleaningReport = async (req, res) => {
         //ดึงข้อมูลห้องที่มีอยู่แล้วใน CleaningReportRoom
         const existingReportRooms = await prisma.cleaningReportRoom.findMany({
             where: { reportId: report.reportId },
-            select: { roomId: true }
+            select: { roomNumber: true }
         })
 
-        const existingRoomIds = new Set(existingReportRooms.map(r => r.roomId))
-        const newRooms = rooms.filter(room => !existingRoomIds.has(room.roomId))
+        const existingRoomIds = new Set(existingReportRooms.map(r => r.roomNumber))
+        const newRooms = rooms.filter(room => !existingRoomIds.has(room.roomNumber))
 
         if (newRooms.length > 0) {
             await prisma.cleaningReportRoom.createMany({
-                data: newRooms.map(room => ({ reportId: report.reportId, roomId: room.roomId })),
+                data: newRooms.map(room => ({ reportId: report.reportId, roomNumber: room.roomNumber })),
                 skipDuplicates: true
             })
         }
 
-        //ดึง roomId ที่อัปเดตใหม่อีกครั้ง
+        //ดึง roomNumber ที่อัปเดตใหม่อีกครั้ง
         const allReportRooms = await prisma.cleaningReportRoom.findMany({
             where: { reportId: report.reportId },
-            select: { roomId: true }
+            select: { roomNumber: true }
         })
-        const validRoomIds = new Set(allReportRooms.map(r => r.roomId))
+        const validRoomIds = new Set(allReportRooms.map(r => r.roomNumber))
 
         console.log("Room ที่สามารถบันทึกผลได้:", [...validRoomIds])
 
@@ -216,15 +216,15 @@ exports.cleaningReport = async (req, res) => {
         for (const room of rooms) {
             if (!room.results || !Array.isArray(room.results)) continue
 
-            if (!validRoomIds.has(room.roomId)) {
-                console.warn(`Room ID ${room.roomId} is not linked to CleaningReportRoom, skipping...`)
+            if (!validRoomIds.has(room.roomNumber)) {
+                console.warn(`Room ID ${room.roomNumber} is not linked to CleaningReportRoom, skipping...`)
                 continue
             }
 
             for (const result of room.results) {
                 cleaningResultsData.push({
                     reportId: report.reportId,
-                    roomId: room.roomId,
+                    roomNumber: room.roomNumber,
                     itemId: result.itemId,
                     cleaningStatus: result.cleaningStatus || 'NORMAL',
                     description: result.description || ""

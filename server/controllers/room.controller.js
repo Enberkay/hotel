@@ -94,7 +94,6 @@ exports.list = async (req, res) => {
         const rooms = await prisma.room.findMany({
             orderBy: { createdAt: "asc" },
             select: {
-                roomId: true,
                 roomNumber: true,
                 floor: true,
                 roomType: true, // enum
@@ -202,11 +201,11 @@ exports.remove = async (req, res) => {
 // ฟังก์ชันรวม 2 ห้องเป็น Signature Room
 exports.groupRoom = async (req, res) => {
     try {
-        const { roomId1, roomId2 } = req.body;
+        const { roomNumber1, roomNumber2 } = req.body;
 
         // ดึงข้อมูลห้องจาก roomId
         const rooms = await prisma.room.findMany({
-            where: { roomId: { in: [roomId1, roomId2] } },
+            where: { roomId: { in: [roomNumber1, roomNumber2] } },
             select: { roomId: true, roomNumber: true, roomStatus: true, roomType: true }
         });
 
@@ -266,11 +265,11 @@ exports.groupRoom = async (req, res) => {
 
 exports.unGroupRoom = async (req, res) => {
     try {
-        const { roomId1, roomId2 } = req.body;
+        const { roomNumber1, roomNumber2 } = req.body;
 
         // ดึงข้อมูลห้องจาก roomId
         const rooms = await prisma.room.findMany({
-            where: { roomId: { in: [roomId1, roomId2] } },
+            where: { roomId: { in: [roomNumber1, roomNumber2] } },
             select: { roomId: true, roomNumber: true, roomStatus: true, roomType: true, pairRoomId: true }
         });
 
@@ -287,7 +286,7 @@ exports.unGroupRoom = async (req, res) => {
 
         // เปลี่ยนสถานะของห้องกลับเป็นห้องเดี่ยว (roomType = 'SINGLE')
         await prisma.room.updateMany({
-            where: { roomId: { in: [roomId1, roomId2] } },
+            where: { roomId: { in: [roomNumber1, roomNumber2] } },
             data: {
                 roomType: 'SINGLE',
                 pairRoomId: null

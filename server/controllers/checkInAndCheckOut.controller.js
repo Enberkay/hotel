@@ -34,7 +34,7 @@ exports.checkIn = async (req, res) => {
 
         const checkedInRoom = await prisma.room.update({
             where: {
-                roomId: Number(roomCheckInId)
+                roomNumber: booking.roomNumber
             },
             data: {
                 roomStatus: 'OCCUPIED'

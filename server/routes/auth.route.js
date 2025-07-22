@@ -1,38 +1,33 @@
-const express = require("express")
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
-const { register, login, currentUser, registerDefaultAdmin } = require("../controllers/auth.controller")
+const {
+  login,
+  currentUser,
+  registerDefaultAdmin,
+} = require("../controllers/auth.controller");
 
-const { adminCheck, authCheck, customerCheck, frontCheck, housekeepingCheck, maintenanceCheck } = require("../middlewares/authCheck")
-const { z } = require('zod');
-const validateWithZod = require('../middlewares/validateWithZod');
+const {
+  adminCheck,
+  authCheck,
+  customerCheck,
+  frontCheck,
+  housekeepingCheck,
+  maintenanceCheck,
+} = require("../middlewares/authCheck");
+const { z } = require("zod");
 
-const registerSchema = z.object({
-  userEmail: z.string().email(),
-  userPassword: z.string().min(6),
-  userName: z.string().min(1),
-  userSurName: z.string().min(1),
-  userNumPhone: z.string().min(8),
-  prefix: z.string().optional(),
-  licensePlate: z.string().optional(),
-});
-
-// ลบ route และ logic ที่เกี่ยวข้องกับ image upload ทั้งหมด
-
-//@ENDPOINT http://localhost:8000/api/register
-router.post("/register", validateWithZod(registerSchema), register)
-router.post("/login", login)
+router.post("/login", login);
 
 // Endpoint สำหรับสร้าง default admin จาก ENV หรือ fallback
-router.post("/register-default-admin", registerDefaultAdmin)
+router.post("/register-default-admin", registerDefaultAdmin);
 
 // router.post("/current-user", authCheck, currentUser)
-router.post("/current-admin", authCheck, adminCheck, currentUser)
+router.post("/current-admin", authCheck, adminCheck, currentUser);
 
 //permission all users
-router.post("/current-customer", authCheck, customerCheck, currentUser)
-router.post("/current-front", authCheck, frontCheck, currentUser)
-router.post("/current-housekeeping", authCheck, housekeepingCheck, currentUser)
-router.post("/current-maintenance", authCheck, maintenanceCheck, currentUser)
+router.post("/current-customer", authCheck, customerCheck, currentUser);
+router.post("/current-front", authCheck, frontCheck, currentUser);
+router.post("/current-housekeeping", authCheck, housekeepingCheck, currentUser);
 
-module.exports = router
+module.exports = router;

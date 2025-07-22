@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
     provider = "prisma-client-js"
@@ -15,45 +11,84 @@ datasource db {
 
 //prisma เป็นการมอง relationship แล้วเอามาใส่ที่ตัวเอง ไม่ใช่เอาตัวที่อยู่ใกล้
 
-model User {
-    userId       Int      @id @default(autoincrement())
-    userEmail    String   @unique // อีเมลเก็บใน User
-    userPassword String?
-    userName     String? // ชื่อเก็บใน User
-    userSurName  String? // นามสกุลเก็บใน User
-    userNumPhone String?  @unique // เบอร์โทรศัพท์เก็บใน User
-    userRole     UserRole @default(customer)
-    prefix       String? //คำนำหน้า
-    licensePlate String? // สำหรับ customer
-    stdId        String? // สำหรับ customer
-    idCard       String? // สำหรับ customer
-    userEnable   Boolean  @default(true)
-    createdAt    DateTime @default(now())
-    // Relations
-    bookingsAsCustomer Booking[] @relation("CustomerBooking")
-    bookingsAsFront Booking[] @relation("FrontBooking")
-    cleaningRequestsAsHousekeeping CleaningRequest[] @relation("HousekeepingCleaningRequest")
-    cleaningRequestsAsFront CleaningRequest[] @relation("FrontCleaningRequest")
-    cleaningReportsAsHousekeeping CleaningReport[] @relation("HousekeepingCleaningReport")
-    cleaningReportsAsFront CleaningReport[] @relation("FrontCleaningReport")
-    repairRequestsAsMaintenance RepairRequest[] @relation("MaintenanceRepairRequest")
-    repairRequestsAsFront RepairRequest[] @relation("FrontRepairRequest")
-    repairReportsAsMaintenance RepairReport[] @relation("MaintenanceRepairReport")
-    repairReportsAsFront RepairReport[] @relation("FrontRepairReport")
+// =========================
+// ENUMS (ค่าคงที่สำหรับแต่ละประเภท)
+// =========================
 
-    @@index([userEmail])
-    @@index([userId])
-}
-
+// บทบาทของผู้ใช้งานระบบ
 enum UserRole {
-    admin
-    customer
-    front
-    housekeeping
-    maintenance
+  admin
+  front
+  housekeeping
 }
 
-// ลบ model Customer, Housekeeping, Maintenance, Front และอัปเดตความสัมพันธ์ใน model อื่น ๆ ให้ใช้ userId แทน ...
+// สถานะของใบแจ้งทำความสะอาด
+enum CleaningRequestStatus {
+  PENDING      // รอแม่บ้านรับเรื่อง
+  IN_PROGRESS  // แม่บ้านกำลังทำความสะอาด
+  COMPLETED    // ทำความสะอาดเสร็จแล้ว
+}
+
+// สถานะของใบรายงานผลทำความสะอาด
+enum CleaningReportStatus {
+  PENDING   // ยังไม่ได้ตรวจสอบ
+  CHECKED   // ตรวจสอบแล้ว
+  REPORTED  // รายงานปัญหา
+}
+
+// สถานะของแต่ละรายการในห้อง (เช่น ของในห้อง)
+enum CleaningStatus {
+  NORMAL   // ปกติ
+  PROBLEM  // มีปัญหา
+}
+
+// ประเภทห้องพัก
+enum RoomTypeEnum {
+  SINGLE
+  DOUBLE
+  SIGNATURE
+}
+
+// สถานะของห้องพัก
+enum RoomStatus {
+  AVAILABLE    // ว่าง
+  OCCUPIED     // มีผู้เข้าพัก
+  RESERVED     // ถูกจอง
+  CLEANING     // กำลังทำความสะอาด
+  MAINTENANCE  // ปิดปรับปรุง
+}
+
+// สถานะของใบจองห้องพัก
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+  NO_SHOW
+}
+
+// =========================
+// MODELS
+// =========================
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  phone        String   @unique
+  role         UserRole
+  licensePlate String?
+  // Relations
+  bookingsAsFront Booking[] @relation("FrontBooking")
+  cleaningRequestsAsHousekeeping CleaningRequest[] @relation("HousekeepingCleaningRequest")
+  cleaningRequestsAsFront CleaningRequest[] @relation("FrontCleaningRequest")
+  cleaningReportsAsHousekeeping CleaningReport[] @relation("HousekeepingCleaningReport")
+  cleaningReportsAsFront CleaningReport[] @relation("FrontCleaningReport")
+
+
+  @@index([phone])
+  @@index([id])
+}
 
 model CleaningRequest {
     requestId Int @id @default(autoincrement())
@@ -68,10 +103,10 @@ model CleaningRequest {
     updatedAt DateTime @default(now()) @updatedAt // **เพิ่มค่า default**
 
     housekeepingId Int?
-    housekeeping   User? @relation("HousekeepingCleaningRequest", fields: [housekeepingId], references: [userId])
+    housekeeping   User? @relation("HousekeepingCleaningRequest", fields: [housekeepingId], references: [id])
 
     frontId Int
-    front   User @relation("FrontCleaningRequest", fields: [frontId], references: [userId])
+    front   User @relation("FrontCleaningRequest", fields: [frontId], references: [id])
 
     cleaningRequestStatus CleaningRequestStatus @default(PENDING)
     CleaningRequestRoom CleaningRequestRoom[]
@@ -80,37 +115,16 @@ model CleaningRequest {
     CleaningReport CleaningReport?
 }
 
-enum CleaningRequestStatus {
-    PENDING
-    IN_PROGRESS
-    COMPLETED
-}
-
-model CleaningRequestRoom {
-    requestId Int
-    roomId    Int
-
-    description String? @default("") //คำอธิบายหรือหมายเหตุ
-
-    //เพื่อติดตามว่าอัปเดตล่าสุดเมื่อไหร่
-    updatedAt DateTime @default(now()) @updatedAt // **เพิ่มค่า default**
-
-    cleaningRequest CleaningRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
-    room            Room            @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
-
-    @@id([requestId, roomId]) // Composite Primary Key
-}
-
 model CleaningReport {
     reportId Int      @id @default(autoincrement())
     //วันที่รายงานผลทำความสะอาด
     reportAt DateTime @default(now())
 
     housekeepingId Int
-    housekeeping   User @relation("HousekeepingCleaningReport", fields: [housekeepingId], references: [userId])
+    housekeeping   User @relation("HousekeepingCleaningReport", fields: [housekeepingId], references: [id])
 
     frontId Int?
-    front   User? @relation("FrontCleaningReport", fields: [frontId], references: [userId])
+    front   User? @relation("FrontCleaningReport", fields: [frontId], references: [id])
 
     // เชื่อมกับ CleaningRequest แบบ 1:1
     requestId       Int             @unique
@@ -124,27 +138,21 @@ model CleaningReport {
     cleaningReportStatus CleaningReportStatus @default(PENDING)
 }
 
-enum CleaningReportStatus {
-    PENDING
-    CHECKED
-    REPORTED
-}
-
 // 🔗 **ตารางกลางสำหรับ M:N**
 model CleaningReportRoom {
     reportId Int
-    roomId   Int
+    roomNumber String
 
     cleaningReport  CleaningReport    @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
-    room            Room              @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+    room            Room              @relation(fields: [roomNumber], references: [roomNumber], onDelete: Cascade)
     CleaningResults CleaningResults[]
 
-    @@id([reportId, roomId]) // Composite Primary Key
+    @@id([reportId, roomNumber]) // Composite Primary Key
 }
 
 model CleaningResults {
     reportId Int
-    roomId   Int
+    roomNumber String
     itemId   Int
 
     description String? @default("") // คำอธิบายหรือหมายเหตุ
@@ -153,9 +161,9 @@ model CleaningResults {
 
     cleaningReport     CleaningReport     @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
     cleaningList       CleaningList       @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
-    cleaningReportRoom CleaningReportRoom @relation(fields: [reportId, roomId], references: [reportId, roomId], onDelete: Cascade)
+    cleaningReportRoom CleaningReportRoom @relation(fields: [reportId, roomNumber], references: [reportId, roomNumber], onDelete: Cascade)
 
-    @@id([reportId, roomId, itemId]) // Composite Primary Key ป้องกัน itemId ซ้ำกันในห้องอื่น
+    @@id([reportId, roomNumber, itemId]) // Composite Primary Key ป้องกัน itemId ซ้ำกันในห้องอื่น
 }
 
 //เป็น checkList ของในห้องแต่ละชิ้น
@@ -165,213 +173,58 @@ model CleaningList {
     CleaningResults CleaningResults[]
 }
 
-//สถานะ ของในห้องแต่ละชิ้น เช่น ปกติ, มีปัญหา
-enum CleaningStatus {
-    NORMAL
-    PROBLEM
-}
-
-//ใบแจ้งซ่อม
-model RepairRequest {
-    requestId Int @id @default(autoincrement())
-
-    //วันที่ออกใบซ่อม
-    requestAt DateTime @default(now())
-
-    maintenanceId Int?
-    maintenance   User? @relation("MaintenanceRepairRequest", fields: [maintenanceId], references: [userId])
-
-    frontId Int
-    front   User @relation("FrontRepairRequest", fields: [frontId], references: [userId])
-
-    repairRequestStatus RepairRequestStatus @default(PENDING)
-    RepairRequestRoom RepairRequestRoom[]
-    RepairReport      RepairReport?
-}
-
-enum RepairRequestStatus {
-    PENDING
-    IN_PROGRESS
-    COMPLETED
-}
-
-//รายละเอียดหรือรายการในใบแจ้งซ่อม
-model RepairRequestRoom {
-    requestId Int
-    roomId    Int
-
-    description String? //คำอธิบายหรือหมายเหตุ
-
-    repairRequest RepairRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
-    room          Room          @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
-
-    @@id([requestId, roomId])
-}
-
-//ใบรายงานผลการซ่อม
-model RepairReport {
-    reportId Int @id @default(autoincrement())
-
-    //วันที่รายงานผลซ่อม
-    reportAt DateTime @default(now())
-
-    maintenanceId Int
-    maintenance   User @relation("MaintenanceRepairReport", fields: [maintenanceId], references: [userId])
-
-    frontId Int
-    front   User @relation("FrontRepairReport", fields: [frontId], references: [userId])
-
-    requestId     Int           @unique //RepairReport 1:1 RepairRequest
-    repairRequest RepairRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
-
-    RepairReportRoom RepairReportRoom[]
-}
-
-//รายละเอียดหรือรายการในใบรายงานผลการซ่อม
-model RepairReportRoom {
-    reportId Int
-    roomId   Int
-
-    description String? //คำอธิบายหรือหมายเหตุ
-
-    repairReport RepairReport @relation(fields: [reportId], references: [reportId], onDelete: Cascade)
-    room         Room         @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
-
-    repairStatus RepairStatus @default(FIXED)
-
-    @@id([reportId, roomId])
-}
-
-//สถานะของแต่ละรายการ [ซ่อมแล้ว, ยังมีปัญหา(ไม่สามารถซ่อมได้)]
-enum RepairStatus {
-    FIXED
-    UNFIXABLE
-}
-
-// ลบ model RoomType และเปลี่ยนเป็น enum
-
-enum RoomTypeEnum {
-    SINGLE
-    DOUBLE
-    SIGNATURE
-}
-
-enum RoomStatus {
-    AVAILABLE
-    OCCUPIED
-    RESERVED
-    CLEANING
-    MAINTENANCE
-}
-
 model Room {
-    roomId     Int    @id @default(autoincrement())
-    roomNumber String @unique
+    roomNumber String @id // ใช้เป็น primary key
     floor      String @default("3")
-
     roomType   RoomTypeEnum @default(SINGLE)
-
     roomStatus RoomStatus @default(AVAILABLE)
-
-    pairRoomId Int?
-    pairRoom   Room? @relation("RoomPairing", fields: [pairRoomId], references: [roomId])
+    pairRoomNumber String?
+    pairRoom   Room? @relation("RoomPairing", fields: [pairRoomNumber], references: [roomNumber])
     pairedWith Room[] @relation("RoomPairing")
     createdAt DateTime @default(now())
     Bookings     Booking[] @relation("MainRoom")
     PairBookings Booking[] @relation("PairRoom")
     CleaningRequestRoom CleaningRequestRoom[]
-    RepairRequestRoom   RepairRequestRoom[]
     CleaningReportRoom CleaningReportRoom[]
-    RepairReportRoom RepairReportRoom[]
     @@index([roomNumber])
-    @@index([roomId])
 }
 
-// เพิ่ม enum BookingStatus, PaymentStatus, PaymentMethod ก่อน model Booking
-
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CHECKED_IN
-  CHECKED_OUT
-  CANCELLED
-  NO_SHOW
+model CleaningRequestRoom {
+    requestId Int
+    roomNumber String
+    description String? @default("")
+    updatedAt DateTime @default(now()) @updatedAt
+    cleaningRequest CleaningRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
+    room            Room            @relation(fields: [roomNumber], references: [roomNumber], onDelete: Cascade)
+    @@id([requestId, roomNumber])
 }
 
+// Booking
 model Booking {
     bookingId Int @id @default(autoincrement())
-    count     Int @default(1) //จำนวนคน 
-
-    customerId Int // Foreign key to Customer
-    customer   User @relation("CustomerBooking", fields: [customerId], references: [userId]) // Relationship with Customer
-
-    roomId Int? // ห้องหลัก
-    room   Room? @relation("MainRoom", fields: [roomId], references: [roomId]) // ตั้งชื่อ relation "MainRoom"
-
-    pairRoomId Int? // ห้องที่ถูกจับคู่ (ถ้ามี)
-    pairRoom   Room? @relation("PairRoom", fields: [pairRoomId], references: [roomId]) // ตั้งชื่อ relation "PairRoom"
-
-    roomType   RoomTypeEnum? // เปลี่ยนจาก roomTypeId เป็น enum
-
+    count     Int @default(1)
+    customerName        String
+    customerSurname     String
+    customerPhone       String
+    customerEmail       String
+    customerIdCard      String
+    customerLicensePlate String
+    roomNumber String? // ห้องหลัก
+    room   Room? @relation("MainRoom", fields: [roomNumber], references: [roomNumber])
+    pairRoomNumber String? // ห้องที่ถูกจับคู่ (ถ้ามี)
+    pairRoom   Room? @relation("PairRoom", fields: [pairRoomNumber], references: [roomNumber])
+    roomType   RoomTypeEnum?
     frontId Int?
-    front   User? @relation("FrontBooking", fields: [frontId], references: [userId])
-
+    front   User? @relation("FrontBooking", fields: [frontId], references: [id])
     total Float @default(0)
-
     checkInDate  DateTime
     checkOutDate DateTime
-
     createdAt   DateTime  @default(now())
     confirmedAt DateTime?
     cancelledAt DateTime?
-
     bookingStatus BookingStatus @default(PENDING)
-    BookingAddonListRelation BookingAddonListRelation[]
-
     @@index([bookingId])
-    @@index([customerId])
-    @@index([roomId])
+    @@index([roomNumber])
     @@index([frontId])
-}
-
-model BookingAddonListRelation {
-    bookingId          Int
-    bookingAddonListId Int
-    price              Float
-
-    booking          Booking          @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade)
-    bookingAddonList BookingAddonList @relation(fields: [bookingAddonListId], references: [bookingAddonListId], onDelete: Cascade)
-
-    @@id([bookingId, bookingAddonListId]) // Composite Primary Key
-}
-
-model BookingAddonList {
-    bookingAddonListId Int      @id @default(autoincrement())
-    createAt           DateTime @default(now())
-
-    BookingAddonListRelation BookingAddonListRelation[]
-    BookingAddon             BookingAddon[]
-}
-
-model BookingAddon {
-    addonId            Int
-    bookingAddonListId Int
-    quantity           Int
-
-    addon            Addon            @relation(fields: [addonId], references: [addonId], onDelete: Cascade)
-    bookingAddonList BookingAddonList @relation(fields: [bookingAddonListId], references: [bookingAddonListId], onDelete: Cascade)
-
-    @@id([addonId, bookingAddonListId]) // Composite Primary Key
-}
-
-model Addon {
-    addonId      Int            @id @default(autoincrement())
-    addonName    String
-    addonName_en String
-    addonName_th String
-    price        Int
-    BookingAddon BookingAddon[]
-
-    @@index([addonId])
 }
 
