@@ -3,7 +3,7 @@ const logger = require('../utils/logger');
 
 exports.cleaningRequest = async (req, res) => {
     try {
-        const { userId } = req.user // ดึง userId จาก JWT Token
+        const { id } = req.user // ดึง id จาก JWT Token
         const { rooms } = req.validated // รับข้อมูลห้องที่ต้องทำความสะอาด
 
         // console.log("Check : ", rooms)
@@ -14,29 +14,27 @@ exports.cleaningRequest = async (req, res) => {
                 .json({ message: "กรุณาระบุห้องที่ต้องทำความสะอาด" })
         }
 
-        // ค้นหา frontId จากตาราง Front ตาม userId
+        // ค้นหา front จากตาราง User ตาม id และ role
         const front = await prisma.user.findUnique({
-            where: { userId, userRole: 'front' }
+            where: { id },
         })
 
-        if (!front) {
+        if (!front || front.role !== 'front') {
             return res
                 .status(403)
                 .json({ message: "Unauthorized: User is not a front desk staff" })
         }
-
-        const frontId = front.userId // ใช้ frontId ที่หาได้จาก userId
 
         // ใช้ transaction เพื่อให้แน่ใจว่าทั้งการสร้าง request และการอัปเดตห้องสำเร็จพร้อมกัน
         const result = await prisma.$transaction(async (prisma) => {
             // สร้างคำขอทำความสะอาด
             const cleaningRequest = await prisma.cleaningRequest.create({
                 data: {
-                    userId,
+                    frontId: id,
                     cleaningRequestStatus: 'PENDING',
                     CleaningRequestRoom: {
-                        create: rooms.map(({ roomId, description }) => ({
-                            roomNumber: roomId,
+                        create: rooms.map(({ roomNumber, description }) => ({
+                            roomNumber,
                             description: description || null,
                         })),
                     },
@@ -47,7 +45,7 @@ exports.cleaningRequest = async (req, res) => {
             // อัปเดตสถานะของห้องที่ส่งคำขอให้เป็น 'CLEANING'
             await prisma.room.updateMany({
                 where: {
-                    roomNumber: { in: rooms.map(({ roomId }) => roomId) },
+                    roomNumber: { in: rooms.map(({ roomNumber }) => roomNumber) },
                 },
                 data: {
                     roomStatus: 'CLEANING',
@@ -57,7 +55,7 @@ exports.cleaningRequest = async (req, res) => {
             return cleaningRequest
         })
         console.log(result)
-        logger.info('Create cleaning request: userId=%s, rooms=%o', userId, rooms.map(r => r.roomId));
+        logger.info('Create cleaning request: userId=%s, rooms=%o', id, rooms.map(r => r.roomNumber));
 
         res.status(201).json({
             message: "สร้างคำขอทำความสะอาดสำเร็จ และอัปเดตสถานะห้องแล้ว",
@@ -72,31 +70,15 @@ exports.cleaningRequest = async (req, res) => {
 
 exports.listCleaningRequest = async (req, res) => {
     try {
-        const { userId } = req.user // ได้จาก authCheck middleware
-        const housekeeping = await prisma.user.findFirst({
-            where: {
-                userId,
-                userRole: 'housekeeping'
-            },
-            select: {
-                userId: true,
-                assignedFloor: true
-            }
+        const { id } = req.user // ได้จาก authCheck middleware
+        const housekeeping = await prisma.user.findUnique({
+            where: { id },
         })
-        if (!housekeeping) {
+        if (!housekeeping || housekeeping.role !== 'housekeeping') {
             return res.status(404).json({ message: "ไม่พบข้อมูลพนักงานทำความสะอาด" })
         }
-        const housekeepingFloor = housekeeping.assignedFloor
+        // ไม่มี assignedFloor ใน schema, ดึงทุก request
         const cleaningRequests = await prisma.cleaningRequest.findMany({
-            where: {
-                CleaningRequestRoom: {
-                    some: {
-                        room: {
-                            floor: housekeepingFloor
-                        }
-                    }
-                }
-            },
             orderBy: { requestAt: "desc" },
             include: {
                 CleaningRequestRoom: {
@@ -109,8 +91,7 @@ exports.listCleaningRequest = async (req, res) => {
                         }
                     }
                 },
-                cleaningRequestStatus: true, // ถ้าเป็น enum หรือ object เดียว ให้ select เฉพาะ field ที่ใช้
-                user: { select: { name: true, phone: true, role: true, licensePlate: true } },
+                user: { select: { name: true, phone: true, role: true, licensePlate: true, email: true, id: true } },
             }
         })
         return res.json(cleaningRequests)
@@ -136,8 +117,7 @@ exports.readCleaningRequest = async (req, res) => {
                         }
                     }
                 },
-                cleaningRequestStatus: true,
-                user: { select: { name: true, phone: true, role: true, licensePlate: true } },
+                user: { select: { name: true, phone: true, role: true, licensePlate: true, email: true, id: true } },
             }
         })
         if (!cleaningRequest) {
@@ -152,7 +132,7 @@ exports.readCleaningRequest = async (req, res) => {
 
 exports.cleaningReport = async (req, res) => {
     try {
-        const { userId } = req.user
+        const { id } = req.user
         const { rooms, requestId } = req.body
 
         console.log("ข้อมูลที่ได้รับจาก Frontend:", JSON.stringify(req.body, null, 2))
@@ -170,7 +150,7 @@ exports.cleaningReport = async (req, res) => {
             return res.status(404).json({ message: "CleaningRequest not found" })
         }
 
-        const housekeeping = await prisma.user.findFirst({ where: { userId } })
+        const housekeeping = await prisma.user.findUnique({ where: { id } })
         if (!housekeeping) {
             return res.status(403).json({ message: "User is not authorized for housekeeping" })
         }
@@ -180,7 +160,7 @@ exports.cleaningReport = async (req, res) => {
             report = await prisma.cleaningReport.create({
                 data: {
                     requestId,
-                    userId: housekeeping.userId,
+                    userId: housekeeping.id,
                     reportAt: new Date()
                 }
             })
@@ -277,25 +257,16 @@ exports.cleaningReport = async (req, res) => {
 //สำหรับแม่บ้าน
 exports.listCleaningReport = async (req, res) => {
     try {
-        const { userId } = req.user // ได้จาก authCheck middleware
+        const { id } = req.user // ได้จาก authCheck middleware
 
         // ค้นหา housekeeping ที่ดูแลชั้นไหน
-        const housekeeping = await prisma.user.findFirst({
-            where: {
-                userId,
-                userRole: 'housekeeping'
-            },
-            select: {
-                userId: true,
-                assignedFloor: true
-            }
+        const housekeeping = await prisma.user.findUnique({
+            where: { id },
         })
 
-        if (!housekeeping) {
+        if (!housekeeping || housekeeping.role !== 'housekeeping') {
             return res.status(404).json({ message: "ไม่พบข้อมูลพนักงานทำความสะอาด" })
         }
-
-        const housekeepingFloor = housekeeping.assignedFloor //ชั้นที่รับผิดชอบ
 
         //ดึงข้อมูล
         const cleaningReport = await prisma.cleaningReport.findMany({
@@ -303,7 +274,7 @@ exports.listCleaningReport = async (req, res) => {
                 CleaningReportRoom: {
                     some: {
                         room: {
-                            floor: housekeepingFloor //เฉพาะห้องที่อยู่ในชั้นที่พนักงานดูแล
+                            floor: housekeeping.assignedFloor //เฉพาะห้องที่อยู่ในชั้นที่พนักงานดูแล
                         }
                     }
                 }
@@ -417,7 +388,7 @@ exports.allListCleaningReport = async (req, res) => {
 
 exports.noteReport = async (req, res) => {
     try {
-        const { userId } = req.user
+        const { id } = req.user
         const { reportId } = req.body
         console.log(reportId)
 
@@ -438,7 +409,7 @@ exports.noteReport = async (req, res) => {
         const front = await prisma.user.findFirst(
             {
                 where: {
-                    userId
+                    id
                 }
             }
         )
@@ -453,7 +424,7 @@ exports.noteReport = async (req, res) => {
             },
             data: {
                 cleaningReportStatus: 'CHECKED',
-                userId: front.userId
+                userId: front.id
             }
         })
         res.json(noted)
@@ -465,7 +436,7 @@ exports.noteReport = async (req, res) => {
 
 exports.noteRequest = async (req, res) => {
     try {
-        const { userId } = req.user
+        const { id } = req.user
         const { requestId } = req.body
 
         if (!requestId) {
@@ -484,7 +455,7 @@ exports.noteRequest = async (req, res) => {
 
         const housekeeping = await prisma.user.findFirst({
             where: {
-                userId
+                id
             }
         })
 
@@ -497,7 +468,7 @@ exports.noteRequest = async (req, res) => {
                 requestId: Number(requestId)
             },
             data: {
-                userId: housekeeping.userId,
+                userId: housekeeping.id,
                 cleaningRequestStatus: 'IN_PROGRESS'
             }
         })
