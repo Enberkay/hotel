@@ -10,7 +10,7 @@ const {
 const {
   checkIn,
   checkOut,
-} = require("../controllers/checkInAndCheckOut.controller");
+} = require("../controllers/bookingStatus.controller");
 
 const { authCheck, frontCheck } = require("../middlewares/authCheck");
 const { z } = require("zod");
