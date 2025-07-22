@@ -1,7 +1,7 @@
 const prisma = require("../config/prisma")
 
-//สำหรับ front กดยกเลิกการจอง
-exports.CancelledBooking = async (req, res) => {
+// สำหรับ front กดยกเลิกการจอง
+exports.cancelBooking = async (req, res) => {
     try {
         const { bookingId } = req.body  // รับจาก body ตามที่ส่งมา
         console.log(bookingId)
@@ -10,7 +10,7 @@ exports.CancelledBooking = async (req, res) => {
             return res.status(400).json({ message: "กรุณาระบุใบจอง" })
         }
 
-        const booking = await prisma.booking.findFirst({
+        const booking = await prisma.booking.findUnique({
             where: {
                 bookingId: Number(bookingId)
             }
@@ -35,8 +35,7 @@ exports.CancelledBooking = async (req, res) => {
             }
         })
 
-
-        res.json(cancelled)
+        res.json({ message: "Booking cancelled successfully", booking: cancelled })
 
     } catch (err) {
         console.log(err)
