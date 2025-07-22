@@ -15,19 +15,18 @@ const {
   housekeepingCheck,
   maintenanceCheck,
 } = require("../middlewares/authCheck");
-const { z } = require("zod");
 
+// Login
 router.post("/login", login);
 
-// Endpoint สำหรับสร้าง default admin จาก ENV หรือ fallback
+// Register default admin
 router.post("/register-default-admin", registerDefaultAdmin);
 
-// router.post("/current-user", authCheck, currentUser)
+// Current user (admin, customer, front, housekeeping, maintenance)
 router.post("/current-admin", authCheck, adminCheck, currentUser);
-
-//permission all users
 router.post("/current-customer", authCheck, customerCheck, currentUser);
 router.post("/current-front", authCheck, frontCheck, currentUser);
 router.post("/current-housekeeping", authCheck, housekeepingCheck, currentUser);
+router.post("/current-maintenance", authCheck, maintenanceCheck, currentUser);
 
 module.exports = router;

@@ -10,6 +10,7 @@ const {
 const {
   checkIn,
   checkOut,
+  cancelBooking,
 } = require("../controllers/bookingStatus.controller");
 
 const { authCheck, frontCheck } = require("../middlewares/authCheck");
@@ -31,7 +32,7 @@ const bookingCreateSchema = z.object({
     .optional(),
 });
 
-//สร้าง Booking (ลูกค้าจองห้อง)
+// สร้าง Booking (ลูกค้าจองห้อง)
 router.post(
   "/bookings",
   authCheck,
@@ -39,19 +40,22 @@ router.post(
   createBooking
 );
 
-//ดูรายการ Booking ทั้งหมด
+// แสดงรายการ Booking ทั้งหมด
 router.get("/bookings", authCheck, listBookings);
 
-//อ่านข้อมูล Booking รายการเดียว
+// ดูรายละเอียด Booking ตาม ID
 router.get("/bookings/:id", authCheck, readBooking);
 
-//ยืนยันการจอง (พนักงาน Front เท่านั้น)
+// ยืนยัน Booking (Front)
 router.put("/bookings/:id/confirm", authCheck, frontCheck, confirmBooking);
 
-// //Check-in ให้ลูกค้า
-router.put("/bookings/:id/check-in", authCheck, checkIn);
+// Check-in
+router.put("/bookings/:id/checkin", authCheck, frontCheck, checkIn);
 
-//Check-out ให้ลูกค้า
-router.put("/bookings/:id/check-out", authCheck, checkOut);
+// Check-out
+router.put("/bookings/:id/checkout", authCheck, frontCheck, checkOut);
+
+// Cancel Booking
+router.put("/bookings/:id/cancel", authCheck, frontCheck, cancelBooking);
 
 module.exports = router;

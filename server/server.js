@@ -6,7 +6,7 @@ const morgan = require("morgan")
 const rateLimit = require('express-rate-limit');
 const { readdirSync } = require("fs")
 const security = require('./middlewares/security');
-const errorHandler = require('./middlewares/errorHandler');
+// const errorHandler = require('./middlewares/errorHandler'); // ไม่ได้ใช้
 const logger = require('./utils/logger');
 
 const app = express()
@@ -51,5 +51,5 @@ app.use((err, req, res, next) => {
 
 //Server
 app.listen(port,()=>{
-    console.log(`Server is running on port ${port}`)
+    logger.info(`Server is running on port ${port}`)
 })

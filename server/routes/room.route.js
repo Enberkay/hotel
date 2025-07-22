@@ -9,37 +9,35 @@ const { authCheck } = require("../middlewares/authCheck")
 const { z } = require('zod');
 const validateWithZod = require('../middlewares/validateWithZod');
 
-const roomCreateSchema = z.array(z.object({
+const roomCreateSchema = z.object({
   roomNumber: z.string().min(1),
   roomType: z.enum(['SINGLE', 'DOUBLE', 'SIGNATURE']),
   roomStatus: z.string().min(1),
-  floor: z.number()
-}));
+  floor: z.string().min(1)
+});
 
-//@ENDPOINT http://localhost:8000/api
+// เพิ่มห้อง (Create Room)
+router.post("/rooms", authCheck, validateWithZod(roomCreateSchema), create)
 
-//เพิ่มห้อง (Create Room)
-router.post("/rooms", validateWithZod(roomCreateSchema), create)
-
-//ดูห้องทั้งหมด (List Rooms)
+// ดูห้องทั้งหมด (List Rooms)
 router.get("/rooms", authCheck, list)
 
-//ดูรายละเอียดห้องตาม ID (Get Room by ID)
-router.get("/rooms/:id", authCheck, read)
+// ดูรายละเอียดห้อง (Read Room)
+router.get("/rooms/:roomNumber", authCheck, read)
 
-//อัปเดตห้อง (Update Room)
-router.put("/rooms/:id", authCheck, update)
+// อัปเดตห้อง (Update Room)
+router.put("/rooms/:roomNumber", authCheck, update)
 
-//ลบห้อง (Delete Room)
-router.delete("/rooms/:id", authCheck, remove)
+// ลบห้อง (Remove Room)
+router.delete("/rooms/:roomNumber", authCheck, remove)
 
-//อัปเดตสถานะห้อง (Change Room Status)
-router.post("/rooms-status", authCheck, changeStatusRoom)
-
-//จัดกลุ่มห้อง (Group Rooms)
+// รวม 2 ห้องเป็น Signature Room
 router.post("/rooms/group", authCheck, groupRoom)
 
-//ยกเลิกการจัดกลุ่มห้อง (Ungroup Rooms)
+// แยกห้อง Signature
 router.post("/rooms/ungroup", authCheck, unGroupRoom)
+
+// เปลี่ยนสถานะห้อง
+router.put("/rooms/status", authCheck, changeStatusRoom)
 
 module.exports = router
