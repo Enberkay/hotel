@@ -54,7 +54,6 @@ exports.cleaningRequest = async (req, res) => {
 
             return cleaningRequest
         })
-        console.log(result)
         logger.info('Create cleaning request: userId=%s, rooms=%o', id, rooms.map(r => r.roomNumber));
 
         res.status(201).json({
@@ -63,7 +62,6 @@ exports.cleaningRequest = async (req, res) => {
         })
     } catch (err) {
         logger.error('Create cleaning request error: %s', err.stack || err.message);
-        console.error(err)
         res.status(500).json({ message: "Server error" })
     }
 }
@@ -96,7 +94,7 @@ exports.listCleaningRequest = async (req, res) => {
         })
         return res.json(cleaningRequests)
     } catch (err) {
-        console.log(err)
+        logger.error('List cleaning request error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" })
     }
 }
@@ -125,7 +123,7 @@ exports.readCleaningRequest = async (req, res) => {
         }
         return res.json(cleaningRequest)
     } catch (err) {
-        console.log(err)
+        logger.error('Read cleaning request error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" })
     }
 }
@@ -135,7 +133,7 @@ exports.cleaningReport = async (req, res) => {
         const { id } = req.user
         const { rooms, requestId } = req.body
 
-        console.log("ข้อมูลที่ได้รับจาก Frontend:", JSON.stringify(req.body, null, 2))
+        logger.info("ข้อมูลที่ได้รับจาก Frontend:", JSON.stringify(req.body, null, 2));
 
         if (!requestId) {
             return res.status(400).json({ message: "requestId is required" })
@@ -189,7 +187,7 @@ exports.cleaningReport = async (req, res) => {
         })
         const validRoomIds = new Set(allReportRooms.map(r => r.roomNumber))
 
-        console.log("Room ที่สามารถบันทึกผลได้:", [...validRoomIds])
+        logger.info("Room ที่สามารถบันทึกผลได้:", [...validRoomIds]);
 
         //สร้าง CleaningResults
         const cleaningResultsData = []
@@ -197,7 +195,7 @@ exports.cleaningReport = async (req, res) => {
             if (!room.results || !Array.isArray(room.results)) continue
 
             if (!validRoomIds.has(room.roomNumber)) {
-                console.warn(`Room ID ${room.roomNumber} is not linked to CleaningReportRoom, skipping...`)
+                logger.warn(`Room ID ${room.roomNumber} is not linked to CleaningReportRoom, skipping...`);
                 continue
             }
 
@@ -213,7 +211,7 @@ exports.cleaningReport = async (req, res) => {
         }
 
 
-        console.log("CleaningResults ที่จะบันทึก:", JSON.stringify(cleaningResultsData, null, 2))
+        logger.info("CleaningResults ที่จะบันทึก:", JSON.stringify(cleaningResultsData, null, 2));
 
         if (cleaningResultsData.length > 0) {
             try {
@@ -221,12 +219,12 @@ exports.cleaningReport = async (req, res) => {
                 for (const result of cleaningResultsData) {
                     await prisma.cleaningResults.create({ data: result })
                 }
-                console.log("CleaningResults บันทึกสำเร็จ!")
+                logger.info("CleaningResults บันทึกสำเร็จ!");
             } catch (error) {
-                console.error("Prisma create Error:", error)
+                logger.error("Prisma create Error:", error);
             }
         } else {
-            console.warn("ไม่มีข้อมูล CleaningResults ที่จะบันทึก")
+            logger.warn("ไม่มีข้อมูล CleaningResults ที่จะบันทึก");
         }
 
         // อัปเดตสถานะ `CleaningRequest` เป็น "เสร็จแล้ว"
@@ -244,11 +242,11 @@ exports.cleaningReport = async (req, res) => {
                 }
             }
         })
-        console.log("รายงานที่อัปเดต:", JSON.stringify(updatedReport, null, 2))
+        logger.info("รายงานที่อัปเดต:", JSON.stringify(updatedReport, null, 2));
 
         res.json({ message: "Cleaning report updated successfully", report: updatedReport })
     } catch (err) {
-        console.error("Error:", err)
+        logger.error("Error:", err.stack || err.message);
         return res.status(500).json({ message: "Server error", error: err.message })
     }
 }
@@ -300,7 +298,7 @@ exports.listCleaningReport = async (req, res) => {
         res.json(cleaningReport)
 
     } catch (err) {
-        console.error("Error:", err)
+        logger.error("Error:", err.stack || err.message);
         return res.status(500).json({ message: "Server error", error: err.message })
     }
 }
@@ -345,7 +343,7 @@ exports.readCleaningReport = async (req, res) => {
 
         res.json(report)
     } catch (err) {
-        console.error("Error:", err)
+        logger.error("Error:", err.stack || err.message);
         return res.status(500).json({ message: "Server error", error: err.message })
     }
 }
@@ -381,7 +379,7 @@ exports.allListCleaningReport = async (req, res) => {
         // console.log(cleaningReport)
         res.json(cleaningReport)
     } catch (err) {
-        console.error("Error:", err)
+        logger.error("Error:", err.stack || err.message);
         return res.status(500).json({ message: "Server error", error: err.message })
     }
 }
@@ -390,7 +388,7 @@ exports.noteReport = async (req, res) => {
     try {
         const { id } = req.user
         const { reportId } = req.body
-        console.log(reportId)
+        logger.info(reportId);
 
         if (!reportId) {
             return res.status(400).json({ message: "กรุณาระบุใบรายงานการทำความสะอาด" })
@@ -429,7 +427,7 @@ exports.noteReport = async (req, res) => {
         })
         res.json(noted)
     } catch (err) {
-        console.error("Error:", err)
+        logger.error("Error:", err.stack || err.message);
         return res.status(500).json({ message: "Server error", error: err.message })
     }
 }
@@ -476,7 +474,7 @@ exports.noteRequest = async (req, res) => {
         res.json(noted)
 
     } catch (err) {
-        console.error("Error:", err)
+        logger.error("Error:", err.stack || err.message);
         return res.status(500).json({ message: "Server error", error: err.message })
     }
 }

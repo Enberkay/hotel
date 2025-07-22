@@ -20,7 +20,6 @@ exports.changeStatusRoom = async (req, res) => {
         }
         const { roomNumbers, roomStatus } = parseResult.data;
         logger.info('Change room status: roomNumbers=%o, roomStatus=%s', roomNumbers, roomStatus);
-        console.log(roomNumbers)
 
         // ค้นหาห้องทั้งหมดที่มี roomNumber ในลิสต์
         const rooms = await prisma.room.findMany({

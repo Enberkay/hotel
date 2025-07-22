@@ -1,5 +1,5 @@
 const prisma = require("../config/prisma");
-const logger = require("../utils/logger");
+const logger = require('../utils/logger');
 
 // กำหนดราคาห้องแต่ละประเภท (config)
 const ROOM_TYPE_PRICES = {

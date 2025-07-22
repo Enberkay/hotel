@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma")
+const logger = require('../utils/logger');
 
 exports.create = async (req, res) => {
     try {
@@ -9,10 +10,11 @@ exports.create = async (req, res) => {
                 itemName: itemName
             }
         })
+        logger.info('Create cleaning item: %o', item);
         res.json(item)
 
     } catch (err) {
-        console.log(err)
+        logger.error('Create cleaning item error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" })
     }
 }
@@ -22,7 +24,7 @@ exports.list = async (req, res) => {
         const item = await prisma.cleaningList.findMany()
         res.json(item)
     } catch (err) {
-        console.log(err)
+        logger.error('List cleaning items error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" })
     }
 }
@@ -40,7 +42,7 @@ exports.read = async (req, res) => {
         }
         res.json(item)
     } catch (err) {
-        console.log(err)
+        logger.error('Read cleaning item error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" })
     }
 }
@@ -72,9 +74,10 @@ exports.update = async (req, res) => {
                 itemName: itemName
             }
         })
+        logger.info('Update cleaning item: %o', itemUpdated);
         res.json(itemUpdated)
     } catch (err) {
-        console.log(err)
+        logger.error('Update cleaning item error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" })
     }
 }
@@ -87,9 +90,10 @@ exports.remove = async (req, res) => {
                 itemId: Number(id)
             }
         })
+        logger.info('Remove cleaning item: %o', item);
         res.json(item)
     } catch (err) {
-        console.log(err)
+        logger.error('Remove cleaning item error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" })
     }
 }

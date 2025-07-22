@@ -1,10 +1,11 @@
 const prisma = require("../config/prisma")
+const logger = require('../utils/logger');
 
 // สำหรับ front กดยกเลิกการจอง
 exports.cancelBooking = async (req, res) => {
     try {
         const { bookingId } = req.body  // รับจาก body ตามที่ส่งมา
-        console.log(bookingId)
+        logger.info('Request to cancel booking: bookingId=%s', bookingId);
 
         if (!bookingId) {
             return res.status(400).json({ message: "กรุณาระบุใบจอง" })
@@ -35,10 +36,11 @@ exports.cancelBooking = async (req, res) => {
             }
         })
 
+        logger.info('Booking cancelled: %o', cancelled);
         res.json({ message: "Booking cancelled successfully", booking: cancelled })
 
     } catch (err) {
-        console.log(err)
+        logger.error('Cancel booking error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" })
     }
 }
@@ -105,7 +107,7 @@ exports.checkIn = async (req, res) => {
         )
 
     } catch (err) {
-        console.log(err)
+        logger.error('Check-In error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" })
     }
 }
@@ -173,7 +175,7 @@ exports.checkOut = async (req, res) => {
         })
 
     } catch (err) {
-        console.log(err)
+        logger.error('Check-Out error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" })
     }
 }

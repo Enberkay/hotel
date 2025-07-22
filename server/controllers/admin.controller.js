@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma")
+const logger = require('../utils/logger');
 
 // สร้างผู้ใช้ใหม่
 exports.createUser = async (req, res) => {
@@ -30,11 +31,11 @@ exports.createUser = async (req, res) => {
                 licensePlate: licensePlate || null
             }
         })
-
+        logger.info('User created: %o', addUser)
         res.json({ message: "User added successfully.", user: addUser })
 
     } catch (err) {
-        console.error(err)
+        logger.error('Create user error: %s', err.stack || err.message)
         res.status(500).json({ message: "Server error" })
     }
 }
@@ -55,7 +56,7 @@ exports.getAllUsers = async (req, res) => {
         });
         res.json(users);
     } catch (err) {
-        console.error(err)
+        logger.error('Get all users error: %s', err.stack || err.message)
         res.status(500).json({ message: "Server error" })
     }
 };
@@ -82,7 +83,7 @@ exports.getUserById = async (req, res) => {
 
         res.json(user);
     } catch (err) {
-        console.error(err)
+        logger.error('Get user by id error: %s', err.stack || err.message)
         res.status(500).json({ message: "Server error" })
     }
 };
@@ -112,10 +113,10 @@ exports.updateUserById = async (req, res) => {
             where: { id },
             data: { name, phone, email, role, licensePlate: licensePlate || null }
         });
-
+        logger.info('User updated: %o', user)
         res.json({ message: "User updated successfully", user });
     } catch (err) {
-        console.error(err)
+        logger.error('Update user error: %s', err.stack || err.message)
         res.status(500).json({ message: "Server error" })
     }
 };
@@ -132,10 +133,10 @@ exports.deleteUserById = async (req, res) => {
 
         // ลบผู้ใช้
         const deletedUser = await prisma.user.delete({ where: { id } });
-
+        logger.info('User deleted: %o', deletedUser)
         res.json({ message: "User deleted successfully", deletedUser });
     } catch (err) {
-        console.error(err)
+        logger.error('Delete user error: %s', err.stack || err.message)
         res.status(500).json({ message: "Server error" })
     }
 };

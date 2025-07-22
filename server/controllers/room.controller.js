@@ -12,7 +12,7 @@ exports.create = async (req, res) => {
         })
 
         if (roomNum) {
-            console.log("Room already exists")
+            logger.warn("Room already exists: %s", roomNumber)
             return res.status(400).json({ message: "Room already exists!!" })
         }
 
@@ -25,10 +25,10 @@ exports.create = async (req, res) => {
                 pairRoomNumber: pairRoomNumber || null
             }
         })
-
+        logger.info('Create room: %o', room)
         res.json(room)
     } catch (err) {
-        console.log(err)
+        logger.error('Create room error: %s', err.stack || err.message)
         res.status(500).json({ message: "Server error" })
     }
 }
@@ -62,11 +62,12 @@ exports.read = async (req, res) => {
             }
         })
         if (!room) {
+            logger.warn('Room not found: %s', roomNumber)
             return res.status(404).json({ message: "Room not found" })
         }
         res.json(room)
     } catch (err) {
-        console.log(err)
+        logger.error('Read room error: %s', err.stack || err.message)
         res.status(500).json({ message: "Server error" })
     }
 }
@@ -84,6 +85,7 @@ exports.update = async (req, res) => {
         });
 
         if (!existingRoom) {
+            logger.warn('Room not found for update: %s', roomNumber)
             return res.status(404).json({ message: "Room not found" });
         }
 
@@ -98,10 +100,10 @@ exports.update = async (req, res) => {
                 pairRoomNumber: pairRoomNumber || null
             }
         });
-
+        logger.info('Update room: %o', room)
         res.json(room);
     } catch (err) {
-        console.error(err);
+        logger.error('Update room error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" });
     }
 };
@@ -115,6 +117,7 @@ exports.remove = async (req, res) => {
             },
         })
         if (!room) {
+            logger.warn('Room not found for remove: %s', roomNumber)
             return res.status(404).json({ message: 'Room not found!!' })
         }
 
@@ -123,10 +126,8 @@ exports.remove = async (req, res) => {
                 roomNumber: roomNumber
             }
         })
-
+        logger.info('Remove room: %s', roomNumber)
         res.send("remove room")
-        logger.info('Remove room: roomNumber=%s', roomNumber);
-
     } catch (err) {
         logger.error('Remove room error: %s', err.stack || err.message);
         res.status(500).json({ message: "Server error" })
@@ -137,44 +138,34 @@ exports.remove = async (req, res) => {
 exports.groupRoom = async (req, res) => {
     try {
         const { roomNumber1, roomNumber2 } = req.body;
-
-        // ดึงข้อมูลห้องจาก roomNumber
         const rooms = await prisma.room.findMany({
             where: { roomNumber: { in: [roomNumber1, roomNumber2] } },
             select: { roomNumber: true, roomStatus: true, roomType: true, pairRoomNumber: true }
         });
-
         if (rooms.length !== 2) {
+            logger.warn('Group room failed: not found %s, %s', roomNumber1, roomNumber2)
             return res.status(400).json({ message: "ไม่พบห้องที่ต้องการรวม" });
         }
-
         const [room1, room2] = rooms;
-
-        // คู่ห้องที่สามารถรวมได้ (ใช้ roomNumber)
         const validRoomPairs = [
             ["315", "316"],
             ["415", "416"],
             ["515", "516"],
             ["615", "616"]
         ];
-
-        // ตรวจสอบว่าห้องที่ขอรวมเป็นคู่ที่ถูกต้องหรือไม่
         const isValidPair = validRoomPairs.some(
             ([roomA, roomB]) =>
                 (room1.roomNumber === roomA && room2.roomNumber === roomB) ||
                 (room1.roomNumber === roomB && room2.roomNumber === roomA)
         );
-
         if (!isValidPair) {
+            logger.warn('Group room failed: invalid pair %s, %s', roomNumber1, roomNumber2)
             return res.status(400).json({ message: "ห้องนี้ไม่สามารถรวมได้" });
         }
-
-        // ตรวจสอบว่าสถานะห้องเป็น "ว่าง" (roomStatus === 'AVAILABLE')
         if (room1.roomStatus !== 'AVAILABLE' || room2.roomStatus !== 'AVAILABLE') {
+            logger.warn('Group room failed: not available %s, %s', roomNumber1, roomNumber2)
             return res.status(400).json({ message: "ห้องไม่ว่าง ไม่สามารถรวมได้" });
         }
-
-        // อัปเดตสถานะของห้องให้เป็น "Signature" และเชื่อม pairRoomNumber
         await prisma.room.update({
             where: { roomNumber: room1.roomNumber },
             data: {
@@ -182,7 +173,6 @@ exports.groupRoom = async (req, res) => {
                 pairRoomNumber: room2.roomNumber
             }
         });
-
         await prisma.room.update({
             where: { roomNumber: room2.roomNumber },
             data: {
@@ -190,10 +180,10 @@ exports.groupRoom = async (req, res) => {
                 pairRoomNumber: room1.roomNumber
             }
         });
-
+        logger.info('Group room success: %s <-> %s', roomNumber1, roomNumber2)
         return res.status(200).json({ message: "รวมสำเร็จ" });
     } catch (err) {
-        console.error(err);
+        logger.error('Group room error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" });
     }
 };
@@ -201,25 +191,19 @@ exports.groupRoom = async (req, res) => {
 exports.unGroupRoom = async (req, res) => {
     try {
         const { roomNumber1, roomNumber2 } = req.body;
-
-        // ดึงข้อมูลห้องจาก roomNumber
         const rooms = await prisma.room.findMany({
             where: { roomNumber: { in: [roomNumber1, roomNumber2] } },
             select: { roomNumber: true, roomStatus: true, roomType: true, pairRoomNumber: true }
         });
-
         if (rooms.length !== 2) {
+            logger.warn('UnGroup room failed: not found %s, %s', roomNumber1, roomNumber2)
             return res.status(400).json({ message: "ไม่พบห้องที่ต้องการแยก" });
         }
-
         const [room1, room2] = rooms;
-
-        // ตรวจสอบว่าห้องนี้เป็นห้องที่ถูกรวมอยู่หรือไม่ (roomType === 'SIGNATURE')
         if (room1.roomType !== 'SIGNATURE' || room2.roomType !== 'SIGNATURE') {
+            logger.warn('UnGroup room failed: not signature %s, %s', roomNumber1, roomNumber2)
             return res.status(400).json({ message: "ห้องนี้ไม่ได้อยู่ในประเภท Signature ไม่สามารถแยกได้" });
         }
-
-        // เปลี่ยนสถานะของห้องกลับเป็นห้องเดี่ยว (roomType = 'SINGLE') และ pairRoomNumber = null
         await prisma.room.updateMany({
             where: { roomNumber: { in: [roomNumber1, roomNumber2] } },
             data: {
@@ -227,10 +211,10 @@ exports.unGroupRoom = async (req, res) => {
                 pairRoomNumber: null
             }
         });
-
+        logger.info('UnGroup room success: %s <-> %s', roomNumber1, roomNumber2)
         return res.status(200).json({ message: "แยกห้องสำเร็จ" });
     } catch (err) {
-        console.error(err);
+        logger.error('UnGroup room error: %s', err.stack || err.message);
         return res.status(500).json({ message: "Server error" });
     }
 };
