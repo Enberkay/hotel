@@ -91,12 +91,9 @@ exports.registerDefaultAdmin = async (req, res) => {
             logger.warn('Register default admin failed: already exists (%s)', email);
             return res.status(400).json({ message: 'Default admin already exists.' });
         }
-        // ถ้ามี field password ใน schema
-        let userData = { name, phone, email, role, licensePlate };
-        if (prisma.user.fields && prisma.user.fields.password) {
-            const hashPassword = await bcrypt.hash(password, 10);
-            userData.password = hashPassword;
-        }
+        // Always hash the password and add to userData
+        const hashPassword = await bcrypt.hash(password, 10);
+        let userData = { name, phone, email, role, licensePlate, password: hashPassword };
         const newUser = await prisma.user.create({ data: userData });
         logger.info('Default admin created: %s', email);
         res.json({ message: 'Default admin created successfully.', email, password });

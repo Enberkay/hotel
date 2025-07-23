@@ -40,7 +40,20 @@ app.use(express.json({limit: "20mb"}))  // {limit: "20mb"} Allow ให้ serve
 security(app);
 
 //  Routes, @ENDPOINT http://localhost:8000/api
-readdirSync("./routes").map((item) => app.use("/api", require("./routes/" + item)))
+const authRoutes = require('./routes/auth.route');
+const adminRoutes = require('./routes/admin.route');
+const bookingRoutes = require('./routes/booking.route');
+const cleaningRoutes = require('./routes/cleaning.route');
+const cleaningListItemRoutes = require('./routes/cleaningListItem.route');
+const roomRoutes = require('./routes/room.route');
+
+app.use('/api', authRoutes);
+app.use('/api', adminRoutes);
+app.use('/api', bookingRoutes);
+app.use('/api', cleaningRoutes);
+app.use('/api', cleaningListItemRoutes);
+app.use('/api', roomRoutes);
+
 // Error handler (ควรอยู่หลัง routes)
 app.use((err, req, res, next) => {
   logger.error('Error: %s', err.stack || err.message);
